@@ -59,13 +59,14 @@ export function electronFilters(filters) {
 
 export async function browseFileOpen(
     filters=[],
-    defaultPath=""
+    defaultPath="",
+    openFolder=false
 ) {
     let output
     if (electron) {
         // get file path from electron dialog
         let file = await electron.files.openDialog({
-            properties: ["openFile"],
+            properties: [openFolder ? "openDirectory" : "openFile"],
             defaultPath: defaultPath,
             filters: electronFilters(filters)
         })

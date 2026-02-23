@@ -6,6 +6,7 @@
     import { electron, git } from "$lib/globals.svelte";
     import ManageProjectsDlg from "$lib/dialogs/projects/manage/ManageProjectsDlg.svelte";
     import NewProjectDlg from "./NewProjectDlg.svelte";
+    import DemosDialog from "$lib/dialogs/demos/DemosDialog.svelte";
 
     let current = getContext("current")
 
@@ -35,7 +36,8 @@
 
     let show = $state({
         manageProjectsDlg: false,
-        browseProjectsDlg: false
+        browseProjectsDlg: false,
+        demosDlg: false
     })
 
     // refresh project when experiment or user changes
@@ -72,24 +74,28 @@
         icon="/icons/btn-add.svg"
         onclick={evt => show.newProjectDlg = true}
         disabled={!current.user}
-    ></MenuItem>
+    />
     <MenuItem
         label="Edit project"
         icon="/icons/btn-edit.svg"
         onclick={evt => window.open(`${current.project.web_url}/edit`, "_blank")}
         disabled={!current.project}
-    ></MenuItem>
+    />
     <MenuItem
         label="Manage local projects..."
         icon="/icons/btn-edit.svg"
-        onclick={(evt) => show.manageProjectsDlg = true}
-    ></MenuItem>
+        onclick={evt => show.manageProjectsDlg = true}
+    />
     <MenuSeparator/>
     <MenuItem
         label="Search projects..."
         icon="/icons/btn-find.svg"
-        onclick={(evt) => show.browseProjectsDlg = true}
-    ></MenuItem>
+        onclick={evt => show.browseProjectsDlg = true}
+    />
+    <MenuItem
+        label="Browse demos..."
+        onclick={evt => show.demosDlg = true}
+    />
 </DropdownButton>
 
 <ManageProjectsDlg 
@@ -97,4 +103,7 @@
 />
 <NewProjectDlg 
     bind:shown={show.newProjectDlg}
+/>
+<DemosDialog
+    bind:shown={show.demosDlg}
 />

@@ -112,6 +112,7 @@ const git = {
   listen: (lsnr) => ipcRenderer.on("git", lsnr),
   output: (message) => ipcRenderer.invoke("git.output", message),
   getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user),
+  clone: (url, folder, depth=1) => ipcRenderer.invoke("git.clone", url, folder, depth),
   pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force),
   stage: (folder) => ipcRenderer.invoke("git.stage", folder),
   commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user),

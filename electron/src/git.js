@@ -113,6 +113,20 @@ export async function getInfo(folder) {
 }
 
 
+export async function clone(url, folder, depth=1) {
+    // log
+    output(`Cloning repo ${url} to folder ${folder}...`)
+    // do clone
+    git.clone({
+        fs,
+        http,
+        url: url,
+        dir: folder,
+        depth: depth
+    })
+}
+
+
 export async function pull(folder, user, force=true) {
     // log
     output(`Getting changes from online...`)
@@ -232,6 +246,7 @@ export function output(message) {
 export const handlers = {
     output: ipcMain.handle("git.output", (evt, message) => output(message)),
     getRemote: ipcMain.handle("git.getRemote", (evt, folder, user) => getRemote(folder, user)),
+    clone: ipcMain.handle("git.clone", (evt, url, folder, depth=1) => clone(url, folder, depth)),
     pull: ipcMain.handle("git.pull", (evt, folder, user, force=true) => pull(folder, user, force)),
     stage: ipcMain.handle("git.stage", (evt, folder) => stage(folder)),
     commit: ipcMain.handle("git.commit", (evt, message, folder, user) => commit(message, folder, user)),
