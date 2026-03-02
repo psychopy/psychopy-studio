@@ -31,7 +31,6 @@
                     tooltip="Open in Builder"
                     onclick={async evt => {
                         // get first psyexp file we can find
-                        console.log(localDemos[demo.pathWithNamespace])
                         let expFile
                         for (let file of await electron.files.scandir(localDemos[demo.pathWithNamespace])) {
                             if (file.endsWith(".psyexp")) {
