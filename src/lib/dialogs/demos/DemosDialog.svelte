@@ -1,11 +1,9 @@
 <script>
     import { Dialog } from "$lib/utils/dialog";
-    import { CompactButton } from "$lib/utils/buttons";
-    import { getContext, onMount } from "svelte";
-    import { electron, git } from "$lib/globals.svelte";
-    import { browseFileOpen } from "$lib/utils/files";
-    import { openIn } from "$lib/utils/views.svelte"
+    import { getContext, onMount, setContext } from "svelte";
+    import { electron } from "$lib/globals.svelte";
     import path from "path-browserify";
+    import DemoTile from "./DemoTile.svelte";
 
     let {
         shown=$bindable()
@@ -13,29 +11,33 @@
 
     let current = getContext("current");
 
-    let local = $state({
-        file: undefined,
-        content: undefined
-    })
-    // whenever the local state changes, update the JSON file
-    $effect(() => {
-        if (local.file && local.content) {
-            electron.files.save(local.file, JSON.stringify(local.content, undefined, 4))
-        }
-    })
+    let localDemos = $state({});
+    setContext("localDemos", localDemos);
+
+    setContext("closeDlg", evt => shown = false)
+
+    let localDemosFile = $state.raw()
 
     onMount(async () => {
         // get json file which keeps track of downloaded demos
-        local.file = path.join(await electron.paths.user(), "demos.json")
+        localDemosFile = path.join(await electron.paths.user(), "demos.json")
         // make sure it exists
-        if (!(await electron.files.exists(local.file))) {
-            await electron.files.save(local.file, "{}")
+        if (!(await electron.files.exists(localDemosFile))) {
+            await electron.files.save(localDemosFile, "{}")
         }
         // read its contents
-        electron.files.load(local.file).then(
-            content => local.content = JSON.parse(content)
+        electron.files.load(localDemosFile).then(
+            content => Object.assign(localDemos, JSON.parse(content))
         )
     })
+
+    $effect(() => {
+        if (localDemosFile && localDemos) {
+            electron.files.save(localDemosFile, JSON.stringify(localDemos, undefined, 4))
+        }
+    })
+
+    let searchTerm = $state.raw("")
 
 
     async function getDemos() {
@@ -43,7 +45,7 @@
         let data = await fetch(
             "/api/demos",
             {
-                headers: current.user.token
+                headers: current.user?.token
             }
         ).then(
             resp => resp.json()
@@ -51,116 +53,62 @@
 
         return data.experiments
     }
+
+    function matches(term, profile) {
+        return (
+            profile.name.toLowerCase().includes(term.toLowerCase()) ||
+            profile.description.toLowerCase().includes(term.toLowerCase()) || 
+            term === ""
+        )
+    }
 </script>
 
 <Dialog
     bind:shown={shown}
 >
-    <div class=demos-array>
-        {#await getDemos()}
-            Loading demos...
-        {:then demos}
-            {#each demos as demo}
-                <div class=demo-button>
-                    <b>{demo.name}</b>
-                    {#if demo.avatarUrl}
-                        <img alt=avatar src={demo.avatarUrl} />
+    <div class=container>
+        <input type=search bind:value={searchTerm} placeholder="Search demos..." />
+        <div class=demos-array>
+            {#await getDemos()}
+                Loading demos...
+            {:then demos}
+                {#each demos as demo}
+                    {#if matches(searchTerm, demo)}
+                        <DemoTile 
+                            demo={demo} 
+                        />
                     {/if}
-                    <div class=ctrls>
-                        {#if local.content?.[demo.pathWithNamespace]}
-                            <CompactButton
-                                icon="/icons/btn-sendbuilder.svg"
-                                tooltip="Open in Builder"
-                                onclick={async evt => {
-                                    // get first psyexp file we can find
-                                    let expFile
-                                    for (let file of await electron.files.scandir(local.content[demo.pathWithNamespace])) {
-                                        if (file.endsWith(".psyexp")) {
-                                            expFile = file
-                                            break
-                                        }
-                                    }
-                                    // open it in builder
-                                    openIn(
-                                        path.join(local.content[demo.pathWithNamespace], expFile), "builder"
-                                    )
-                                    // close dialog
-                                    shown = false
-                                }}
-                            />
-                        {:else}
-                            <CompactButton
-                                icon="/icons/btn-download.svg"
-                                tooltip="Download"
-                                onclick={async evt => {
-                                    // user picks a folder
-                                    let folder = await browseFileOpen([], "", true)
-                                    if (folder) {
-                                        // clone from gitlab
-                                        await git.clone(demo.gitlabUrl, folder.file)
-                                        // store local folder
-                                        local.content[demo.pathWithNamespace] = folder.file
-                                    }
-                                    
-                                }}
-                            />
-                        {/if}
-                        <CompactButton
-                            icon="/icons/rbn-pavlovia.svg"
-                            tooltip="View online"
-                            onclick={evt => window.open(demo.pavloviaUrl.replace("run.pavlovia.org", "pavlovia.org"))}
-                        />
-                        <CompactButton
-                            icon="/icons/btn-runjs.svg"
-                            tooltip="Run online"
-                            onclick={evt => window.open(demo.pavloviaUrl)}
-                        />
-                    </div>
-                </div>
-            {/each}
-        {:catch err}
-            Failed to load demos
+                {/each}
+            {:catch err}
+                Failed to load demos
 
-            <pre>
-                {err}
-            </pre>
-        {/await}
+                <pre>
+                    {err}
+                </pre>
+            {/await}
+        </div>
     </div>
 </Dialog>
 
 <style>
-    .demos-array {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1rem;
-        width: 66rem;
-    }
-
-    .demo-button {
+    .container {
         display: flex;
         flex-direction: column;
-        gap: .5rem;
-        align-items: center;
-        border: 1px solid var(--overlay);
-        border-radius: .5rem;
-        min-width: 10rem;
+        gap: 1rem;
+        padding: 1rem;
+        box-sizing: border-box;
+        height: 100%;
+    }
+    .demos-array {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 66rem;
+        overflow-y: auto;
+        height: 100%;
         padding: 1rem;
         box-sizing: border-box;
     }
 
-    .demo-button .ctrls {
-        display: flex;
-        flex-direction: row;
-        justify-items: start;
-        gap: .5rem;
-        width: 100%;
-    }
-
-    .demo-button img {
-        width: 8rem;
-        height: 8rem;
-        border-radius: .5rem;
-    }
+    
 </style>
