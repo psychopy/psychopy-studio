@@ -87,6 +87,8 @@ async function getUserInfo(token) {
  * Uses the stored refresh token to refresh the stored access token
  */
 async function refreshToken(username) {
+    console.log("Refreshing Pavlovia authentication token...")
+    // send request
     const resp = await fetch(
         `/api/token/refresh?${new URLSearchParams({
             root: auth.root,
@@ -97,50 +99,51 @@ async function refreshToken(username) {
         }).toString()}`,
         { method: "post" }
     );
-
+    // if request failed, error so we can catch it further down
     if (!resp.ok) {
         throw new Error(`Token refresh failed: ${resp.statusText}`);
     }
-
+    // get response
     const data = await resp.json();
-
+    // store response
     if (data.access_token && data.refresh_token) {
         users[username].token.access = data.access_token;
         users[username].token.refresh = data.refresh_token;
-        return data;
     } else {
         throw new Error(data.message || 'Token refresh failed');
     }
+    // queue up next refresh in case token expires this session
+    setTimeout(
+        evt => refreshToken(username), 
+        3600000 // 1hr
+    )
+
+    return data;
 }
 
 
 export async function login(username, current) {
     if (users[username]) {
-        // if we have a stored access token, make sure it's in date
+        // if we have a stored access token...
         if (users[username].token?.access) {
+            // always refresh the token
+            await refreshToken(username);
+            // try to get user info with current token
             try {
-                // Try to get user info with current token
                 const profile = await getUserInfo(users[username].token.access);
                 users[username].profile = profile;
-            } catch (err) {
-                try {
-                    // If that fails, refresh the token and try again
-                    await refreshToken(username);
-                    const profile = await getUserInfo(users[username].token.access);
-                    users[username].profile = profile;
-                } catch (refreshErr) {
-                    // If refresh fails, clear the user's tokens and force new OAuth
-                    delete users[username].token;
-                    // Now treat as new user
-                    return login(undefined, current);
-                }
+            } catch {
+                // if refresh fails, clear the user's tokens and force new OAuth
+                delete users[username].token;
+                // now treat as new user
+                return login(undefined, current);
             }
         } else {
-            // No token at all, treat as new user
+            // otherwise, treat as new user
             return login(undefined, current);
         }
     } else {
-        // if logging in from scratch
+        // if logging in from scratch...
         if (!auth.code) {
             // Reset OAuth state for fresh flow
             auth.state = String(crypto.randomUUID());
