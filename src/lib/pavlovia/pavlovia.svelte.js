@@ -115,7 +115,7 @@ async function refreshToken(username) {
     // queue up next refresh in case token expires this session
     setTimeout(
         evt => refreshToken(username), 
-        data.expires_in
+        data.expires_in * 1000
     )
 
     return data;
