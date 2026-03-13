@@ -17,6 +17,10 @@ export class Flow {
                     rt,
                     currentLoop
                 );
+                // is it terminated?
+                loop.terminator = this.flat.find(
+                    emt => emt instanceof LoopTerminator && emt.name === rt.name
+                )
                 // add to the current loop
                 if (currentLoop instanceof Flow) {
                     dynamic.push(loop);
@@ -32,7 +36,6 @@ export class Flow {
                 if (currentLoop instanceof Flow) {
                     throw "Loop Terminator found with no matching Loop Initiator";
                 } else {
-                    currentLoop.terminator = rt;
                     currentLoop = currentLoop.parent;
                 }
             } else {
@@ -275,23 +278,13 @@ export class FlowLoop {
 export class LoopInitiator extends HasParams {
 
     loopType = $derived(() => this.params['loopType'].val);
+    complete = $derived(this.terminator !== undefined);
+    index = $derived(this.exp.flow.flat.indexOf(this))
 
     constructor(tag) {
         super(tag);
         this.exp = undefined;
         this.terminator = undefined;
-    }
-
-    get index() {
-        for (let i in this.exp.flow.flat) {
-            if (this.exp.flow.flat[i] === this) {
-                return i;
-            }
-        }
-    }
-
-    get complete() {
-        return this.terminator !== undefined;
     }
 
     addTerminator() {
