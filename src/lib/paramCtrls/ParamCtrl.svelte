@@ -32,7 +32,7 @@
         // evaluate condition
         if (String(dep.condition).startsWith("==")) {
             // equal to something...
-            target = String(dep.condition).replace(/==['"](.*?)['"]|==(.*?)/, "$1")
+            target = String(dep.condition).replace(/== *['"](.*?)['"]|== *(.*?)/, "$1")
             // convert True/False to true/false
             if (target.trim() === "True") {
                 target = true
