@@ -89,7 +89,7 @@ class _FontManager {
         scanning: Promise.resolve(true),
         refresh: (experiment) => {
             // clear fonts
-            experiment.fonts.length = 0
+            this.experiment.fonts.length = 0
             // get folder
             let folder = experiment.file.parent
             if (folder) {
