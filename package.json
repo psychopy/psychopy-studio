@@ -1,7 +1,7 @@
 {
 	"name": "psychopy-studio",
 	"author": "Open Science Tools Ltd.",
-	"version": "2026.1.1",
+	"version": "2026.1.2",
 	"description": "Open-source package for creating experiments in behavioral science.",
 	"main": "electron/src/index.cjs",
 	"type": "module",
