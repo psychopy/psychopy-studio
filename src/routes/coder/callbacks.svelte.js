@@ -33,7 +33,7 @@ export async function fileOpen() {
         current.pages[current.tab]?.file?.parent
     )
     // abort if no file
-    if (file === undefined) {
+    if (!file || !file.file) {
         return
     }
     // load from file
