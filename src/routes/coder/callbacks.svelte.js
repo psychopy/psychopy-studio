@@ -65,7 +65,7 @@ export async function fileSaveAs() {
         current.pages[current.tab]?.file?.file || "untitled.py"
     )
     // abort if no file
-    if (file === undefined) {
+    if (!file || !file.file) {
         return
     }
     // set file
