@@ -1,13 +1,12 @@
 {
     "configurations": [
         {
-            "name": "PsychoPy4 (browser)",
+            "name": "PsychopPy Studio (app)",
             "request": "launch",
+            "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
                 "run",
-                "svelte:dev",
-                "--",
-                "--open"
+                "electron:start"
             ],
             "runtimeExecutable": "npm",
             "skipFiles": [
@@ -16,12 +15,13 @@
             "type": "node"
         },
         {
-            "name": "PsychopPy4 (app)",
+            "name": "PsychoPy Studio (browser)",
             "request": "launch",
-            "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
                 "run",
-                "electron:start"
+                "svelte:dev",
+                "--",
+                "--open"
             ],
             "runtimeExecutable": "npm",
             "skipFiles": [
