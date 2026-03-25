@@ -81,7 +81,7 @@
                         // do translation in Python
                         python.liaison.send("app", {
                             command: "try",
-                            args: ["psychopy.experiment.py2js_transpiler:translatePythonToJavaScript", element.params[key].val.trim()]
+                            args: ["psychopy.experiment.py2js_transpiler:translatePythonToJavaScript", element.params[key].val.trim(), null]
                         }, 10000).then(resp => {
                             if (resp.success) {
                                 element.params[jskey].val = resp.result
