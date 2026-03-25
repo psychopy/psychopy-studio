@@ -22,16 +22,22 @@
             current.experiment.file.parent, 
             $state.snapshot(current.user)
         ).then(
-            resp => awaiting.resolve(resp)
+            resp => {
+                // resolve promise
+                awaiting.resolve(resp);
+                // make new promise to await next time
+                awaiting = Promise.withResolvers();
+            }
         ),
-        CANCEL: evt => awaiting.resolve(false)
+        CANCEL: evt => {
+            // resolve promise
+            awaiting.reject(false);
+            // make new promise to await next time
+            awaiting = Promise.withResolvers();
+        }
     }}
     onopen={evt => {
         message = "";
-        // refresh promise
-        let newPromise = Promise.withResolvers();
-        awaiting.resolve(newPromise.promise);
-        awaiting = newPromise;
     }}
     bind:shown={shown}
     shrink

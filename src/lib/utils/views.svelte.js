@@ -43,7 +43,7 @@ export async function openIn(file, target) {
 /**
  * Show the first of a particular window, or open one if none are open
  */
-export async function showWindow(target) {
+export async function showWindow(target, focus=true) {
     if (electron) {
         // get windows matching target
         let windows = await electron.windows.get(target);
@@ -55,7 +55,9 @@ export async function showWindow(target) {
             id = await electron.windows.new(target)
         }
         // focus window
-        await electron.windows.focus(id)
+        if (focus) {
+            await electron.windows.focus(id)
+        }
     }
 }
 

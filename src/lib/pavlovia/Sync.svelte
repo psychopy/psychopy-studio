@@ -15,12 +15,15 @@
 
 
     export async function sync(folder, user, force=false) {
+        let sha
         // if indicated in exp settings, compile JS
         if (current.experiment?.settings?.params?.['exportHTML'].val === "on Sync") {
             await current.experiment.writeScript("PsychoJS")
         }
         // get remote
         let remote = await git.getRemote(folder, user);
+        // open runner to capture output (but don't focus it)
+        showWindow("runner", false)
         // if there is no remote, create one
         if (remote === null) {
             // prompt to create one
@@ -36,28 +39,28 @@
         }
         // pull from remote
         await git.pull(folder, user, false)
-        // stage all changes
-        let sha
-        if ((await git.stage(folder)).length) {
-            // propt to commit
+        // scan for local changes
+        let changes = await git.stage(folder)
+        // stage any changes
+        if (changes.length) {
+            // prompt to commit
             show.commit = true;
-            sha = await awaiting.commit.promise;
-            // open runner to capture output
-            showWindow("runner")
-            // if cancelled, return
-            if (!sha) {
+            // wait until either given a commit, or told to cancel
+            try {
+                sha = await awaiting.commit.promise;
+            } catch {
+                // if cancelled, abort sync
                 git.output("Cancelled by user.")
                 return
             }
             // push changes
             await git.push(folder, user, force)
         } else {
-            // open runner to capture output
-            showWindow("runner")
             // explain failure
             git.output("Nothing to push.")
         }
-        
+        // focus runner
+        showWindow("runner", true)
         git.output(`Finished sync`)
 
         return sha

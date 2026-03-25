@@ -148,14 +148,14 @@ export async function stage(folder) {
     let changed = []
     // iterate through files
     for (let file of fs.globSync("**/*.*", { cwd: folder })) {
+        // get file status
+        let status = await git.status({
+            fs,
+            dir: folder,
+            filepath: file
+        })
         // skip if gitignored or unchanged
-        if (["ignored", "unmodified", "*unmodified"].includes(
-            await git.status({
-                fs,
-                dir: folder,
-                filepath: file
-            })
-        )) {
+        if (["ignored", "unmodified", "*unmodified"].includes(status)) {
             continue
         }
         // stage
