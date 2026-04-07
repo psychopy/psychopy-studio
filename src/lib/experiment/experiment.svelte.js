@@ -449,7 +449,7 @@ export class Experiment {
                 await electron.paths.user(), "devices.json"
             )]
         }, 10000).catch(
-            err => logging.error([`Failed to set devices file`, err])
+            err => console.error([`Failed to set devices file`, err])
         )
 
         // create experiment object via Liaison
