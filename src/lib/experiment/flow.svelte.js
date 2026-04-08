@@ -34,7 +34,7 @@ export class Flow {
             } else if (rt instanceof LoopTerminator) {
                 // close current loop, if any
                 if (currentLoop instanceof Flow) {
-                    logging.warn(
+                    console.warn(
                         `Found Loop Terminator (${rt.name}) with no matching Loop Initiator."`
                     )
                 } else {

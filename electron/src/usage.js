@@ -1,6 +1,7 @@
 import { appVersion }  from "./version.js";
 import { platform, arch } from "process";
-import os from "os"
+import os from "os";
+import logging from "./logging.js";
 
 export class UsageReport {
     constructor() {
@@ -22,7 +23,7 @@ export class UsageReport {
         ).then(
             resp => resp.text()
         ).then(
-            resp => console.log("Sent usage statistics", this.asJSON())
+            resp => logging.log("Sent usage statistics", this.asJSON())
         )
     }
 
