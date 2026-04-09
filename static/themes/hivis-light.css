@@ -1,0 +1,29 @@
+:root {
+    /* colors */
+    --red: #CC0000;
+    --purple: #880088;
+    --blue: #0066FF;
+    --green: #00AA00;
+    --yellow: #F1D302;
+    --orange: #CC6600;
+    /* shades */
+    --base: #FFFFFF;
+    --mantle: #EEEEEE;
+    --crust: #DDDDDD;
+    --overlay: #444444;
+    --outline: #000000;
+    /* text colors */
+    --text: #000000;
+    --hltext: #FFFFFF;
+    --text-on-red: var(--hltext);
+    --text-on-purple: var(--hltext);
+    --text-on-blue: var(--hltext);
+    --text-on-green: var(--hltext);
+    --text-on-orange: var(--hltext);
+    --text-on-yellow: var(--text);
+    --text-on-base: var(--text);
+    --text-on-mantle: var(--text);
+    --text-on-crust: var(--text);
+    --text-on-overlay: var(--hltext);
+    --text-on-outline: var(--hltext);
+}
