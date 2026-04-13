@@ -143,6 +143,7 @@ export class Experiment {
     constructor(filename) {
         // create attributes
         this.settings = new Component("SettingsComponent")
+        this.settings.exp = this
         this.flow = new Flow(this);
         // starting defaults
         this.reset()

@@ -162,10 +162,10 @@
             borderless
         />
         {#if current.experiment !== null }
-        <ParamsDialog
-            element={current.experiment.settings}
-            bind:shown={show.settingsDlg}
-        ></ParamsDialog>
+            <ParamsDialog
+                element={current.experiment.settings}
+                bind:shown={show.settingsDlg}
+            />
         {/if}
         <SwitchButton 
             labels={[translate("Pilot"), translate("Run")]} 
