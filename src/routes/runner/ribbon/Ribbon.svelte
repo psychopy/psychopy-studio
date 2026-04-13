@@ -110,7 +110,9 @@
     {/if}
 
     <RibbonSection label=Pavlovia icon="/icons/rbn-pavlovia.svg">
-        <UserCtrl />
+        <div class=padded>
+            <UserCtrl />
+        </div>
     </RibbonSection>
 
     <RibbonGap></RibbonGap>
@@ -139,3 +141,10 @@
         {/if}
     </RibbonSection>
 </Ribbon>
+
+<style>
+    .padded {
+        display: flex;
+        padding: .25rem;
+    }
+</style>

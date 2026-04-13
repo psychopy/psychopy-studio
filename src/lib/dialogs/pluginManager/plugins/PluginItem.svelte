@@ -1,5 +1,7 @@
 <script>
-    import { Button } from "$lib/utils/buttons";
+    import { Button, DropdownButton } from "$lib/utils/buttons";
+    import { MenuItem } from "$lib/utils/menu";
+    import { Version } from "$lib/utils/versions.js";
     import { getContext } from "svelte";
     import { python } from "$lib/globals.svelte";
     import ProgressDlg from "../ProgressDlg.svelte";
@@ -26,12 +28,16 @@
         Object.keys(siblings.installed).includes(plugin.pipname)
     )
 
-    async function install(evt) {
+    let selectedVersion = $state.raw(
+        siblings.installed[plugin.pipname]
+    )
+
+    async function install(version=undefined) {
         // show progress dlg
         showProgress = true
-        // install
-        return await python.venv.installPackage(
-            venv, plugin.pipname
+        // install specific version
+        return python.venv.installPackage(
+            venv, plugin.pipname, version
         ).then(
             resp => python.venv.getPackages(
                 venv
@@ -55,38 +61,111 @@
             )
         );
     }
+
+    async function getVersions(plugin) {
+        let resp = await fetch(`https://pypi.org/pypi/${plugin.pipname}/json`).then(
+            resp => {
+                if (!resp.ok) {
+                    throw new Error(resp.status)
+                }
+
+                return resp.json()
+            }
+        )
+
+        return Object.keys(resp.releases).sort(Version.sorter)
+    }
+
 </script>
 
 <!-- this is drawn or not drawn according to selection -->
 {#snippet page()}
     <div class=plugin-page>
-        <div class=title>
-            <img class=plugin-avatar src={plugin.icon} alt={plugin.pipname} />
-            <a href="{plugin.homepage}" class=plugin-name>{plugin.name}</a>
-            <code class=plugin-pipname>{plugin.pipname}</code>
-            <div class=plugin-install-btn>
-                {#if !installed}
-                    <Button
-                        label={translate("Install")}
-                        icon="/icons/btn-download.svg"
-                        onclick={install}
-                        horizontal
-                        disabled={venv === undefined}
-                    />
-                {:else}
-                    <Button
-                        label={translate("Uninstall")}
-                        icon="/icons/btn-delete.svg"
-                        onclick={uninstall}
-                        horizontal
-                        disabled={venv === undefined}
-                    />
-                {/if}
+        <header>
+            <img 
+                class=avatar 
+                src={plugin.icon} 
+                alt={plugin.pipname} 
+            />
+            <div 
+                class=details
+            >
+                <a href="{plugin.homepage}" class=name>
+                    <h2>{plugin.name}</h2>
+                </a>
+                <code class=pipname>
+                    {plugin.pipname}
+                </code>
+                <div class=header-ctrls>
+                    {#if installed}
+                        <DropdownButton
+                            label="{translate("Version")} {siblings.installed[plugin.pipname]}"
+                            disabled={venv === undefined}
+                        >
+                            {#await getVersions(plugin) then versions}
+                                {#each versions as version}
+                                    <MenuItem
+                                        label={version}
+                                        icon={version === siblings.installed[plugin.pipname] ? "/icons/sym-dot-blue.svg" : undefined}
+                                        onclick={evt => install(version)}
+                                    />
+                                {/each}
+                            {/await}
+                        </DropdownButton>
+                        {#await getVersions(plugin) then versions}
+                            {#if Version.parse(versions[0]).newerThan(siblings.installed[plugin.pipname])}
+                                <Button
+                                    label={translate("Update")}
+                                    icon="/icons/btn-refresh.svg"
+                                    onclick={evt => install(versions[0])}
+                                    horizontal
+                                />
+                            {/if}
+                        {/await}
+                        <Button
+                            label={translate("Uninstall")}
+                            icon="/icons/btn-delete.svg"
+                            onclick={async evt => {
+                                // show progress dlg
+                                showProgress = true
+                                // uninstall
+                                return await python.venv.uninstallPackage(
+                                    venv, plugin.pipname
+                                ).then(
+                                    resp => python.venv.getPackages(
+                                        venv
+                                    ).then(
+                                        packages => siblings.installed = packages
+                                    )
+                                );
+                            }}
+                            disabled={venv === undefined}
+                            horizontal
+                        />
+                    {:else}
+                        <DropdownButton
+                            label={translate("Install")}
+                            icon="/icons/btn-download.svg"
+                            onclick={evt => install()}
+                            disabled={venv === undefined}
+                        >
+                            {#await getVersions(plugin) then versions}
+                                {#each versions as version}
+                                    <MenuItem
+                                        label="Version {version}"
+                                        onclick={evt => install(version)}
+                                    />
+                                {/each}
+                            {/await}    
+                        </DropdownButton>
+                    {/if}
+                </div>
             </div>
-        </div>
+        </header>
         {#each (plugin.description || "").split("\n") as line}
             <p>{line}</p>
         {/each}
+        
 
         <ProgressDlg
             tag="uv:{plugin.pipname}"
@@ -103,25 +182,94 @@
     class:installed={installed}
     onclick={evt => siblings.selected = page}
 >
-    <img class=plugin-avatar src={plugin.icon} alt={plugin.pipname} />
-    <div class=plugin-name>{plugin.name}</div>
-    <code class=plugin-pipname>{plugin.pipname}</code>
-    <div class=plugin-install-btn></div>
+    <img 
+        class=avatar 
+        src={plugin.icon} 
+        alt={plugin.pipname} 
+    />
+    <div class=details>
+        <h3 class=name>
+            {plugin.name}
+        </h3>
+        <code class=pipname>
+            {plugin.pipname}
+        </code>
+    </div>
+    
 </button>
 
 <style>
-    .plugin-item, .plugin-page .title {
+
+    .plugin-page {
+        display: flex;
+        flex-direction: column;
+        padding: 0 1rem;
+        gap: 1rem;
+        width: 45rem;
+    }
+    .plugin-item, .plugin-page header {
         display: grid;
         position: relative;
-        grid-template-columns: [avatar] min-content [start] 1fr [end];
-        grid-template-rows: [start] min-content min-content [button] 1fr [end];
-        align-items: center;
+        align-items: start;
         align-content: start;
         justify-items: start;
         justify-content: start;
-        gap: 0 1rem;
+        gap: 1rem;
         width: 100%;
     }
+
+    .plugin-item {
+        grid-template-columns: [avatar] 4rem [start] 1fr [end];
+        border: 1px solid var(--overlay);
+        border-radius: .5rem;
+        padding: 1rem;
+        box-sizing: border-box;
+        background-color: var(--mantle);
+    }
+    .plugin-item.selected {
+        border: 1px solid var(--blue);
+    }
+    .plugin-item.installed {
+        background-color: var(--base)
+    }
+
+    .plugin-page header {
+        grid-template-columns: [avatar] 6rem [start] 1fr [end];
+    }
+    
+    .name {
+        text-decoration: none;
+        color: var(--text);
+        font-size: 1.25rem;
+        grid-column: start / button;
+        text-align: left;
+    }
+
+    .avatar {
+        border-radius: .5rem;
+        width: 100%;
+    }
+    .details {
+        text-align: left;
+    }
+    .header-ctrls {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: .5rem;
+        margin: 1rem 0;
+    }
+    .version-ctrl {
+        display: flex;
+        flex-direction: row;
+        gap: .5rem;
+        width: 100%;
+    }
+    #version-ctrl {
+        flex-grow: 1;
+    }
+
+/*     
 
     .plugin-install-btn {
         margin-top: .5rem;
@@ -178,5 +326,5 @@
         align-items: start;
         gap: .5rem;
         width: 45rem;
-    }
+    } */
 </style>

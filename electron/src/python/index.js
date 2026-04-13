@@ -26,7 +26,7 @@ export const handlers = {
     venv: {
         setup: ipcMain.handle("python.venv.setup", async (evt, venv, prerelease=false) => (await getVenv(venv)).setup(prerelease)),
         executable: ipcMain.handle("python.venv.executable", async (evt, venv) => (await getVenv(venv)).executable),
-        installPackage: ipcMain.handle("python.venv.installPackage", async (evt, venv, name) => (await getVenv(venv)).installPackage(name)),
+        installPackage: ipcMain.handle("python.venv.installPackage", async (evt, venv, name, version=undefined) => (await getVenv(venv)).installPackage(name, version)),
         uninstallPackage: ipcMain.handle("python.venv.uninstallPackage", async (evt, venv, name) => (await getVenv(venv)).uninstallPackage(name)),
         getPackages: ipcMain.handle("python.venv.getPackages", async (evt, venv) => (await getVenv(venv)).getPackages()),
         getPackageDetails: ipcMain.handle("python.venv.getPackageDetails", async (evt, venv, name) => (await getVenv(venv)).getPackageDetails(name))

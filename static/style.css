@@ -26,6 +26,54 @@ body {
     transition: border-color .2s, box-shadow .2s;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-block-start: 1em;
+  margin-block-end: .2em;
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child {
+  margin-block-start: .2em;
+}
+
+h1 {
+  font-size: 2.55rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.35rem;
+}
+
+h4 {
+  font-size: 1.15rem;
+}
+
+h5 {
+  font-size: 1.05rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p {
+  margin-block-start: .2em;
+  margin-block-end: 1em;
+}
+
 select,
 option,
 input,

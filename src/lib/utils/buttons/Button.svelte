@@ -188,7 +188,8 @@
     button {
         display: grid;
         align-items: center;
-        padding: .75em 1em;
+        padding: .6em .8em;
+        gap: .1rem;
         font-family: var(--body);
         max-width: 100%;
         max-height: 100%;

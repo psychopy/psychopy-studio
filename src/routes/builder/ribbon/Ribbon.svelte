@@ -259,8 +259,12 @@
                 />
             {/snippet}
         </PavloviaSync>
-        <UserCtrl />
-        <ProjectCtrl />
+        <div class=padded>
+            <UserCtrl />
+        </div>
+        <div class=padded>
+            <ProjectCtrl />
+        </div>
     </RibbonSection>
 
     <RibbonGap></RibbonGap>
@@ -289,3 +293,10 @@
         {/if}
     </RibbonSection>
 </Ribbon>
+
+<style>
+    .padded {
+        display: flex;
+        padding: .25rem;
+    }
+</style>

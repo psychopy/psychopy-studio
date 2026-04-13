@@ -109,8 +109,9 @@ export class PythonVenv {
      * Install a package or multiple packages to this environment
      * 
      * @param {string|array<string>} name Name, path or URL of the package to install (or an array of these, for multiple packages)
+     * @param {string} version Version to install (leave blank for latest)
      */
-    async installPackage(name) {
+    async installPackage(name, version=undefined) {
         // log start
         output(
             `uv:${name}`, `Installing ${name}...\n`
@@ -119,13 +120,18 @@ export class PythonVenv {
         if (typeof name === "string") {
             name = [name]
         }
+        // append version if given
+        let cmdname = name
+        if (version) {
+            cmdname = name.map(item => `${item}==${version}`)
+        }
         // run uv command to install
         await uv.execTracked([
-            "pip", "install", ...name, "--python", this.executable
-        ], undefined, `uv:${name}`)
+            "pip", "install", ...cmdname, "--python", this.executable
+        ], undefined, `uv:${name.join("+")}`)
         // log done
         output(
-            `uv:${name}`, `Finished installing ${name}.\n`
+            `uv:${name.join("+")}`, `Finished installing ${name}.\n`
         )
     }
 
