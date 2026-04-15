@@ -40,6 +40,7 @@
                 // create device
                 return python.liaison.send("app", {
                     command: "run",
+                    args: ["psychopy.hardware:DeviceManager.addDevice"],
                     kwargs: profiles[0]
                 })
             }

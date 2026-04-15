@@ -1,10 +1,12 @@
 <script>
     import { Dialog } from "$lib/utils/dialog";
-    import { Listbook, Notebook, NotebookPage } from "$lib/utils/notebook";
+    import { Listbook, Notebook, NotebookPage, ButtonTab } from "$lib/utils/notebook";
     import { python } from "$lib/globals.svelte";
-    import MonitorConfigurationDlg from "./MonitorConfiguration.svelte";
     import { MonitorConfiguration } from "./configuration.svelte";
     import { translate } from "$lib/translation";
+    import { makeUnique } from "$lib/utils/tools/namespace.js";
+    import MonitorPage from "./MonitorPage.svelte";
+    import { setContext } from "svelte";
 
     let {
         shown=$bindable()
@@ -89,8 +91,27 @@
                     }
                 }
             )
+        },
+        new: () => {
+            // make a unique name
+            let name = makeUnique("monitor", Object.keys(monitors.all))
+            // add it to monitors array
+            monitors.all[name] = {
+                name: name,
+                calibrations: []
+            }
         }
     });
+    setContext("monitors", monitors)
+    // on rename monitor, reassign key
+    $effect(() => {
+        for (let [key, monitor] of Object.entries(monitors.all)) {
+            if (!(monitor.name in monitors.all)) {
+                monitors.all[monitor.name] = monitor
+                delete monitors.all[key]
+            }
+        }
+    })
     // refresh on init to populate
     monitors.refresh()
 </script>
@@ -111,34 +132,26 @@
             {:then}
                 {#each Object.entries(monitors.all) as [name, details]}
                     <NotebookPage
-                        label={name}
+                        bind:label={monitors.all[name].name}
+                        close={evt => delete monitors.all[name]}
                         bind:selected={
                             () => monitors.selection.monitor === name,
                             (evt) => monitors.selection.monitor = name
                         }
                     >
-                        <Listbook>
-                            {#each Object.entries(details.calibrations || {}) as [calibName, calib]}
-                                <NotebookPage
-                                    label={calibName}
-                                    bind:selected={
-                                        () => monitors.selection.calibration === calibName,
-                                        (evt) => monitors.selection.calibration = calibName
-                                    }
-                                >
-                                    {#if monitors.all[name]?.calibrations[calibName]}
-                                        <MonitorConfigurationDlg 
-                                            bind:calib={monitors.all[name].calibrations[calibName]}
-                                        />
-                                    {/if}
-                                </NotebookPage>
-                            {/each}
-                        </Listbook>
+                        <MonitorPage 
+                            bind:details={monitors.all[name]}
+                        />
                     </NotebookPage>
                 {/each}
             {:catch err}
                 {err}
             {/await}
+            <ButtonTab
+                callback={monitors.new}
+                label="+"
+                tooltip={translate("Add a new monitor configuration")}
+            />
         </Notebook>
     </div>
 </Dialog>
