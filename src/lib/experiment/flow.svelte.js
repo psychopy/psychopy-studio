@@ -220,7 +220,8 @@ export class Flow {
             } else if (elementNode.nodeName === "LoopTerminator") {
                 // error if initiator doesn't exist
                 if (!(name in initiators)) {
-                    throw Error(`Reference to nonexistant LoopInitiator ${name} in LoopTerminator`);
+                    console.error(`Reference to nonexistant LoopInitiator ${name} in LoopTerminator`);
+                    continue
                 }
                 // recreate
                 initiators[name].addTerminator();
@@ -236,7 +237,8 @@ export class Flow {
                     continue;
                 } else {
                     // if profile is a ref to a non-existent object, error
-                    throw Error(`Reference to nonexistant Routine ${name} in flow`);
+                    console.error(`Reference to nonexistant Routine ${name} in flow`);
+                    continue
                 }
             }
         }
