@@ -333,6 +333,8 @@ export class Experiment {
             }
             routine.exp = this;
             routine.fromXML(routineNode);
+            // make sure name matches node name (in case experiment was made before Routine Settings existed)
+            routine.settings.params['name'].val = routineNode.getAttribute("name")
             // parse and append node
             this.routines[routine.name] = routine
         }
