@@ -411,50 +411,6 @@ function setMenu(win, template) {
 }
 
 
-/**
- * Opens a new BrowserWindow to login to Pavlovia, and waits for it to have a code in the URL
- * 
- * @param {string} url Authentication URL to use
- * @param {string} pattern Regex pattern we expect to be able to use to get the auth code
- */
-async function authenticatePavlovia(url) {
-  // create window
-  let win = new BrowserWindow({
-    icon: favicon,
-    width: 980,
-    height: 720,
-    show: true
-  });
-  win.removeMenu();
-  // Clear all storage data to force fresh login
-  await win.webContents.session.clearStorageData({
-    storages: ['cookies', 'localstorage', 'sessionstorage', 'cachestorage', 'websql', 'indexdb']
-  });
-  // load auth url
-  win.loadURL(url);
-  // construct promise for the auth code
-  let code = Promise.withResolvers()
-  // on navigate, resolve if we have a code
-  win.webContents.on("did-navigate", (evt, url) => {
-    // search the URL for the auth code
-    let params = new URLSearchParams(
-      url.replace(/https:\/\/.*?(?=\?)/, "")
-    )
-    // if we got one...
-    if (params.get("code")) {
-      // resolve the promise
-      code.resolve(
-        params.get("code")
-      )
-      // close the window
-      win.close()
-    }
-  })
-
-  return code.promise
-}
-
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -486,39 +442,6 @@ app.on("quit", (evt, code) => {
   svelte.process.kill(0);
 })
 
-
-function getFileTree(folder, recursive = false) {
-  let output = [];
-
-  try {
-    for (let item of fs.readdirSync(folder, { recursive: false })) {
-      // construct absolute path
-      let abspath = path.join(folder, item);
-      // get stats
-      let stats = fs.statSync(abspath);
-      // construct details
-      let details = {
-        relpath: item,
-        abspath: abspath,
-      }
-      if (stats.isDirectory()) {
-        // if directory, recursively get children
-        details.children = getFileTree(abspath)
-      } else {
-        // if file, get size
-        details.size = stats.size / 1000000
-      }
-      // append
-      output.push(details)
-    }
-  } catch (err) {
-    console.error(err)
-
-    return output
-  }
-
-  return output
-}
 
 /* handlers which can be invoked by electron */
 
@@ -574,7 +497,6 @@ const handlers = {
       get: ipcMain.handle("electron.clipboard.get", (evt) => clipboard),
       set: ipcMain.handle("electron.clipboard.set", (evt, value) => clipboard = value)
     },
-    authenticatePavlovia: ipcMain.handle("electron.authenticatePavlovia", (evt, url) => authenticatePavlovia(url)),
     version: ipcMain.handle("electron.version", (evt) => appVersion),
     platform: ipcMain.handle("electron.platform", (evt) => process.platform),
     quit: ipcMain.handle("electron.quit", (evt) => app.quit())

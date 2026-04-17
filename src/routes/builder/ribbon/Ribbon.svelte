@@ -27,7 +27,7 @@
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js"
     import ParamsDialog from "$lib/paramCtrls/ParamsDialog.svelte";
     import { IconButton, SwitchButton } from '$lib/utils/buttons';
-    import { users, UserCtrl, ProjectCtrl } from '$lib/pavlovia/pavlovia.svelte';
+    import { UserCtrl, ProjectCtrl } from '$lib/pavlovia';
     import MonitorCenterDlg from '$lib/dialogs/monitorCenter/MonitorCenterDlg.svelte';
     import PavloviaSync from "$lib/pavlovia/Sync.svelte";
     import { translate } from "$lib/translation";

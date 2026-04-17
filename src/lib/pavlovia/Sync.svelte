@@ -2,7 +2,6 @@
     import { git } from "$lib/globals.svelte";
     import { showWindow } from "$lib/utils/views.svelte";
     import { getContext } from "svelte";
-    import { findProject } from "./pavlovia.svelte";
     import CommitDlg from "./CommitDlg.svelte";
     import NewProjectDlg from "./NewProjectDlg.svelte";
 

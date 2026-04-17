@@ -1,38 +1,13 @@
 <script>
     import { DropdownButton } from "$lib/utils/buttons";
-    import { getContext, onMount } from "svelte";
-    import { projects, users, findProject } from "./pavlovia.svelte";
-    import { MenuItem, MenuSeparator, SubMenu } from "$lib/utils/menu";
-    import { electron, git } from "$lib/globals.svelte";
+    import { getContext } from "svelte";
+    import { MenuItem, MenuSeparator } from "$lib/utils/menu";
+    import { git } from "$lib/globals.svelte";
     import ManageProjectsDlg from "$lib/dialogs/projects/manage/ManageProjectsDlg.svelte";
     import NewProjectDlg from "./NewProjectDlg.svelte";
     import { translate } from "$lib/translation";
 
     let current = getContext("current")
-
-    onMount(async () => {
-        // no saved projects if not in electron
-        if (!electron) {
-            return
-        }
-        // get file path
-        let file = await electron.paths.pavlovia.projects();
-        let dir = await electron.paths.pavlovia.dir();
-        // make sure pavlovia folder exists
-        if (!(await electron.files.exists(dir))) {
-            await electron.files.mkdir(dir);
-        }
-        // make sure projects.json exists
-        if (!(await electron.files.exists(file))) {
-            await electron.files.save(file, "{}");
-        }
-        // get file contents
-        let content = await electron.files.load(file);
-        // parse JSON
-        let data = JSON.parse(content);
-        // apply
-        Object.assign(projects, data)
-    })
 
     let show = $state({
         newProjectDlg: false,
@@ -43,7 +18,14 @@
     })
 
     // refresh project when experiment or user changes
-    $effect(async () => current.project = await findProject(current.experiment, current.user))
+    $effect(
+        () => git.getProjectInfo(
+            { folder: current.experiment.file.parent }, 
+            $state.snapshot(current.user)
+        ).then(
+            resp => current.project = resp
+        )
+    )
 
     let label = $derived.by(() => {
         if (current.project) {
@@ -70,12 +52,14 @@
     }}
     disabled={!current.project}
 >
-    <MenuItem
-        label={translate("New project")}
-        icon="/icons/btn-add.svg"
-        onclick={evt => show.newProjectDlg = true}
-        disabled={!current.user || !current.experiment?.file?.file}
-    />
+    {#if !current.project}
+        <MenuItem
+            label={translate("New project")}
+            icon="/icons/btn-add.svg"
+            onclick={evt => show.newProjectDlg = true}
+            disabled={!current.user || !current.experiment?.file?.file}
+        />
+    {/if}
     <MenuItem
         label={translate("Edit project")}
         icon="/icons/btn-edit.svg"

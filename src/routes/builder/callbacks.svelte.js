@@ -1,4 +1,4 @@
-import { electron, projects, python } from '$lib/globals.svelte.js';
+import { electron, python } from '$lib/globals.svelte.js';
 import { current } from './globals.svelte.js';
 
 import path from "path-browserify";
@@ -39,13 +39,6 @@ export async function openFile(file) {
         current.routine = Object.values(current.experiment.routines)[0];
     } else {
         current.routine = undefined;
-    }
-    // is file a known project?
-    for (let project of Object.values(projects)) {
-        // placeholder: how do we query local folder?
-        if (project.id.endsWith(current.experiment.file.stem)) {
-            current.project = project
-        }
     }
     // mark as no longer modified
     current.experiment.history.clear()

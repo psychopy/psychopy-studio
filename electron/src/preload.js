@@ -44,7 +44,6 @@ const electron = {
     get: () => ipcRenderer.invoke("electron.clipboard.get").then(resp => resp),
     set: (value) => ipcRenderer.invoke("electron.clipboard.set", value).then(resp => resp)
   },
-  authenticatePavlovia: (url) => ipcRenderer.invoke("electron.authenticatePavlovia", url).then(resp => resp),
   version: () => ipcRenderer.invoke("electron.version").then(resp => resp),
   platform: () => ipcRenderer.invoke("electron.platform").then(resp => resp),
   quit: () => ipcRenderer.invoke("electron.quit")
@@ -112,12 +111,19 @@ contextBridge.exposeInMainWorld('python', python)
 
 const git = {
   listen: (lsnr) => ipcRenderer.on("git", lsnr),
-  output: (message) => ipcRenderer.invoke("git.output", message),
-  getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user),
-  pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force),
-  stage: (folder) => ipcRenderer.invoke("git.stage", folder),
-  commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user),
-  push: (folder, user, force=false) => ipcRenderer.invoke("git.push", folder, user, force),
+  output: (message) => ipcRenderer.invoke("git.output", message).then(resp => resp),
+  server: () => ipcRenderer.invoke("git.server").then(resp => resp),
+  login: () => ipcRenderer.invoke("git.login").then(resp => resp),
+  loadUsers: () => ipcRenderer.invoke("git.loadUsers").then(resp => resp),
+  listUsers: () => ipcRenderer.invoke("git.listUsers").then(resp => resp),
+  listGroups: () => ipcRenderer.invoke("git.listGroups").then(resp => resp),
+  getUserInfo: (username) => ipcRenderer.invoke("git.getUserInfo", username).then(resp => resp),
+  getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user).then(resp => resp),
+  getProjectInfo: (group, name, username) => ipcRenderer.invoke("git.getProjectInfo", group, name, username).then(resp => resp),
+  pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force).then(resp => resp),
+  stage: (folder) => ipcRenderer.invoke("git.stage", folder).then(resp => resp),
+  commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user).then(resp => resp),
+  push: (folder, user, force=false) => ipcRenderer.invoke("git.push", folder, user, force).then(resp => resp),
   newProject: (details, folder, user) => ipcRenderer.invoke("git.newProject", details, folder, user).then(resp => resp)
 }
 contextBridge.exposeInMainWorld('git', git)

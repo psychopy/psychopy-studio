@@ -22,7 +22,7 @@
     import Menu from "./Menu.svelte";
     import { getContext } from "svelte";
     import { IconButton, SwitchButton } from '$lib/utils/buttons';
-    import { UserCtrl } from '$lib/pavlovia/pavlovia.svelte';
+    import { UserCtrl } from '$lib/pavlovia';
     import { electron, python } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
 
