@@ -210,48 +210,6 @@ const createWindow = () => {
       }
     });
 
-    app.post('/api/token/authorize', express.json(), async (req, res) => {
-      try {
-        const params = req.query;
-        const response = await fetch(`${params.root}/oauth/token`, {
-          method: "POST",
-          body: JSON.stringify({
-            client_id: params.client,
-            code: params.code,
-            grant_type: "authorization_code",
-            redirect_uri: params.redirect,
-            code_verifier: params.verifier
-          }),
-          headers: { "Content-type": "application/json; charset=UTF-8" }
-        });
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    app.post('/api/token/refresh', express.json(), async (req, res) => {
-      try {
-        const params = req.query;
-        const response = await fetch(`${params.root}/oauth/token`, {
-          method: "POST",
-          body: JSON.stringify({
-            client_id: params.client,
-            refresh_token: params.refresh,
-            grant_type: "refresh_token",
-            redirect_uri: params.redirect,
-            code_verifier: params.verifier
-          }),
-          headers: { "Content-type": "application/json; charset=UTF-8" }
-        });
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
     // Handle SPA fallback without wildcard
     app.use((req, res) => {
       res.sendFile(path.join(__dirname, '../../dist/index.html'));
