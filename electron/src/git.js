@@ -1,4 +1,4 @@
-import { app, ipcMain } from "electron";
+import { app, ipcMain, safeStorage } from "electron";
 import git from "isomorphic-git";
 import logging from "./logging.js";
 import http from "isomorphic-git/http/node";
@@ -217,10 +217,17 @@ export async function loadUsers() {
     if (!fs.existsSync(file)) {
         fs.writeFileSync(file, JSON.stringify({}))
     }
-    // load JSON data
-    let data = JSON.parse(
-        fs.readFileSync(file, { encoding: 'utf8' })
-    )
+    // read file (decrypt if possible)
+    let content
+    if (safeStorage.isEncryptionAvailable()) {
+        content = safeStorage.decryptString(
+            fs.readFileSync(file)
+        )
+    } else {
+        content = fs.readFileSync(file, { encoding: 'utf8' })
+    }
+    // parse as JSON
+    let data = JSON.parse(content)
     // create a User object for each entry
     for (let [username, { token, profile }] of Object.entries(data)) {
         try {
@@ -268,8 +275,13 @@ export function saveUsers() {
     if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder, { recursive: true })
     }
+    // save file (encrypt if possible)
+    let content = JSON.stringify(output, undefined, 4)
+    if (safeStorage.isEncryptionAvailable()) {
+        content = safeStorage.encryptString(content)
+    }
     // write output
-    fs.writeFileSync(file, JSON.stringify(output, undefined, 4))
+    fs.writeFileSync(file, content)
 }
 
 
