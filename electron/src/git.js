@@ -144,15 +144,13 @@ async function login() {
             win.on("close", reject)
             // on navigate, resolve if we have a code
             win.webContents.on("did-navigate", (evt, url) => {
-                // search the URL for the auth code
-                let params = new URLSearchParams(
-                    url.replace(/https:\/\/.*?(?=\?)/, "")
-                )
-                // if we got one...
-                if (params.get("code")) {
+                // convert url to an object
+                url = new URL(url);
+                // if we got a code...
+                if (server.endsWith(url.hostname) && url.pathname === "/" && url.searchParams.get("code")) {
                     // resolve the promise
                     resolve(
-                        params.get("code")
+                        url.searchParams.get("code")
                     )
                     // remove close handler
                     win.removeListener('close', reject)
