@@ -61,7 +61,10 @@
                 {#if current.user}
                     <MenuItem
                         label={translate("Logout")}
-                        onclick={evt => current.user = undefined}
+                        onclick={evt => {
+                            current.user = undefined;
+                            git.clearUsers();
+                        }}
                     />
                 {:else}
                     <MenuItem

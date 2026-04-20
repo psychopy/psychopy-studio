@@ -137,8 +137,9 @@ async function login() {
     // load auth url
     win.loadURL(url);
     // promise to wait for user to log in
+    let code
     try {
-        let code = await new Promise((resolve, reject) => {
+        code = await new Promise((resolve, reject) => {
             // if window closes before promise is resolved, reject promise
             win.on("close", reject)
             // on navigate, resolve if we have a code
@@ -269,6 +270,17 @@ export function saveUsers() {
     }
     // write output
     fs.writeFileSync(file, JSON.stringify(output, undefined, 4))
+}
+
+
+/**
+ * Clear saved information on all users
+ */
+export function clearUsers() {
+    // clear users dict
+    users = {}
+    // save
+    saveUsers()
 }
 
 
@@ -546,6 +558,7 @@ export const handlers = {
     server: ipcMain.handle("git.server", (evt) => server),
     login: ipcMain.handle("git.login", (evt) => login()),
     loadUsers: ipcMain.handle("git.loadUsers", (evt) => loadUsers()),
+    clearUsers: ipcMain.handle("git.clearUsers", (evt) => clearUsers()),
     listUsers: ipcMain.handle("git.listUsers", (evt) => Object.keys(users)),
     listGroups: ipcMain.handle("git.listGroups", (evt) => listGroups()),
     getUserInfo: ipcMain.handle("git.getUserInfo", (evt, username) => users[username]?.profile),
