@@ -6,8 +6,19 @@
     import { translate } from "$lib/translation";
 
     let current = getContext("current");
+
+    // load users on launch
+    let loading = git.loadUsers();
+
+    // on launch, log in as first available user, if there are any
+    loading.then(
+        loaded => git.listUsers().then(
+            users => current.user = current.user ? current.user : users?.[0]
+        )
+    )
 </script>
-{#await git.loadUsers() then loaded}
+
+{#await loading then loaded}
     {#key current.user}
         {#await git.getUserInfo($state.snapshot(current.user)) then profile}
             <DropdownButton
@@ -51,7 +62,7 @@
                     <MenuItem
                         label={translate("Login")}
                         onclick={async evt => {
-                            let users = git.listUsers();
+                            let users = await git.listUsers();
                             if (users.length) {
                                 current.user = users[0]
                             } else {
