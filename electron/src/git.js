@@ -137,28 +137,33 @@ async function login() {
     // load auth url
     win.loadURL(url);
     // promise to wait for user to log in
-    let code = await new Promise((resolve, reject) => {
-        // if window closes before promise is resolved, reject promise
-        win.on("close", reject)
-        // on navigate, resolve if we have a code
-        win.webContents.on("did-navigate", (evt, url) => {
-            // search the URL for the auth code
-            let params = new URLSearchParams(
-                url.replace(/https:\/\/.*?(?=\?)/, "")
-            )
-            // if we got one...
-            if (params.get("code")) {
-                // resolve the promise
-                resolve(
-                    params.get("code")
+    try {
+        let code = await new Promise((resolve, reject) => {
+            // if window closes before promise is resolved, reject promise
+            win.on("close", reject)
+            // on navigate, resolve if we have a code
+            win.webContents.on("did-navigate", (evt, url) => {
+                // search the URL for the auth code
+                let params = new URLSearchParams(
+                    url.replace(/https:\/\/.*?(?=\?)/, "")
                 )
-                // remove close handler
-                win.removeListener('close', reject)
-                // close the window
-                win.close()
-            }
+                // if we got one...
+                if (params.get("code")) {
+                    // resolve the promise
+                    resolve(
+                        params.get("code")
+                    )
+                    // remove close handler
+                    win.removeListener('close', reject)
+                    // close the window
+                    win.close()
+                }
+            })
         })
-    })
+    } catch {
+        // if cancelled by user, return harmlessly
+        return
+    }
     // get tokens from code
     let data = await fetch(`${server}/oauth/token`, {
         method: "POST",

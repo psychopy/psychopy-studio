@@ -49,7 +49,12 @@
                     <MenuSeparator />
                     <MenuItem
                         label={translate("New user...")}
-                        onclick={async evt => current.user = await git.login()}
+                        onclick={async evt => {
+                            let user = await git.login()
+                            if (user) {
+                                current.user = user
+                            }
+                        }}
                     />
                 </SubMenu>
                 <MenuSeparator />
