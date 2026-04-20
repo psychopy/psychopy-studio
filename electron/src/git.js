@@ -148,6 +148,7 @@ export async function stage(folder) {
     let changed = []
     // iterate through files
     for (let file of fs.globSync("**/*.*", { cwd: folder })) {
+        file = file.replaceAll("\\", "/")
         // get file status
         let status = await git.status({
             fs,
