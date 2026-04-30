@@ -226,9 +226,26 @@ export class UV {
             pythonVersion = `cpython-${pythonVersion}-macos-x86_64-none`
         }
         // make a new venv
-        await this.execTracked([
-            "venv", folder, "--python", pythonVersion, "--clear"
-        ])
+        try {
+            await this.execTracked([
+                "venv", folder, "--python", pythonVersion, "--clear"
+            ])
+        } catch (err) {
+            // on Mac, we might need to install Rosetta first
+            if (err.code === 86) {
+                // install Rosetta
+                await execTracked(
+                    "UV", 
+                    "/usr/sbin/softwareupdate", 
+                    ["--install-rosetta", "--agree-to-license"]
+                )
+                // make venv again - this time with Rosetta
+                await this.execTracked([
+                    "venv", folder, "--python", pythonVersion, "--clear"
+                ])
+            }
+        }
+        
         // return its path
         return this.findPython(psychopyVersion)
     }
