@@ -243,6 +243,8 @@ export class UV {
                 await this.execTracked([
                     "venv", folder, "--python", pythonVersion, "--clear"
                 ])
+            } else {
+                throw err
             }
         }
         
