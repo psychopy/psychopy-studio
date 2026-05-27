@@ -37,7 +37,7 @@
 {#if !component.hidden}
 <Button 
     label={titleCase(component['__name__'])}
-    icon="/icons/components/{component['__name__']}.svg"
+    icon={component.iconSVG}
     vertical
     onclick={newRoutine}
 />

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-495,0)">
+        <g id="btn-dirup" transform="matrix(0.451519,0,0,0.451519,495,0.0104752)">
+            <rect x="0" y="0" width="70.872" height="70.866" style="fill:none;"/>
+            <g transform="matrix(1.68538,0,0,-1.75988,56.6464,45.795)">
+                <path d="M0,10.79L-10.653,21.443C-11.724,22.514 -13.453,22.514 -14.524,21.443L-25.164,10.79C-26.894,9.073 -25.675,6.135 -23.235,6.135L-17.822,6.135L-17.822,-6.484C-17.822,-9.371 -15.482,-11.724 -12.582,-11.724C-9.682,-11.724 -7.343,-9.371 -7.343,-6.484L-7.343,6.135L-1.929,6.135C0.51,6.135 1.717,9.073 0,10.79" style="fill:var(--outline);fill-rule:nonzero;"/>
+            </g>
+        </g>
+    </g>
+</svg>

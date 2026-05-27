@@ -6,6 +6,7 @@
     import { getContext } from "svelte";
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
     import { profiles, pending } from "$lib/experiment/profiles.svelte";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
 
@@ -34,9 +35,9 @@
 >
     <!-- button to open add Loop menu -->
     <Button 
-        label="Add Loop"
+        label={translate("Add Loop")}
         icon="/icons/btn-loop.svg"
-        tooltip="Add a loop to the experiment flow"
+        tooltip={translate("Add a loop to the experiment flow")}
         onclick={() => showMenu = true}
         disabled={current.inserting}
         horizontal
@@ -46,15 +47,15 @@
     <Menu 
         bind:shown={showMenu}
     >
-        {#await pending.loops}
+        {#await pending.loops.promise}
             <MenuItem 
-                label="Loading loops..."
+                label={translate("Loading loops...")}
             />
         {:then loops}
             {#each Object.entries(loops) as [loopType, loopProfile]}
                 {#if !loopProfile.hidden}
                     <MenuItem 
-                        label="New {loopProfile.label?.toLowerCase?.() || loopType}..."
+                        label={translate("New {}...").replace("{}", loopProfile.label?.toLowerCase?.() || loopType)}
                         onclick={() => {
                             // create blank Loop
                             current.inserting = new LoopInitiator(loopType)
@@ -72,7 +73,7 @@
     {#if current.inserting instanceof LoopInitiator}
     <Dialog 
         id=new-loop 
-        title="New loop"
+        title={translate("New loop")}
         bind:shown={showDialog} 
         onopen={() => current.inserting.restore.set()}
         buttons={{
@@ -89,7 +90,7 @@
         <ParamsNotebook 
             bind:valid={valid}
             element={current.inserting}
-        ></ParamsNotebook>
+        />
     </Dialog>
     {/if}
 </div>

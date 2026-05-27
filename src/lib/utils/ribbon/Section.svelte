@@ -47,13 +47,13 @@
     }
     .ribbon-section-label {
         display: grid;
-        grid-template-columns: [icon] 1rem [label] min-content;
+        grid-template-columns: [icon] 1rem [label] auto;
         gap: .5rem;
         align-items: center;
         position: absolute;
         bottom: 0;
     }
-    .ribbon-section:not(:first-child) {
+    .ribbon-section:not(:first-of-type) {
         border-left: 1px solid var(--overlay)
     }
 </style>

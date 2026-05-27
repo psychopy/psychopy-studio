@@ -21,12 +21,12 @@
 </script>
 <div 
     class=param-code-input-multi
+    id={param.name}
     {@attach element => param.registerValidator("code", validateCode, 10)}
     {...attachments}
 >
     <CodeEditor 
         bind:value={param.val}
-        resize=vertical
         language={language}
         readonly={disabled}
         disabled={disabled}

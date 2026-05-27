@@ -88,12 +88,16 @@ export function input(tag, message, timeout=undefined) {
  * @param {string} command Command to run
  * @param {array<string>} args Arguments to pass to child process
  * @param {int} timeout Time (ms) after which to give up
+ * @param {boolean} silent Set true to prevent output from going to stdout
  */
-export function execSync(tag, command, args, timeout=undefined) {
+export function execSync(tag, command, args, timeout=undefined, silent=false) {
     // join args 
     let cmd = [command, ...args].join(" ")
     // log input in front end
-    input(tag, cmd, timeout)
+    if (!silent) {
+        input(tag, cmd, timeout)
+    }
+    
     // execute
     let resp = proc.execSync(cmd, {timeout: timeout})
     // decode resp if necessary
@@ -105,7 +109,9 @@ export function execSync(tag, command, args, timeout=undefined) {
         resp = resp.trim()
     }
     // pass output to front end
-    output(tag, resp)
+    if (!silent) {
+        output(tag, resp)
+    }
 
     return resp
 }

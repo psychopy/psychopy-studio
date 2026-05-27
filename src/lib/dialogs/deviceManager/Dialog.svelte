@@ -7,6 +7,7 @@
     import AddDeviceDialog from "./addDevice/AddDeviceDialog.svelte";
     import { pending } from "$lib/experiment/profiles.svelte";
     import { onMount } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         /** @bindable @type {boolean} State controlling when this dialog is shown */
@@ -50,7 +51,7 @@
             return
         }
         // wait for Python to have started so we have necessary class defs
-        await pending.devices
+        await pending.devices.promise
         // get devices file path
         let file = await electron.paths.devices();
         // make sure devices.json exists
@@ -162,7 +163,7 @@
 
 <Dialog
     id="device-manager"
-    title="Device manager"
+    title={translate("Device manager")}
     buttons={{
         OK: evt => {
             // set restore point
@@ -210,8 +211,8 @@
                 selected
             >
                 <div class=placeholder-page>
-                    <p>No devices have been setup.</p>
-                    <p>Click "Add device" to add a new device, or import devices from a .json file.</p>
+                    <p>{translate("No devices have been setup.")}</p>
+                    <p>{translate("Click \"Add device\" to add a new device, or import devices from a .json file.")}</p>
                 </div>
             </NotebookPage>
             {/if}
@@ -219,22 +220,22 @@
             {#if electron}
                 <ButtonTab
                     callback={(evt) => showAddDeviceDialog = true}
-                    label="+ Add device"
+                    label={translate("+ Add device")}
                     tooltip={electron
-                        ? "Setup a currently connected device"
-                        : "Device setup not available in web-only"
+                        ? translate("Setup a currently connected device")
+                        : translate("Device setup not available in web-only")
                     }
                     disabled={!electron}
-                ></ButtonTab>
+                />
                 <AddDeviceDialog
                     bind:shown={showAddDeviceDialog}
-                ></AddDeviceDialog>
+                />
             {/if}
             <ButtonTab
                 callback={openDevicesFile}
-                label="⭱ Import devices"
-                tooltip="Import devices from a .json file"
-            ></ButtonTab>
+                label={translate("⭱ Import devices")}
+                tooltip={translate("Import devices from a .json file")}
+            />
         </Listbook>
     </div>
 </Dialog>

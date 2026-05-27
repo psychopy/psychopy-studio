@@ -3,7 +3,7 @@
     import { getContext } from "svelte";
     import { Button } from "$lib/utils/buttons";
     import ProgressDlg from "../ProgressDlg.svelte";
-    var decoder = new TextDecoder();
+    import { translate } from "$lib/translation";
 
     let {
         name,
@@ -12,7 +12,7 @@
     } = $props()
 
     let siblings = getContext("siblings");
-    siblings.all.push(name)
+    siblings.all.push($state.snapshot(name))
 
     $effect(() => {
         if (siblings.selected === undefined) {
@@ -62,21 +62,21 @@
     <div class=package-page>
         {#await getProfile(name)}
             <h2>
-                Getting package details...
+                {translate("Getting package details...")}
             </h2>
         {:then profile}
             <div class=package-name><code>{profile.info.name}</code></div>
             <div class=ctrls>
                 {#if !installed}
                     <Button
-                        label="Install"
+                        label={translate("Install")}
                         icon="/icons/btn-download.svg"
                         onclick={install}
                         horizontal
                     />
                 {:else}
                     <Button
-                        label="Uninstall"
+                        label={translate("Uninstall")}
                         icon="/icons/btn-delete.svg"
                         onclick={uninstall}
                         horizontal
@@ -87,7 +87,10 @@
                 {@html marked(profile.info.description || "")}
             </div>
         {:catch err}
-            <h2>Failed to load details for <code>{name}</code></h2>
+            <h2>
+                {translate("Failed to load details for ")}
+                <code>{name}</code>
+            </h2>
             <div class=package-desc>
                 {err}
             </div>

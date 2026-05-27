@@ -129,7 +129,7 @@ export class Liaison {
                 args: ["prefs.setDevicesFile", path.join(
                     app.getPath("appData"), "psychopy4", "devices.json"
                 )]
-            }, 10000, true).catch(
+            }, undefined, true).catch(
                 err => logging.error([`Failed to set devices file`, err])
             )
             // set prefs from JSON
@@ -138,7 +138,7 @@ export class Liaison {
                 args: ["prefs.fromJSON", path.join(
                     app.getPath("appData"), "psychopy4", "preferences.json"
                 )]
-            }, 10000, true).catch(
+            }, undefined, true).catch(
                 err => logging.error([`Failed to load preferences`, err])
             )
         } catch (err) {

@@ -1,12 +1,13 @@
 <script>
     import EntryPoint from './EntryPoint.svelte';
-    import Menu from '$lib/utils/menu/Menu.svelte';
-    import MenuItem from '$lib/utils/menu/Item.svelte';
+    import { Menu, SubMenu, MenuItem} from '$lib/utils/menu';
     import { getContext } from "svelte"
     import { ParamsDialog } from "$lib/paramCtrls";
     import StaticPeriod from './StaticPeriod.svelte';
     import { Icon } from "$lib/utils/icons";
-    import { prefs } from "$lib/preferences.svelte"
+    import { prefs } from "$lib/preferences.svelte";
+    import { translate } from "$lib/translation";
+    import { copyComponent, pasteComponent } from "../callbacks.svelte";
     
     let current = getContext("current");
 
@@ -149,12 +150,12 @@
 >
     <MenuItem
         icon="/icons/btn-edit.svg"
-        label="Edit Component"
+        label={translate("Edit Component")}
         onclick={(evt) => showDialog = true}
     />
     <MenuItem
         icon="/icons/sym-dot-{component.disabled ? "blue" : "light"}.svg"
-        label="{component.disabled ? "Enable" : "Disable"} Component"
+        label={component.disabled ? translate("Enable Component") : translate("Disable Component")}
         onclick={(evt) => {
             // update history
             current.experiment.history.update(`${component.disabled ? "enable" : "disable"} ${component.name}`);
@@ -163,8 +164,28 @@
         }}
     />
     <MenuItem 
+        icon="/icons/btn-copy.svg"
+        label={translate("Copy Component")}
+        onclick={evt => copyComponent(component)}
+    />
+    <SubMenu
+        icon="/icons/btn-paste.svg"
+        label={translate("Paste Component")}
+    >
+        <MenuItem
+            icon="/icons/sym-arrow-up.svg"
+            label={translate("Above")}
+            onclick={evt => pasteComponent(current.routine, component.index)}
+        />
+        <MenuItem
+            icon="/icons/sym-arrow-down.svg"
+            label={translate("Below")}
+            onclick={evt => pasteComponent(current.routine, component.index + 1)}
+        />
+    </SubMenu>
+    <MenuItem 
         icon="/icons/btn-delete.svg"
-        label="Delete Component"
+        label={translate("Delete Component")}
         onclick={(evt) => {
             // update history
             current.experiment.history.update(`remove ${component.name}`);

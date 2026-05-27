@@ -3,6 +3,7 @@
     import { Dialog } from "$lib/utils/dialog";
     import Project from "./Project.svelte";
     import { projects } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         shown=$bindable()
@@ -45,7 +46,7 @@
 
 <Dialog
     id=manageProjects
-    title="Local projects"
+    title={translate("Local projects")}
     bind:shown={shown}
     buttons={{
         OK: (evt) => {}

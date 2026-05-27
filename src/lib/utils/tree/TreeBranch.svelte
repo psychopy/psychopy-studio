@@ -6,11 +6,12 @@
     let {
         label,
         icon=undefined,
+        onselect=(evt, data) => {},
+        onactivate=(evt, data) => {},
+        open=$bindable(false),
         /** @interface */
         children
     } = $props()
-
-    let open = $state.raw(false);
 </script>
 
 <div 
@@ -19,7 +20,11 @@
     <TreeNode
         label={label}
         icon={icon}
-        onselect={(evt, data) => open = !open}
+        onselect={(evt, data) => {
+            open = !open;
+            onselect(evt, data)
+        }}
+        onactivate={onactivate}
     >
         <!-- arrow showing open state -->
         {#snippet chevron()}
@@ -41,15 +46,17 @@
     .tree-branch {
         display: flex;
         flex-direction: column;
-        gap: .5rem;
     }
     .tree-branch-nodes {
         display: flex;
         flex-direction: column;
-        gap: .5rem;
         align-items: stretch;
-        margin-left: .5rem;
-        padding-left: .5rem;
-        border-left: 1px solid var(--overlay);
+        margin-left: 1rem;
+        border-left: 1px solid var(--mantle);
     }
+    .tree-branch-nodes:hover,
+    .tree-branch-nodes:active {
+        border-color: var(--overlay)
+    }
+
 </style>

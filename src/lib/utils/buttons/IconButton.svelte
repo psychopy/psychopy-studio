@@ -3,6 +3,7 @@
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
     import { Message, MessageArray } from "$lib/utils/message";
     import { MessageDialog } from "$lib/utils/dialog";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {string} Text label for this button, if any */
@@ -45,6 +46,7 @@
         onfocusin={() => {show.tooltip = true}}
         onfocusout={() => {show.tooltip = false}}
         class:borderless={borderless}
+        aria-label={label}
     >
         <Icon 
             src={{
@@ -65,9 +67,9 @@
                 // if completed/not started, regular label
                 ready: label,
                 // if awaiting, regular label + cancel (if possible)
-                awaiting: label + (cancel ? " (cancel)" : ""),
+                awaiting: label + (cancel ? ` (${translate("cancel")})` : ""),
                 // if error, error icon
-                error: "Failed, click to show error"
+                error: translate("Failed, click to show error")
             }[status]}            
         </Tooltip>
 

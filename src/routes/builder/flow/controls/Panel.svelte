@@ -4,8 +4,8 @@
 </script>
 
 <div class=flow-buttons>
-    <AddRoutineButton></AddRoutineButton>
-    <AddLoopButton></AddLoopButton>
+    <AddRoutineButton />
+    <AddLoopButton />
 </div>
 
 <style>

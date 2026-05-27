@@ -1,5 +1,6 @@
 <script>
     import { optionsFromParam } from "./utils.js";
+    import { translate } from "$lib/translation";
 
     let {
         param=$bindable(),
@@ -17,15 +18,17 @@
 <div
     class=param-multi-choice-input
     style:color={param.valid.value ? "inherit" : "var(--red)"}
+    id={param.name}
     {@attach element => param.registerValidator("multiChoice", validateMultiChoice, 10)}
     {...attachments}
 >
     {#await optionsFromParam(param)}
-        Loading...
+        {translate("Loading...")}
     {:then options}
         {#each options as [val, label]}
             <input
                 type=checkbox
+                id="{param.name}:{val}"
                 bind:checked={
                     () => param.val.includes(val),
                     (value) => {
@@ -44,10 +47,12 @@
                 }
                 disabled={disabled}
             />
-            {label}
+            <label for="{param.name}:{val}">
+                {label}
+            </label>
         {/each}
     {:catch}
-        Failed to load options.
+        {translate("Failed to load options.")}
     {/await}
     
 </div>

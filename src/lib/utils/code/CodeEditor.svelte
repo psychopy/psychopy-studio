@@ -155,8 +155,8 @@
     class="container" 
     bind:this={container}
     style:resize={resize}
-    style:overflow-y={resize !== "horizontal" ? "auto" : "hidden"}
-    style:overflow-x={resize !== "vertical" ? "auto" : "hidden"}
+    style:overflow-y={resize !== "vertical" ? "hidden" : "auto"}
+    style:overflow-x={resize !== "horizontal" ? "hidden" : "auto"}
     style:opacity={disabled ? "50%" : "100%"}
 ></div>
 

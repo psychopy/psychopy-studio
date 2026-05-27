@@ -3,8 +3,9 @@
     import { Dialog } from "$lib/utils/dialog";
     import PluginsPanel from "./plugins/PluginsPanel.svelte";
     import PackagesPanel from "./packages/PackagesPanel.svelte";
+    import VenvChooser from "./VenvChooser.svelte";
     import { python } from "$lib/globals.svelte"
-    import { setContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         shown=$bindable()
@@ -20,7 +21,7 @@
 
 <Dialog
     id=plugin-mgr
-    title="Plugins & packages"
+    title={translate("Plugins & packages")}
     buttons={{
         OK: evt => {}
     }}
@@ -29,26 +30,9 @@
     <div class=container>
         <div class=environment-ctrl>
             Python environment:
-            <select bind:value={venv}>
-                {#await python.venv.executable("app") then appExecutable}
-                    {#await python.uv.getEnvironments()}
-                        <option>
-                            Scanning Python environments...
-                        </option>
-                    {:then environments}
-                        {#each environments as env}
-                            <option value={env.executable === appExecutable ? "app" : env.psychopyVersion}>
-                                {env.psychopyVersion}
-                                {#if env.executable === appExecutable}
-                                    (default)
-                                {/if}
-                            </option>
-                        {/each}
-                    {:catch err}
-                        <option>{err}</option>
-                    {/await}
-                {/await}
-            </select>
+            <VenvChooser 
+                bind:value={venv}
+            />
         </div>
 
         <Notebook>

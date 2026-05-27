@@ -5,6 +5,7 @@
     import { Icon } from "$lib/utils/icons";
     import { prefs } from "$lib/preferences.svelte";
     import { marked } from "marked";
+    import { translate } from "$lib/translation";
 
     let {
         categories=["general", "silly"],
@@ -35,14 +36,13 @@
 </script>
 
 <MessageDialog
-    title="PsychoPy Tips"
+    title={translate("PsychoPy Tips")}
     buttons={{
         OK: evt => {
             if (hide) {
                 prefs.params.showStartupTips.val = false;
                 prefs.save()
             }
-            
         },
         EXTRA: {
             Refresh: chooseTip
@@ -61,7 +61,7 @@
     </div>
     <div class=stop>
         <input type=checkbox bind:checked={hide}/>
-        Don't show startup tips
+        {translate("Don't show startup tips")}
     </div>
 </MessageDialog>
 

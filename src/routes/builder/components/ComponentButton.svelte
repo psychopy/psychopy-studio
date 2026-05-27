@@ -4,6 +4,7 @@
     import { getContext } from "svelte";
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
     import { ParamsNotebook } from "$lib/paramCtrls";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
 
@@ -56,7 +57,7 @@
 
 <Dialog 
     id=new-component
-    title="New {titleCase(component['__name__'])}"
+    title={translate("New {}").replace("{}", titleCase(component['__name__']))}
     bind:shown={showDialog}
     onopen={() => dlgComponent.restore.set()}
     buttons={{

@@ -1,7 +1,9 @@
 <script>
     import { mapping } from "./ctrls";
+    import { marked } from "marked";
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
     import { current } from "../../routes/builder/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         name,
@@ -99,14 +101,14 @@
 {#if shown && param.inputType !== "hidden"}
     <div 
         class=param-ctrl 
-        id={name}
+        id={param.name}
         style:grid-template-rows={inline ? "[label] min-content [warning] min-content" : "[label] min-content [ctrl] auto [warning] min-content"}
         style:flex-grow={grow ? 1 : 0}
         {...attachments}
     >
         <label 
             class=param-label 
-            for={name}
+            for={param.name}
             style:grid-column-start={inline ? "gap" : "label"}
             style:align-self={inline ? "center" : "end"}
             onmouseenter={(evt) => showTooltip = true}
@@ -130,12 +132,15 @@
                 id="{name}-updates" 
                 disabled={param.allowedUpdates.length == 1} 
                 bind:value={param.updates}
+                aria-label="{name} updates"
             >
                 {#each param.allowedUpdates as ud}
                     <option value={ud}>{ud}</option>
                 {/each}
                 {#each current.experiment.updateTargets as ud}
-                    <option value="set during: {ud.name}">set during: {ud.name}</option>
+                    <option value="set during: {ud.name}">
+                        {translate("set during: {}").replace("{}", ud.name)}
+                    </option>
                 {/each}
             </select>
         {/if}
@@ -153,7 +158,7 @@
             class=warning
         >
             {#if param.valid.warning}
-                {param.valid.warning}
+                {@html marked( param.valid.warning || "")}
             {/if}
         </div>
     </div>
@@ -199,5 +204,6 @@
         grid-column-end: end;
         justify-self: end;
         margin-top: -.25rem;
+        text-align: right;
     }
 </style>

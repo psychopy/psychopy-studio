@@ -1,11 +1,12 @@
 import path from "path-browserify";
+import { translate } from "$lib/translation";
 
 
 class _FontManager {
     // fonts installed on the system
     system = $state({
-        label: "System",
-        description: "Fonts which are installed to your computer",
+        label: translate("System"),
+        description: translate("Fonts which are installed to your computer"),
         fonts: [],
         scanning: Promise.resolve(true),
         refresh: () => {
@@ -29,8 +30,8 @@ class _FontManager {
     })
     // fonts packaged with PsychoPy
     packaged = $state({
-        label: "Packaged",
-        description: "Fonts which come packaged with PsychoPy",
+        label: translate("Packaged"),
+        description: translate("Fonts which come packaged with PsychoPy"),
         fonts: [],
         scanning: Promise.resolve(true),
         refresh: () => {
@@ -54,8 +55,8 @@ class _FontManager {
     })
     // fonts downloaded to the user folder
     user = $state({
-        label: "User",
-        description: "Fonts saved to your PsychoPy user folder",
+        label: translate("User"),
+        description: translate("Fonts saved to your PsychoPy user folder"),
         fonts: [],
         scanning: Promise.resolve(true),
         refresh: () => {
@@ -82,8 +83,8 @@ class _FontManager {
     })
     // fonts in the current experiment folder
     experiment = $state({
-        label: "Experiment",
-        description: "Fonts in the current experiment folder",
+        label: translate("Experiment"),
+        description: translate("Fonts in the current experiment folder"),
         fonts: [],
         scanning: Promise.resolve(true),
         refresh: (experiment) => {

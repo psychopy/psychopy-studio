@@ -4,6 +4,7 @@
     import FileCtrl from "./FileCtrl.svelte";
     import { electron, python } from "$lib/globals.svelte";
     import { MessageDialog } from "$lib/utils/dialog"; 
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -57,18 +58,18 @@
 {#if electron}
     <CompactButton
         icon="/icons/btn-{param.val ? "" : "new-"}table.svg"
-        tooltip="{param.val ? "Open" : "Create"} table"
+        tooltip={param.val ? translate("Open table") : translate("Create table")}
         onclick={param.val ? openTable : newTable}
         disabled={disabled || param.isCode}
     />
 
     <MessageDialog
-        title="Reminder..."
+        title={translate("Reminder...")}
         buttons={{
             OK: evt => {},
         }}
         bind:shown={showPrompt}
     >
-        <p>Once you have created and saved your table, please remember to add it.</p>
+        <p>{translate("Once you have created and saved your table, please remember to add it.")}</p>
     </MessageDialog>
 {/if}

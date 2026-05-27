@@ -1,5 +1,6 @@
 <script>
     import { Dialog } from "$lib/utils/dialog";
+    import { translate } from "$lib/translation";
 
     let {
         filter=$bindable(),
@@ -15,7 +16,7 @@
     shrink
 >
     <div class=container>
-        Show only Components which work with...
+        {translate("Show only Components which work with...")}
         <div class=radio-ctrl>  
             <input 
                 type=radio 
@@ -33,7 +34,9 @@
                 onclick={(evt) => filter = ["PsychoPy"]}
                 checked={filter && filter.includes("PsychoPy") && !filter.includes("PsychoJS")}
             />
-            <label for=component-filter-py>PsychoPy (local)</label>
+            <label for=component-filter-py>
+                {translate("PsychoPy (local)")}
+            </label>
                 
             <input 
                 type=radio 
@@ -42,7 +45,9 @@
                 onclick={(evt) => filter = ["PsychoJS"]}
                 checked={filter && !filter.includes("PsychoPy") && filter.includes("PsychoJS")}
             />
-            <label for=component-filter-js>PsychoJS (online)</label>
+            <label for=component-filter-js>
+                P{translate("PsychoJS (online)")}
+            </label>
 
             <input 
                 type=radio 
@@ -51,7 +56,9 @@
                 onclick={(evt) => filter = ["PsychoPy", "PsychoJS"]}
                 checked={filter && filter.includes("PsychoPy") && filter.includes("PsychoJS")}
             />
-            <label for=component-filter-both>Both</label>
+            <label for=component-filter-both>
+                {translate("Both")}
+            </label>
         </div>
     </div>
 </Dialog>

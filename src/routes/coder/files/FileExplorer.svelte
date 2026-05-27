@@ -25,6 +25,7 @@
     <TreeRoot>
         <FolderNode
             bind:value={directory}
+            top
         />
     </TreeRoot>
 </div>

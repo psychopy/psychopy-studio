@@ -21,6 +21,8 @@
 <Item 
     label={label} 
     icon={icon} 
+    onmouseenter={() => shown = true}
+    onmouseleave={() => shown = false}
     onclick={() => {
         shown = true
     }}
@@ -28,6 +30,7 @@
     close={false}
     disabled={disabled}
 >
+
     {#snippet submenu()}
         <Icon 
             src="/icons/sym-arrow-right.svg"

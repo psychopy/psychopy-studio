@@ -192,15 +192,38 @@
                 "enabled": []
             }
         },
-        "locale": {
-            "val": "system locale",
+        "environmentsFolder": {
+            "val": null,
             "valType": "str",
             "inputType": "choice",
             "categ": "Application",
             "updates": null,
             "allowedUpdates": null,
-            "allowedVals": "python:///psychopy.localization:available",
-            "allowedLabels": [],
+            "allowedVals": [
+                "user",
+                "global"
+            ],
+            "allowedLabels": [
+                "User folder",
+                "Shared folder"
+            ],
+            "label": "Python environments",
+            "hint": "Where should we put Python on your machine?",
+            "plugin": null,
+            "depends": {
+                "shown": [],
+                "enabled": []
+            }
+        },
+        "locale": {
+            "val": "system locale",
+            "valType": "str",
+            "inputType": "locale",
+            "categ": "Application",
+            "updates": null,
+            "allowedUpdates": null,
+            "allowedVals": null,
+            "allowedLabels": null,
             "label": "Language",
             "hint": "Language to use in menus etc; not all translations are available. Select a value, then restart the app.",
             "plugin": null,
@@ -220,6 +243,8 @@
                 "psychopy",
                 "psychopy-light",
                 "psychopy-dark",
+                "hivis-light",
+                "hivis-dark",
                 "catppuccin-latte",
                 "catppuccin-frappe",
                 "catppuccin-macchiato",
@@ -230,6 +255,8 @@
                 "PsychoPy Responsive",
                 "PsychoPy Light",
                 "PsychoPy Dark",
+                "High-Vis Light",
+                "High-Vis Dark",
                 "Catppuccin Latte",
                 "Catppuccin Frappe",
                 "Catppuccin Macchiato",

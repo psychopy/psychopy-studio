@@ -5,7 +5,7 @@ import { Experiment } from "$lib/experiment";
 import { Script } from "$lib/experiment/script.svelte";
 import { electron } from "$lib/globals.svelte";
 import { current } from './globals.svelte.js';
-
+import { translate } from "$lib/translation";
 
 
 export async function addFile(file, pilotMode=undefined) {
@@ -89,14 +89,14 @@ export async function fileOpen(replace=false) {
     if (replace) {
         allowedFiles = [
             // only psyrun if we're replacing
-            { description: "PsychoPy Runner Configurations", accept: {"application/x-python-code": [".psyrun"]} }
+            { description: translate("PsychoPy Runner Configurations"), accept: {"application/x-python-code": [".psyrun"]} }
         ]
     } else {
         // psyexp, py and psyrun if we're adding
         allowedFiles = [
-            { description: "PsychoPy Experiments", accept: {"application/xml": [".psyexp"]} },
-            { description: "Python Scripts", accept: {"application/x-python-code": [".py"]} },
-            { description: "PsychoPy Runner Configurations", accept: {"application/x-python-code": [".psyrun"]} }
+            { description: translate("PsychoPy Experiments"), accept: {"application/xml": [".psyexp"]} },
+            { description: translate("Python Scripts"), accept: {"application/x-python-code": [".py"]} },
+            { description: translate("PsychoPy Runner Configurations"), accept: {"application/x-python-code": [".psyrun"]} }
         ]
     }
     // open file browser
@@ -153,7 +153,7 @@ export async function fileSaveAs() {
     // open file browser
     let file = await browseFileSave(
         [
-            { description: "PsychoPy Runner Configurations", accept: {"application/xml": [".psyrun"]} }
+            { description: translate("PsychoPy Runner Configurations"), accept: {"application/xml": [".psyrun"]} }
         ],
         current.file?.file || "untitled.psyrun"
     )

@@ -2,6 +2,7 @@
     import { MessageDialog } from "$lib/utils/dialog";
     import { getContext } from "svelte";
     import { fileSave } from "./callbacks.svelte.js";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current")
 
@@ -38,6 +39,6 @@
         CANCEL: (evt) => {},
     }}
 >
-    '{current.experiment.file.name}' has unsaved changes, save now?
+    {translate("{}' has unsaved changes, save now?").replace("{}", current.experiment.file.name)}
 </MessageDialog>
 {/if}

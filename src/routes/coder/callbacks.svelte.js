@@ -2,7 +2,8 @@ import { electron, python, projects } from '$lib/globals.svelte.js';
 import { browseFileOpen, browseFileSave, parsePath } from "$lib/utils/files.js";
 import { openIn, showDevTools } from "$lib/utils/views.svelte"
 import { current } from './globals.svelte.js';
-import { Script } from "$lib/experiment"
+import { Script } from "$lib/experiment";
+import { translate } from "$lib/translation";
 
 
 /* File */
@@ -25,9 +26,9 @@ export function fileNew() {
 export async function fileOpen() {
     let file = await browseFileOpen(
         [
-            { description: "Python Scripts", accept: {"text/x-python-code": [".py"]} },
-            { description: "JavaScript Scripts", accept: {"text/javascript": [".js"]} },
-            { description: "Data Files", accept: {"text/csv": [".csv"], "application/json": [".json"]}},
+            { description: translate("Python Scripts"), accept: {"text/x-python-code": [".py"]} },
+            { description: translate("JavaScript Scripts"), accept: {"text/javascript": [".js"]} },
+            { description: translate("Data Files"), accept: {"text/csv": [".csv"], "application/json": [".json"]}},
         ],
         current.pages[current.tab]?.file?.parent
     )
@@ -58,9 +59,9 @@ export async function fileSaveAs() {
     // open file browser
     let file = await browseFileSave(
         [
-            { description: "Python Scripts", accept: {"text/x-python-code": [".py"]} },
-            { description: "JavaScript Scripts", accept: {"text/javascript": [".js"]} },
-            { description: "Data Files", accept: {"text/csv": [".csv"], "application/json": [".json"]}},
+            { description: translate("Python Scripts"), accept: {"text/x-python-code": [".py"]} },
+            { description: translate("JavaScript Scripts"), accept: {"text/javascript": [".js"]} },
+            { description: translate("Data Files"), accept: {"text/csv": [".csv"], "application/json": [".json"]}},
         ],
         current.pages[current.tab]?.file?.file || "untitled.py"
     )

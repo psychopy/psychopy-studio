@@ -1,6 +1,7 @@
 <script>
     import { CompactButton } from "$lib/utils/buttons";
     import { projects } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         project
@@ -17,7 +18,7 @@
             onclick={(evt) => delete projects[project.id]}
         />
     </div>  
-    <div>Local folder:</div>
+    <div>{translate("Local folder:")}</div>
     <input bind:value={project.localRoot} />
     
 </div>

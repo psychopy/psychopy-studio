@@ -2,6 +2,7 @@
     import PluginItem from "./PluginItem.svelte";
     import { electron, python } from "$lib/globals.svelte";
     import { onMount, setContext, untrack } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         venv=$bindable()
@@ -42,7 +43,7 @@
             <input type=search bind:value={searchterm} />
             <div class=plugins-list>
                 {#await fetch("/api/plugins").then(resp => resp.json())}
-                    <div class=message>Getting plugins...</div>
+                    <div class=message>{translate("Getting plugins...")}</div>
                 {:then plugins}
                     {#each plugins.sort(
                         // installed packages at the top
@@ -56,7 +57,9 @@
                         {/if}
                     {/each}
                 {:catch err}
-                    <div class=message>Failed to get plugins</div>
+                    <div class=message>
+                        {translate("Failed to get plugins")}
+                    </div>
                     <pre>{err}</pre>
                 {/await}
             </div>

@@ -1,5 +1,6 @@
 <script>
     import { python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
     
     let {
         value=$bindable(),
@@ -39,7 +40,7 @@
     <div class=ctrls>
         <!-- long -->
         <div class=ctrl>
-            <div class=label>Long</div>
+            <div class=label>{translate("Long")}</div>
             <input 
                 type=number 
                 bind:value={lms[0]}
@@ -50,7 +51,7 @@
         </div>
         <!-- medium -->
         <div class=ctrl>
-            <div class=label>Medium</div>
+            <div class=label>{translate("Medium")}</div>
             <input 
                 type=number 
                 bind:value={lms[1]}
@@ -61,7 +62,7 @@
         </div>
         <!-- short -->
         <div class=ctrl>
-            <div class=label>Short</div>
+            <div class=label>{translate("Short")}</div>
             <input 
                 type=number 
                 bind:value={lms[2]}
@@ -87,7 +88,7 @@
         {/await}
     {:else}
         <div class=preview>
-            LMS preview is not available in browser.
+            {translate("LMS preview is not available in browser.")}
         </div>
     {/if}
 </div>

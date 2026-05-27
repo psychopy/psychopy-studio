@@ -8,6 +8,7 @@
     import { CompactButton } from "$lib/utils/buttons";
     import { PluginManagerDlg } from "$lib/dialogs/pluginManager"
     import { electron, python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     /**
      * Sort Components into ordered categories
@@ -73,11 +74,13 @@
      */
     async function refreshProfiles() {
         if (await python?.ready) {
-            profilesPending.components = python.liaison.send("app", {
-                command: "run",
-                args: ["psychopy.experiment:getElementProfiles"]
-            }, 100000).then(
-                data => Object.assign(allProfiles.components, data)
+            profilesPending.components.resolve(
+                python.liaison.send("app", {
+                    command: "run",
+                    args: ["psychopy.experiment:getElementProfiles"]
+                }, 100000).then(
+                    data => Object.assign(allProfiles.components, data)
+                )
             )
         }
     }
@@ -91,7 +94,7 @@
         {#if python?.ready}
             <CompactButton
                 icon="/icons/btn-add.svg"
-                tooltip="Get more..."
+                tooltip={translate("Get more...")}
                 onclick={evt => showPluginMgr = true}
             />
             <PluginManagerDlg 
@@ -99,24 +102,26 @@
             />
             <CompactButton
                 icon="/icons/btn-refresh.svg"
-                tooltip="Reload Components"
+                tooltip={translate("Reload Components")}
                 onclick={refreshProfiles}
             />
         {/if}
         <CompactButton
             icon="/icons/btn-filter.svg"
-            tooltip="Filter..."
-            onclick={(evt) => showFilterDlg = true}
+            tooltip={translate("Filter...")}
+            onclick={evt => showFilterDlg = true}
         />
         <FilterDialog
             bind:filter={filter}
             bind:shown={showFilterDlg}
-        ></FilterDialog>
+        />
     </div>
     <div class=components>
         {#await python?.ready then ready}
-            {#await profilesPending.components}
-                <div class=message>Loading Components...</div>
+            {#await profilesPending.components.promise}
+                <div class=message>
+                    {translate("Loading Components...")}
+                </div>
             {:then}
                 {#each sortProfiles(allProfiles.components) as [categ, categProfiles]}
                     {#if filterProfiles(categProfiles).length}
@@ -125,11 +130,11 @@
                                 {#if profile['__class__'].startsWith("psychopy.experiment.components") || profile['__class__'].endsWith("omponent")}
                                     <ComponentButton 
                                         component={profile}
-                                    ></ComponentButton>
+                                    />
                                 {:else}
                                     <RoutineButton 
                                         component={profile}
-                                    ></RoutineButton>
+                                    />
                                 {/if}
                             {/each}
                         </ComponentSection>
@@ -138,7 +143,7 @@
             {:catch err}
                 <div class="message error">
                     <div>
-                        Failed to load Components. 
+                        {translate("Failed to load Components.")}
                     </div>
                     <pre>
 {err.error?.join?.("\n")}

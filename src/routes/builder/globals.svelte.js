@@ -17,5 +17,7 @@ export let current = $state({
     routine: undefined,
     moving: undefined,
     inserting: undefined,
-    clipboard: new Clipboard()
+    clipboard: new Clipboard(),
+    // setting this as false mutes "Python error..." popups
+    errorPopups: true
 })

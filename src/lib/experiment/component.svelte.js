@@ -27,6 +27,11 @@ export class Component extends HasParams {
             // if measured on the fly, assume 60 for display purposes
             fr = 60;
         }
+        // use estimated start if we have one
+        let startEstim = parseFloat(this.params['startEstim']?.val)
+        if (!isNaN(startEstim)) {
+            return startEstim
+        }
         // if we don't have the necessary params, return null
         if (!("startType" in this.params) || !("startVal" in this.params)) {
             return null;
@@ -60,6 +65,11 @@ export class Component extends HasParams {
         } else {
             // if measured on the fly, assume 60 for display purposes
             fr = 60;
+        }
+        // use estimated stop if we have one
+        let durEstim = parseFloat(this.params['durationEstim']?.val)
+        if (!isNaN(durEstim)) {
+            return (this.visualStart || 0) + durEstim
         }
         // if we don't have the necessary params, return null
         if (!("stopType" in this.params) || !("stopVal" in this.params)) {

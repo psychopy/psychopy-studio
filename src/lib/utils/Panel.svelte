@@ -44,6 +44,7 @@
     .panel .pnl-title {
         padding: .3em 1rem;
         background-color: var(--overlay);
+        color: var(--text-on-overlay);
         width: stretch;
         overflow: hidden;
     }

@@ -1,5 +1,6 @@
 import { Param } from "$lib/experiment";
 import { python } from "$lib/globals.svelte";
+import { translate } from "$lib/translation";
 
 
 export class MonitorConfiguration {
@@ -40,8 +41,8 @@ export class MonitorConfiguration {
             updates: "constant",
             inputType: "single",
             valType: "code",
-            label: "Screen distance (cm)",
-            hint: "How far, in centimeters (cm), is the screen from the participant?"
+            label: translate("Screen distance (cm)"),
+            hint: translate("How far, in centimeters (cm), is the screen from the participant?")
         })
         this.params.sizePix = new Param("sizePix")
         Object.assign(this.params.sizePix, {
@@ -49,8 +50,8 @@ export class MonitorConfiguration {
             updates: "constant",
             inputType: "single",
             valType: "list",
-            label: "Screen size (pix)",
-            hint: "The dimensions of the screen in pixels"
+            label: translate("Screen size (pix)"),
+            hint: translate("The dimensions of the screen in pixels")
         })
         this.params.width = new Param("width")
         Object.assign(this.params.width, {
@@ -58,8 +59,8 @@ export class MonitorConfiguration {
             updates: "constant",
             inputType: "single",
             valType: "code",
-            label: "Screen width (cm)",
-            hint: "The width of the screen in cenimeters (cm)"
+            label: translate("Screen width (cm)"),
+            hint: translate("The width of the screen in centimeters (cm)")
         })
         this.params.usebits = new Param("usebits")
         Object.assign(this.params.usebits, {
@@ -67,8 +68,8 @@ export class MonitorConfiguration {
             updates: "constant",
             inputType: "bool",
             valType: "code",
-            label: "Use bits++?",
-            hint: "Whether to use a CRS Bits++ calibration tool"
+            label: translate("Use bits++?"),
+            hint: translate("Whether to use a CRS Bits++ calibration tool")
         })
         this.params.gammaGrid = new Param("gammaGrid")
         Object.assign(this.params.gammaGrid, {
@@ -76,8 +77,8 @@ export class MonitorConfiguration {
             updates: "constant",
             inputType: "calibration",
             valType: "code",
-            label: "Gamma calibration",
-            hint: "Gamma calibration grid"
+            label: translate("Gamma calibration"),
+            hint: translate("Gamma calibration grid")
         })
         
         // {
@@ -107,31 +108,31 @@ export class CalibrationSetup {
         Object.assign(this.params.photometer, {
             valType: "code",
             inputType: "choice",
-            label: "Photometer",
-            hint: "Photometer device, from the device manager, to use for this calibration"
+            label: translate("Photometer"),
+            hint: translate("Photometer device, from the device manager, to use for this calibration")
         })
         this.params.screen = new Param("screen")
         Object.assign(this.params.screen, {
             valType: "code",
             inputType: "single",
-            label: "Screen",
-            hint: "Screen number to run calibration on"
+            label: translate("Screen"),
+            hint: translate("Screen number to run calibration on")
         })
         this.params.patchSize = new Param("patchSize")
         Object.assign(this.params.patchSize, {
             val: 0.3,
             valType: "code",
             inputType: "single",
-            label: "Patch size",
-            hint: "How much of the screen (0-1) the calibration patch should occupy"
+            label: translate("Patch size"),
+            hint: translate("How much of the screen (0-1) the calibration patch should occupy")
         })
         this.params.nPoints = new Param("nPoints")
         Object.assign(this.params.nPoints, {
             val: 8,
             valType: "code",
             inputType: "single",
-            label: "Calibration points",
-            hint: "How many calibration points to use"
+            label: translate("Calibration points"),
+            hint: translate("How many calibration points to use")
         })
         // get photometer classes
         this.ready = python.liaison.send("app", {

@@ -5,6 +5,7 @@
     import { getContext } from "svelte";
     import { copyRoutine } from "../callbacks.svelte";
     import ParamsDialog from "$lib/paramCtrls/ParamsDialog.svelte";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
 
@@ -84,13 +85,13 @@
     {#if element.settings}
         <MenuItem
             icon="/icons/btn-edit.svg"
-            label="Routine settings"
-            onclick={(evt) => show.settingsDlg = true}
+            label={translate("Routine settings")}
+            onclick={evt => show.settingsDlg = true}
         />
     {/if}
     <MenuItem
         icon="/icons/sym-dot-{element.disabled ? "blue" : "light"}.svg"
-        label="{element.disabled ? "Enable" : "Disable"} Routine"
+        label={element.disabled ? translate("Enable Routine") : translate("Disable Routine")}
         onclick={(evt) => {
             // update history
             current.experiment.history.update(`${element.disabled ? "enable" : "disable"} ${element.name}`);
@@ -104,12 +105,12 @@
     />
     <MenuItem 
         icon="/icons/btn-copy.svg"
-        label="Copy Routine"
+        label={translate("Copy Routine")}
         onclick={evt => copyRoutine(element)}
     />
     <MenuItem 
         icon="/icons/btn-delete.svg"
-        label="Remove Routine"
+        label={translate("Remove Routine")}
         onclick={removeRoutine}
     />
 </Menu>

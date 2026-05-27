@@ -28,6 +28,7 @@
 
 <select 
     class=param-choice-input
+    id={param.name}
     disabled={disabled || param.allowedVals.length == 1 && param.allowedVals.includes(param.val)} 
     bind:value={param.val}
     style:color={param.valid.value ? "inherit" : "var(--red)"}

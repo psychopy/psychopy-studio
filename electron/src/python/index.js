@@ -26,7 +26,7 @@ export const handlers = {
     venv: {
         setup: ipcMain.handle("python.venv.setup", async (evt, venv, prerelease=false) => (await getVenv(venv)).setup(prerelease)),
         executable: ipcMain.handle("python.venv.executable", async (evt, venv) => (await getVenv(venv)).executable),
-        installPackage: ipcMain.handle("python.venv.installPackage", async (evt, venv, name) => (await getVenv(venv)).installPackage(name)),
+        installPackage: ipcMain.handle("python.venv.installPackage", async (evt, venv, name, version=undefined) => (await getVenv(venv)).installPackage(name, version)),
         uninstallPackage: ipcMain.handle("python.venv.uninstallPackage", async (evt, venv, name) => (await getVenv(venv)).uninstallPackage(name)),
         getPackages: ipcMain.handle("python.venv.getPackages", async (evt, venv) => (await getVenv(venv)).getPackages()),
         getPackageDetails: ipcMain.handle("python.venv.getPackageDetails", async (evt, venv, name) => (await getVenv(venv)).getPackageDetails(name))
@@ -34,6 +34,8 @@ export const handlers = {
     uv: {
         folder: ipcMain.handle("python.uv.folder", (evt) => uv.folder),
         executable: ipcMain.handle("python.uv.executable", (evt) => uv.executable),
+        findDirectory: ipcMain.handle("python.uv.findDirectory", (evt, option) => uv.findDirectory(option)),
+        setDirectory: ipcMain.handle("python.uv.setDirectory", (evt, option) => uv.setDirectory(option)),
         exists: ipcMain.handle("python.uv.exists", (evt) => uv.exists()),
         install: ipcMain.handle("python.uv.install", (evt) => uv.install()),
         makeExecutable: ipcMain.handle("python.uv.makeExecutable", (evt, psychopyVersion, pythonVersion) => uv.makeExecutable(psychopyVersion, pythonVersion)),
@@ -62,7 +64,7 @@ export const handlers = {
         stop: ipcMain.handle("python.scripts.stop", async (evt, venv, id) => (await getVenv(venv)).scripts[id].stop())
     },
     psychojs: {
-        run: ipcMain.handle("python.psychojs.run", async (evt, cwd) => await PsychoJSServer.run(cwd)),
+        run: ipcMain.handle("python.psychojs.run", async (evt, cwd, params={}) => await PsychoJSServer.run(cwd, params)),
         stop: ipcMain.handle("python.psychojs.stop", (evt, address) => getPsychoJSServer(address).stop()),
     }
 }

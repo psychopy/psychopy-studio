@@ -1,6 +1,7 @@
 <script>
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
     import { ParamsNotebook } from "$lib/paramCtrls/index.js";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment/param.svelte.js")<HasParams>} Element which this dialog edits */
@@ -31,7 +32,7 @@
 
 <Dialog 
     id="{element.name}-parameters"
-    title="Editing: {element.name || element.tag}"
+    title={`${translate("Editing")}: ${element.name || element.tag}`}
     bind:shown={shown} 
     onclose={onclose}
     onopen={() => element.restore.set()}

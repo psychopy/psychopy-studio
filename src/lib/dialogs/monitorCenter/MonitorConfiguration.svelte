@@ -2,6 +2,7 @@
     import { Button } from "$lib/utils/buttons";
     import { ParamCtrl } from "$lib/paramCtrls";
     import CalibrationSetupDlg from "./CalibrationSetupDlg.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         calib=$bindable()
@@ -22,7 +23,7 @@
     {/each}
     <div class=calibrate-btn>
         <Button 
-            label="Calibrate"
+            label={translate("Calibrate")}
             icon="/icons/btn-runpy.svg"
             onclick={evt => show.calibSetup = true}
             horizontal

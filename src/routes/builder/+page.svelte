@@ -19,12 +19,15 @@
     } from "./callbacks.svelte";
     import { python } from "$lib/globals.svelte";
     import TipsDialog from '../../lib/dialogs/tips/TipsDialog.svelte';
+    import { updateLocale, translate } from "$lib/translation";
 
     // parse url params
     let params = new URLSearchParams(location.search)
     // if given a file to open, open it
     if (params.get("fileOpen")) {
-        openFile(params.get("fileOpen"))
+        params.get("fileOpen").split(",").forEach(
+            item => openFile(item)
+        )
     }
 
     // reference current in context for ease of access
@@ -36,13 +39,25 @@
         // mark ready
         electron.windows.emit("ready", true)
     }
-    
+
+    $effect(updateLocale)
+
+    // keep app state up to date with open files
+    if (electron) {
+        $effect(() => {
+            electron.state.updateFrame(
+                {
+                    files: [current.experiment?.file?.file]
+                }
+            )
+        })
+    }
 </script>
 
 {#if current.experiment.file}
-    <title>PsychoPy Builder: {current.experiment.file?.name}</title>
+    <title>{translate("PsychoPy Builder")}: {current.experiment.file?.name}</title>
 {:else}
-    <title>PsychoPy Builder</title>
+    <title>{translate("PsychoPy Builder")}</title>
 {/if}
 
 <Frame
@@ -56,7 +71,7 @@
             <PaneGroup direction="horizontal">
                 <Pane defaultSize={3/4}>
                     <Panel 
-                        title=Routines 
+                        title={translate("Routines")} 
                     >
                         <RoutinesNotebook />
                     </Panel>
@@ -66,7 +81,7 @@
 
                 <Pane defaultSize={1/4}>
                     <Panel 
-                        title=Components 
+                        title={translate("Components")} 
                     >
                         <ComponentsPanel />
                     </Panel>
@@ -78,7 +93,7 @@
 
         <Pane defaultSize={1/3}>
             <Panel 
-                title=Flow 
+                title={translate("Flow")} 
                 hspan={4}
             >
                 <FlowPanel />
@@ -103,7 +118,9 @@
     <!-- this will setup a Python instance -->
     {#if python}
         <SetupPython />
-        <PythonErrors />
+        <PythonErrors 
+            bind:enabled={current.errorPopups}
+        />
     {/if}
 
 </Frame>

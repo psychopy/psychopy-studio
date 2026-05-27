@@ -1,12 +1,13 @@
 <script>
     import { Notebook, NotebookPage } from "$lib/utils/notebook";
+    import { showWindow } from "$lib/utils/views.svelte";
+    import { DeepLink } from "$lib/dialogs/deepLink";
     import Frame from "$lib/utils/Frame.svelte";
     import Panel from "$lib/utils/Panel.svelte";
     import { PaneGroup, Pane, PaneResizer } from "paneforge";
     import Theme from "$lib/utils/Theme.svelte";
     import AlertsOutput from "./outputs/AlertsOutput.svelte";
     import FilesPanel from "./files/Panel.svelte";
-
     import { current } from "./globals.svelte";
     import { setContext } from "svelte";
     import StdoutOutput from "./outputs/StdoutOutput.svelte";
@@ -18,6 +19,8 @@
     import Shortcuts from '$lib/utils/Shortcuts.svelte';
     import { shortcuts } from "./callbacks.svelte";
     import TipsDialog from '$lib/dialogs/tips/TipsDialog.svelte';
+    import { updateLocale, translate } from "$lib/translation"
+    
 
     setContext("current", current)
 
@@ -25,7 +28,9 @@
     let params = new URLSearchParams(location.search)
     // if given a file to open, open it
     if (params.get("fileOpen")) {
-        addFile(params.get("fileOpen"))
+        params.get("fileOpen").split(",").forEach(
+            item => addFile(item)
+        )
     }
     
     // listen for messages from other windows
@@ -43,7 +48,10 @@
             if (!current.output.alerts.some(
                 item => item.code === message.message.code
             )) {
-                current.output.alerts.push(message.message)
+                current.output.alerts.push(message.message);
+                // focus runner and switch to alerts tab
+                showWindow("runner", true)
+                current.tab = "alerts";
             }
         }
     )
@@ -52,24 +60,50 @@
         (evt, message) => current.output.stdout += `${message}\n`
     )
     python.output.stderr.listen(
-        (evt, message) => current.output.stdout += `${message}\n`
+        (evt, message) => {
+            current.output.stdout += `${message}\n`;
+            // focus runner and switch to stdout tab
+            showWindow("runner", true)
+            current.tab = "stdout";
+        }
     )
     python.liaison.listen("error",
-        (evt, message) => current.output.stdout += `${message.error}\n`
+        (evt, message) => {
+            current.output.stdout += `${message.error}\n`;
+            // focus runner and switch to stdout tab
+            showWindow("runner", true)
+            current.tab = "stdout";
+        }
     )
     // setup listener for pavlovia
     git.listen(
         (evt, message) => {
-            current.output.pavlovia += message + "\n"
+            current.output.pavlovia += message + "\n";
+            // focus runner and switch to pavlovia tab
+            showWindow("runner", true)
+            current.tab = "pavlovia";
         }
     )
+
+    $effect(updateLocale)
+
+    // keep app state up to date with open files
+    if (electron) {
+        $effect(() => {
+            electron.state.updateFrame(
+                {
+                    files: Object.values(current.runlist).map(item => item.file?.file)
+                }
+            )
+        })
+    }
 </script>
 
 
 {#if current.runlist[current.selection]?.file?.name}
-    <title>PsychoPy Runner: {current.runlist[current.selection].file.name}</title>
+    <title>{translate("PsychoPy Runner")}: {current.runlist[current.selection].file.name}</title>
 {:else}
-    <title>PsychoPy Runner</title>
+    <title>{translate("PsychoPy Runner")}</title>
 {/if}
 <Frame
     onFileDrop={(evt, file) => addFile(file)}
@@ -155,4 +189,8 @@
     />
     <!-- this will setup a Python instance -->
     <SetupPython />
+    <!-- this will handle opening Pavlovia projects from a URI -->
+    <DeepLink 
+        project={params.get("projectOpen")}
+    />
 </Frame>
