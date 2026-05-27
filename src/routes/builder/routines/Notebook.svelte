@@ -6,6 +6,7 @@
     import { getContext } from "svelte";
     import { Dialog } from '$lib/utils/dialog';
     import { ParamsNotebook } from '$lib/paramCtrls';
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
     let showNewRoutineDialog = $state.raw(false)
@@ -37,7 +38,7 @@
                     current.experiment.history.update()
                     delete current.experiment.routines[name]
                 }}
-                closeTooltip="Delete {name}"
+                closeTooltip={translate("Delete {}").replace("{}", name)}
                 data={routine}
             >
                 {#if routine instanceof Routine}
@@ -55,7 +56,7 @@
             // show dialog
             showNewRoutineDialog = true
         }}
-        tooltip="New Routine..."
+        tooltip={translate("New Routine...")}
     ></ButtonTab>
 </Notebook>
 

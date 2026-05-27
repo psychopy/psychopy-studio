@@ -1,5 +1,6 @@
 <script>
     import { python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         value=$bindable(),
@@ -39,7 +40,7 @@
     <div class=ctrls>
         <!-- elevation -->
         <div class=ctrl>
-            <div class=label>Elevation</div>
+            <div class=label>{translate("Elevation")}</div>
             <input 
                 type=number 
                 bind:value={dkl[0]}
@@ -49,7 +50,7 @@
         </div>
         <!-- azimuth -->
         <div class=ctrl>
-            <div class=label>Azimuth</div>
+            <div class=label>{translate("Azimuth")}</div>
             <input 
                 type=number 
                 bind:value={dkl[1]}
@@ -59,7 +60,7 @@
         </div>
         <!-- blue -->
         <div class=ctrl>
-            <div class=label>Contrast</div>
+            <div class=label>{translate("Contrast")}</div>
             <input 
                 type=number 
                 bind:value={dkl[2]}
@@ -85,7 +86,7 @@
         {/await}
     {:else}
         <div class=preview>
-            DKL preview is not available in browser.
+            {translate("DKL preview is not available in browser.")}
         </div>
     {/if}
 </div>

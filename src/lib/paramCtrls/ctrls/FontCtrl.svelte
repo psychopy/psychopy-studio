@@ -5,6 +5,7 @@
     import { getContext } from "svelte";
     import { CompactButton } from "$lib/utils/buttons";
     import { FontManager, FontManagerDialog} from "$lib/dialogs/fontManager";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -67,7 +68,7 @@
 {#if python?.ready}
     <CompactButton 
         icon="/icons/btn-case.svg"
-        tooltip="Open font manager"
+        tooltip={translate("Open font manager")}
         awaiting={FontManager.all.scanning}
         onclick={evt => show.dialog = true}
     />

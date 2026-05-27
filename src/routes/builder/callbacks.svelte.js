@@ -1,11 +1,12 @@
-import { electron, projects, python } from '$lib/globals.svelte.js';
+import { electron, python } from '$lib/globals.svelte.js';
 import { current } from './globals.svelte.js';
 
 import path from "path-browserify";
 import { newWindow, openIn, showDevTools } from "$lib/utils/views.svelte"
 import { browseFileOpen, browseFileSave, parsePath } from "$lib/utils/files.js";
-import { Routine, HasParams } from "$lib/experiment"
+import { Routine, Component, HasParams } from "$lib/experiment"
 import { prefs } from "$lib/preferences.svelte";
+import { translate } from "$lib/translation";
 
 
 /* File */
@@ -18,7 +19,7 @@ export async function file_open() {
     // open file browser
     let file = await browseFileOpen(
         [
-            { description: "PsychoPy Experiments", accept: {"application/xml": [".psyexp"]} }
+            { description: translate("PsychoPy Experiments"), accept: {"application/xml": [".psyexp"]} }
         ],
         current.experiment.file?.parent || ""
     )
@@ -38,13 +39,6 @@ export async function openFile(file) {
         current.routine = Object.values(current.experiment.routines)[0];
     } else {
         current.routine = undefined;
-    }
-    // is file a known project?
-    for (let project of Object.values(projects)) {
-        // placeholder: how do we query local folder?
-        if (project.id.endsWith(current.experiment.file.stem)) {
-            current.project = project
-        }
     }
     // mark as no longer modified
     current.experiment.history.clear()
@@ -85,7 +79,7 @@ export async function file_save_as() {
     // open file browser
     let file = await browseFileSave(
         [
-            { description: "PsychoPy Experiments", accept: {"application/xml": [".psyexp"]} }
+            { description: translate("PsychoPy Experiments"), accept: {"application/xml": [".psyexp"]} }
         ],
         current.experiment.file?.file || "untitled.psyexp"
     )
@@ -203,6 +197,41 @@ export async function pasteRoutine() {
     current.experiment.routines[element.name] = current.routine = element
 }
 
+/**
+ * Copy the given Component to the app's (inter-window) clipboard
+ * 
+ * @param {HasParams} component Component to copy
+ */
+export function copyComponent(component) {
+    // store JSON representation in clipboard
+    current.clipboard.set(component.toJSON())
+}
+
+/**
+ * Paste a Component from the (inter-window) clipboard into the given Routine at the given position
+ * 
+ * @param {Routine} routine Routine to paste into
+ * @param {integer} index Index in the Routine to insert the Component
+ */
+export async function pasteComponent(routine, index) {
+    let clipboard = await current.clipboard.get()
+    // abort if nothing is in the clipboard
+    if (!clipboard) {
+        return
+    }
+    // create element from clipboard
+    let element = new Component(clipboard.tag)
+    element.fromJSON(clipboard)
+    // make name valid
+    let name = current.experiment.resolveNameConflict(element.name)
+    // set name
+    if (element.params['name']) {
+        element.params['name'].val = name
+    }
+    // add to Routine
+    routine.insertComponent(element, index)
+}
+
 /* Run */
 
 
@@ -256,8 +285,12 @@ export async function compileJS() {
 export async function runPython() {
     // send to runner
     await sendToRunner()
+    // mute error popups (errors will be shown in Runner)
+    current.errorPopups = false
     // run script
     await current.experiment.runPython(true)
+    // re-enable error popups
+    current.errorPopups = true
 
     return true
 }
@@ -265,6 +298,8 @@ export async function runPython() {
 export async function stopPython(executable) {
     // cancel running
     await current.experiment.stopPython()
+    // re-enable error popups
+    current.errorPopups = true
 }
 
 export async function runJS() {

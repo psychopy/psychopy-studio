@@ -1,6 +1,7 @@
 <script>
     import { prefs } from "$lib/preferences.svelte";
     import ParamsDialog from "$lib/paramCtrls/ParamsDialog.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         shown=$bindable()
@@ -8,7 +9,7 @@
 </script>
 
 {#await prefs.ready}
-    Loading...
+    {translate("Loading...")}
 {:then}
     <ParamsDialog
         element={prefs}

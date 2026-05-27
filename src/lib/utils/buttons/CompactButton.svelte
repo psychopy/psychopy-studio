@@ -26,6 +26,7 @@
     onfocusin={() => {showTooltip = true}}
     onfocusout={() => {showTooltip = false}}
     style:z-index={showTooltip ? 10 : "inherit"}
+    aria-label={tooltip}
 >
     {#if tooltip}
         <Tooltip

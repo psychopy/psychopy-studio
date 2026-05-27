@@ -29,6 +29,7 @@
 <input 
     class=param-text-input-single 
     type="text" 
+    id={param.name}
     bind:value={param.val} 
     class:valid={param.valid.value} 
     class:code={param.isCode} 

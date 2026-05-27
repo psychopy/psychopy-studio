@@ -3,42 +3,76 @@
     import SingleLineCtrl from "./ctrls/SingleLineCtrl.svelte";
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
 
-    /** @prop @type {string} Name (Start or Stop)*/
-    export let name;
-    /** @prop @type {{valueParam: import("$lib/experiment").Param|null, typeParam: import("$lib/experiment").Param|null, expectedParam: import("$lib/experiment").Param|null}}*/
-    export let params;
+    let {
+        valueParam=$bindable(),
+        typeParam=$bindable(),
+        expectedParam=$bindable()
+    } = $props()
+
+    let showTooltip = $state.raw(false)
 </script>
 
-<div class=start-stop-ctrl id={name}>
-    <label class=param-label for={name}>
-        {name}
-        {#if params.valueParam !== null && params.valueParam.hint}
-        <Tooltip>
-            {params.valueParam.hint}
-        </Tooltip>
-        {/if}
-    </label>
+<div class=start-stop-ctrl id={valueParam?.name}>
+    {#if valueParam}
+        <label 
+            class=param-label 
+            for={valueParam.name}
+            onmouseenter={evt => showTooltip = true}
+            onmouseleave={evt => showTooltip = false}
+            onfocusin={evt => showTooltip = true}
+            onfocusout={evt => showTooltip = false}
+        >
+            {#if valueParam?.hint}
+                <Tooltip
+                    bind:shown={showTooltip}
+                    position=right
+                >
+                    {valueParam.hint}
+                </Tooltip>
+            {/if}
+            {valueParam.label}
+        </label>
+    {/if}
     <div class=param-gap></div>
-    {#if params.typeParam !== null}
-    <div class=param-type>
-        {#if params.typeParam.hint}
-        <Tooltip>
-            {params.typeParam.hint}
-        </Tooltip>
-        {/if}
-        <select disabled={params.typeParam.allowedVals.length == 1} bind:value={params.typeParam.val}>
-            {#each params.typeParam.allowedVals as val}
-            <option value={val} selected={params.typeParam.val === val}>{val}</option>
-            {/each}
-        </select>
-    </div>
+    {#if typeParam}
+        <div class=param-type>
+            {#if typeParam.hint}
+                <Tooltip>
+                    {typeParam.hint}
+                </Tooltip>
+            {/if}
+            <select 
+                aria-label={typeParam.label}
+                bind:value={typeParam.val}
+                disabled={typeParam.allowedVals.length == 1}
+            >
+                {#each typeParam.allowedVals as val}
+                    <option value={val} selected={typeParam.val === val}>{val}</option>
+                {/each}
+            </select>
+        </div>
     {/if}
-    {#if params.valueParam !== null}
-    <input class=param-value type="text" bind:value={params.valueParam.val} />
+    {#if valueParam}
+        <input 
+            class=param-value 
+            type="text" 
+            id={valueParam.name}
+            bind:value={valueParam.val} 
+        />
     {/if}
-    {#if params.expectedParam !== null}
-    <label class=param-estim-label for="{name}-type">{params.expectedParam.label}</label>
-    <input class=param-estim type="text" bind:value={params.expectedParam.val} id="{name}-type" />
+    {#if expectedParam !== null}
+        <label 
+            class=param-estim-label 
+            for={expectedParam?.name}
+        >
+            {expectedParam.label}
+        </label>
+        <input 
+            class=param-estim 
+            type="text" 
+            bind:value={expectedParam.val} 
+            id={expectedParam?.name}
+        />
     {/if}
 </div>
 

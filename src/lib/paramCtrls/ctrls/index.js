@@ -21,6 +21,7 @@ export { default as FontCtrl } from "./FontCtrl.svelte";
 export { default as ColorCtrl } from "./ColorCtrl.svelte";
 export { default as UnknownCtrl } from "./UnknownCtrl.svelte";
 export { default as CalibrationCtrl } from "./CalibrationCtrl.svelte";
+export { default as LocaleCtrl } from "./LocaleCtrl.svelte";
 
 
 import {
@@ -46,7 +47,8 @@ import {
     UnknownCtrl,
     ValidatorCtrl,
     KeyPressCtrl,
-    CalibrationCtrl
+    CalibrationCtrl,
+    LocaleCtrl
 } from ".";
 
 
@@ -73,5 +75,6 @@ export var mapping = {
     "inv": UnknownCtrl,
     "validator": ValidatorCtrl,
     "keypress": KeyPressCtrl,
-    "calibration": CalibrationCtrl
+    "calibration": CalibrationCtrl,
+    "locale": LocaleCtrl
 }

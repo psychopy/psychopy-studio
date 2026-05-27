@@ -38,7 +38,7 @@
         >
             <DeviceProfile
                 profile={device}
-            ></DeviceProfile>
+            />
         </div>
     </Info>
     

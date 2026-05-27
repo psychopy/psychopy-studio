@@ -2,6 +2,7 @@
     import { Button } from "$lib/utils/buttons";
     import { Icon } from "$lib/utils/icons";
     import { onMount, untrack } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         id,
@@ -27,6 +28,8 @@
         onclose=() => {},
         /** @prop @type {Boolean} Determines whether the dialog box should shrink to fit its contents */
         shrink=false,
+        /** @prop @type {boolean} Whether or not to include a close button */
+        closable=true,
         /** @interface */
         children=undefined
     } = $props();
@@ -59,20 +62,23 @@
             <label for={id}>{title}</label>
             <div class=gap></div>
             <div class=title-btns>
-                <button 
-                    id=close
-                    onclick={(evt) => {
-                        shown = false;
-                        if (buttons.CANCEL) {
-                            buttons.CANCEL(evt)
-                        }
-                    }}
-                >
-                    <Icon 
-                        src="/icons/sym-close.svg"
-                        size=.75rem
-                    />
-                </button>
+                {#if closable}
+                    <button 
+                        id=close
+                        onclick={(evt) => {
+                            shown = false;
+                            if (buttons.CANCEL) {
+                                buttons.CANCEL(evt)
+                            }
+                        }}
+                        aria-label={translate("Close")}
+                    >
+                        <Icon 
+                            src="/icons/sym-close.svg"
+                            size=.75rem
+                        />
+                    </button>
+                {/if}
             </div>
         </div>
         <div 
@@ -83,21 +89,21 @@
         </div>
         <div class="buttons">
             <div class="btn-array extra">
-                    {#if buttons.HELP}
+                {#if buttons.HELP}
                     <Button 
-                        label=Help
+                        label={translate("Help")}
                         onclick={() => {
                             window.open(buttons.HELP, '_blank').focus();
                         }} 
                         horizontal
-                    ></Button>
-                    {/if}
+                    />
+                {/if}
             </div>
             <div class=gap></div>
             <div class="btn-array standard">
                 {#if buttons.YES}
                 <Button 
-                    label="Yes"
+                    label={translate("Yes")}
                     onclick={(evt) => {
                         buttons['YES'](evt);
                         shown = false;
@@ -105,11 +111,11 @@
                     affirmative
                     horizontal
                     disabled={buttonsDisabled && buttonsDisabled['YES']}
-                ></Button>
+                />
                 {/if}
                 {#if buttons.NO}
                 <Button 
-                    label="No"
+                    label={translate("No")}
                     onclick={(evt) => {
                         buttons['NO'](evt);
                         shown = false;
@@ -117,11 +123,11 @@
                     horizontal
                     negative
                     disabled={buttonsDisabled && buttonsDisabled['NO']}
-                ></Button>
+                />
                 {/if}
                 {#if buttons.OK}
                 <Button 
-                    label="OK"
+                    label={translate("OK")}
                     onclick={(evt) => {
                         buttons['OK'](evt);
                         shown = false;
@@ -129,17 +135,17 @@
                     primary
                     horizontal
                     disabled={buttonsDisabled && buttonsDisabled['OK']}
-                ></Button>
+                />
                 {/if}
                 {#if buttons.APPLY}
                 <Button 
-                    label="Apply"
+                    label={translate("Apply")}
                     onclick={(evt) => {
                         buttons['APPLY'](evt); 
                     }} 
                     horizontal
                     disabled={buttonsDisabled && buttonsDisabled['APPLY']}
-                ></Button>
+                />
                 {/if}
                 {#if buttons.EXTRA}
                     {#each Object.entries(buttons['EXTRA']) as [label, onclick]}
@@ -153,14 +159,14 @@
                 {/if}
                 {#if buttons.CANCEL}
                 <Button 
-                    label="Cancel"
+                    label={translate("Cancel")}
                     onclick={(evt) => {
                         buttons['CANCEL'](evt); 
                         shown = false;
                     }} 
                     horizontal
                     disabled={buttonsDisabled && buttonsDisabled['CANCEL']}
-                ></Button>
+                />
                 {/if}
             </div>
         </div>
@@ -181,8 +187,9 @@
         outline: none;
         padding: 0;
         border: 1px solid var(--outline);
-        width: fit-content;
+        min-width: fit-content;
         height: fit-content;
+        resize: horizontal;
     }
     dialog .content {
         position: relative;

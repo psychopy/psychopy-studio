@@ -1,6 +1,7 @@
 <script>
     import { prefs } from "$lib/preferences.svelte";
-    import { CompactButton } from "$lib/utils/buttons"
+    import { CompactButton } from "$lib/utils/buttons";
+    import { translate } from "$lib/translation";
 
     let {
         param=$bindable(),
@@ -26,7 +27,7 @@
         // if binding is blank, it's invalid
         if (!param.val.length) {
             valid.value = false
-            valid.warning = "No binding set"
+            valid.warning = translate("No binding set")
         }
         // iterate through existing key bindings
         for (let [name, prefParam] of Object.entries(prefs.shortcuts)) {
@@ -37,7 +38,12 @@
             // if this keybinding matches on already in use, it's invalid
             if (prefParam.val.length && prefParam.val.every(val => param.val.includes(val.toUpperCase())) && param.val.every(val => prefParam.val.includes(val.toUpperCase()))) {
                 valid.value = false
-                valid.warning = `Keybinding '${param.val.join("+")}' for ${param.name} is already in use by '${prefParam.label}'`
+                valid.warning = translate(
+                    `Keybinding '{1}' for {2} is already in use by '{3}'`
+                )
+                .replace("{1}", param.val.join("+"))
+                .replace("{2}", param.name)
+                .replace("{3}", prefParam.label)
             }
         }
     }
@@ -72,12 +78,12 @@
         <CompactButton 
             onclick={evt => param.val.length = 0}
             icon="/icons/btn-clear.svg"
-            tooltip="Clear keypresses"
+            tooltip={translate("Clear keypresses")}
         />
         <CompactButton 
             onclick={evt => selected = false}
             icon="/icons/btn-tick.svg"
-            tooltip="Done"
+            tooltip={translate("Done")}
             disabled={!param.valid.value}
         />
     {:else}
@@ -85,7 +91,7 @@
             type=text
             onclick={evt => selected = !disabled}
             style:color={hovered ? "var(--outline)" : "inherit"}
-            value={hovered ? "Click to set" : param.val.join?.(" + ")}
+            value={hovered ? translate("Click to set") : param.val.join?.(" + ")}
         />
     {/if}
 </div>

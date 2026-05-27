@@ -2,6 +2,7 @@
     import { MessageDialog } from "$lib/utils/dialog";
     import { getContext } from "svelte";
     import { file_save } from "../callbacks.svelte.js";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current")
 
@@ -22,22 +23,22 @@
 </script>
 
 {#if current.experiment.history.past.length}
-<MessageDialog
-    id=save-prompt
-    bind:shown={shown}
-    buttons={{
-        YES: (evt) => {
-            // if yes, save and do action
-            file_save()
-            action(evt)
-        },
-        NO: (evt) => {
-            // if no, just do action
-            action(evt)
-        },
-        CANCEL: (evt) => {},
-    }}
->
-    '{current.experiment.file.name}' has unsaved changes, save now?
-</MessageDialog>
+    <MessageDialog
+        id=save-prompt
+        bind:shown={shown}
+        buttons={{
+            YES: (evt) => {
+                // if yes, save and do action
+                file_save()
+                action(evt)
+            },
+            NO: (evt) => {
+                // if no, just do action
+                action(evt)
+            },
+            CANCEL: (evt) => {},
+        }}
+    >
+        {translate("'{}' has unsaved changes, save now?").replace("{}", current.experiment.file.name)}
+    </MessageDialog>
 {/if}

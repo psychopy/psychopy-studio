@@ -4,8 +4,8 @@
 </script>
 
 <div class=flow-panel>
-    <FlowControls></FlowControls>
-    <Flow></Flow>
+    <FlowControls />
+    <Flow />
 </div>
 
 <style>

@@ -2,7 +2,7 @@
     import { CompactButton } from "$lib/utils/buttons";
     import { CodeOutput } from "$lib/utils/code";
     import { getContext } from "svelte";
-    import { python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current");
 </script>
@@ -13,7 +13,7 @@
         <CompactButton
             icon="/icons/btn-clear.svg"
             onclick={evt => current.output.stdout = ""}
-            tooltip="Clear stdout"
+            tooltip={translate("Clear stdout")}
         />
     {/snippet}
 </CodeOutput>

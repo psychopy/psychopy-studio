@@ -1,7 +1,6 @@
 <script>
     import { Notebook, NotebookPage, ButtonTab } from "$lib/utils/notebook";
     import { python } from "$lib/globals.svelte";
-    import { onMount } from "svelte";
     import Shell from "./Shell.svelte";
 
     let shells = $state({})

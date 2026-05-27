@@ -1,6 +1,5 @@
 <script>
     import { setContext } from 'svelte';
-    import Tooltip from '../tooltip/Tooltip.svelte';
 
     let {
         /** @prop @type {function} Function to execute when the page is changed */
@@ -32,7 +31,15 @@
         {@render children?.()}
     </div>
     <div class=notebook-page>
-        {@render pages.selected.page?.()}
+        {#if pages.selected.index === undefined}
+            <div class=placeholder-page>
+                <svg>
+                    <use href={"/branding/emblem-line.svg"} />
+                </svg>
+            </div>
+        {:else}
+            {@render pages.selected.page?.()}
+        {/if}
     </div>
 </div>
 
@@ -45,6 +52,7 @@
         align-items: stretch;
         margin: auto;
         height: 100%;
+        width: 100%;
     }
 
     .notebook-tabs {
@@ -70,5 +78,20 @@
         z-index: 1;
         border: 1px solid var(--overlay);
         grid-row-start: page;
+    }
+
+    .placeholder-page {
+        position: absolute;
+        left: 0; right: 0; top: 0; bottom: 0;
+        background-color: var(--crust);
+        color: var(--outline);
+        overflow: hidden;
+    }
+
+    .placeholder-page svg {
+        opacity: 10%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 </style>

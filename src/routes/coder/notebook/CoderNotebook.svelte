@@ -4,6 +4,7 @@
     import { CodeEditor } from "$lib/utils/code";
     import { prefs } from "$lib/preferences.svelte";
     import { Script } from "$lib/experiment";
+    import { translate } from "$lib/translation";
 
     var media = $state({
         prefersColorScheme: "light"
@@ -50,6 +51,6 @@
             stem: "untitled",
             ext: ".py"
         }))}
-        tooltip="New file..."
+        tooltip={translate("New file...")}
     />
 </Notebook>

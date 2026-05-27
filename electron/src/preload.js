@@ -12,6 +12,8 @@ const electron = {
     focus: (id) => ipcRenderer.invoke("electron.windows.focus", id).then(resp => resp),
     devtools: (id) => ipcRenderer.invoke("electron.windows.devtools", id).then(resp => resp),
     close: (id) => ipcRenderer.invoke("electron.windows.close", id).then(resp => resp),
+    hideMenu: () => ipcRenderer.invoke("electron.windows.hideMenu").then(resp => resp),
+    setMenu: (template) => ipcRenderer.invoke("electron.windows.setMenu", template).then(resp => resp),
   },
   paths: {
     getPathForFile: (file) => webUtils.getPathForFile(file), 
@@ -42,7 +44,9 @@ const electron = {
     get: () => ipcRenderer.invoke("electron.clipboard.get").then(resp => resp),
     set: (value) => ipcRenderer.invoke("electron.clipboard.set", value).then(resp => resp)
   },
-  authenticatePavlovia: (url) => ipcRenderer.invoke("electron.authenticatePavlovia", url).then(resp => resp),
+  state: {
+    updateFrame: (details) => ipcRenderer.invoke("electron.state.updateFrame", details).then(resp => resp)
+  },
   version: () => ipcRenderer.invoke("electron.version").then(resp => resp),
   platform: () => ipcRenderer.invoke("electron.platform").then(resp => resp),
   quit: () => ipcRenderer.invoke("electron.quit")
@@ -62,7 +66,7 @@ const python = {
   venv: {
     setup: (venv, prerelease=false) => ipcRenderer.invoke("python.venv.setup", venv, prerelease).then(resp => resp),
     executable: (venv) => ipcRenderer.invoke("python.venv.executable", venv).then(resp => resp),
-    installPackage: (venv, name) => ipcRenderer.invoke("python.venv.installPackage", venv, name).then(resp => resp),
+    installPackage: (venv, name, version=undefined) => ipcRenderer.invoke("python.venv.installPackage", venv, name, version).then(resp => resp),
     uninstallPackage: (venv, name) => ipcRenderer.invoke("python.venv.uninstallPackage", venv, name).then(resp => resp),
     getPackages: (venv) => ipcRenderer.invoke("python.venv.getPackages", venv).then(resp => resp),
     getPackageDetails: (venv, name) => ipcRenderer.invoke("python.venv.getPackageDetails", venv, name).then(resp => resp)
@@ -71,6 +75,8 @@ const python = {
     folder: () => ipcRenderer.invoke("python.uv.folder").then(resp => resp),
     executable: () => ipcRenderer.invoke("python.uv.executable").then(resp => resp),
     exists: () => ipcRenderer.invoke("python.uv.exists").then(resp => resp),
+    findDirectory: (option) => ipcRenderer.invoke("python.uv.findDirectory", option).then(resp => resp),
+    setDirectory: (option) => ipcRenderer.invoke("python.uv.setDirectory", option).then(resp => resp),
     install: () => ipcRenderer.invoke("python.uv.install").then(resp => resp),
     makeExecutable: (psychopyVersion, pythonVersion) => ipcRenderer.invoke("python.uv.makeExecutable", psychopyVersion, pythonVersion).then(resp => resp),
     findPython: (version) => ipcRenderer.invoke("python.uv.findPython", version).then(resp => resp),
@@ -102,7 +108,7 @@ const python = {
     stop: (venv, id) => ipcRenderer.invoke("python.scripts.stop", venv, id).then(resp => resp),
   },
   psychojs: {
-    run: (cwd) => ipcRenderer.invoke("python.psychojs.run", cwd).then(resp => resp),
+    run: (cwd, params={}) => ipcRenderer.invoke("python.psychojs.run", cwd, params).then(resp => resp),
     stop: (address) => ipcRenderer.invoke("python.psychojs.stop", address).then(resp => resp),
   }
 }
@@ -110,12 +116,22 @@ contextBridge.exposeInMainWorld('python', python)
 
 const git = {
   listen: (lsnr) => ipcRenderer.on("git", lsnr),
-  output: (message) => ipcRenderer.invoke("git.output", message),
-  getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user),
-  pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force),
-  stage: (folder) => ipcRenderer.invoke("git.stage", folder),
-  commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user),
-  push: (folder, user, force=false) => ipcRenderer.invoke("git.push", folder, user, force),
-  newProject: (details, folder, user) => ipcRenderer.invoke("git.newProject", details, folder, user).then(resp => resp)
+  output: (message) => ipcRenderer.invoke("git.output", message).then(resp => resp),
+  server: () => ipcRenderer.invoke("git.server").then(resp => resp),
+  login: () => ipcRenderer.invoke("git.login").then(resp => resp),
+  loadUsers: () => ipcRenderer.invoke("git.loadUsers").then(resp => resp),
+  clearUsers: () => ipcRenderer.invoke("git.clearUsers").then(resp => resp),
+  listUsers: () => ipcRenderer.invoke("git.listUsers").then(resp => resp),
+  listGroups: (username) => ipcRenderer.invoke("git.listGroups", username).then(resp => resp),
+  getUserInfo: (username) => ipcRenderer.invoke("git.getUserInfo", username).then(resp => resp),
+  getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user).then(resp => resp),
+  getProjectInfo: (details, username) => ipcRenderer.invoke("git.getProjectInfo", details, username).then(resp => resp),
+  clone: (details, username) => ipcRenderer.invoke("git.clone", details, username).then(resp => resp),
+  pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force).then(resp => resp),
+  stage: (folder) => ipcRenderer.invoke("git.stage", folder).then(resp => resp),
+  commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user).then(resp => resp),
+  push: (folder, user, force=false) => ipcRenderer.invoke("git.push", folder, user, force).then(resp => resp),
+  newProject: (details, folder, user) => ipcRenderer.invoke("git.newProject", details, folder, user).then(resp => resp),
+  loadProjects: () => ipcRenderer.invoke("git.loadProjects").then(resp => resp),
 }
 contextBridge.exposeInMainWorld('git', git)

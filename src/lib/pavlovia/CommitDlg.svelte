@@ -2,6 +2,7 @@
     import { Dialog } from "$lib/utils/dialog";
     import { git } from "$lib/globals.svelte";
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         shown=$bindable(),
@@ -14,7 +15,7 @@
 </script>
 
 <Dialog 
-    title="Commit changes"
+    title={translate("Commit changes")}
     buttons={{
         OK: evt => git.commit(
             $state.snapshot(message), 
@@ -42,7 +43,7 @@
     shrink
 >
     <div class=content>
-        Briefly describe the changes made since last sync.
+        {translate("Briefly describe the changes made since last sync.")}
         <input bind:value={message} />
     </div>
 </Dialog>

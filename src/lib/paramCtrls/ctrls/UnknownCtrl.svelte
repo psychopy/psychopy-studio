@@ -1,6 +1,7 @@
 <script>
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { CompactButton } from "$lib/utils/buttons";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -14,11 +15,11 @@
 
 {#if param.deleted}
     <div class=deleted-lbl>
-        Deleted
+        {translate("Deleted")}
     </div>
     <CompactButton 
         icon="/icons/btn-undo.svg"
-        tooltip="Unrecognised param deleted. Undo?"
+        tooltip={translate("Unrecognised param deleted. Undo?")}
         onclick={evt => param.deleted = false}
     />
 {:else}
@@ -30,7 +31,7 @@
     />
     <CompactButton 
         icon="/icons/btn-delete.svg"
-        tooltip="Delete unrecognised param?"
+        tooltip={translate("Delete unrecognised param?")}
         onclick={evt => param.deleted = true}
     />
 {/if}

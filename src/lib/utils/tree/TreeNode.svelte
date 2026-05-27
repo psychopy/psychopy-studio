@@ -59,10 +59,15 @@
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
-        gap: .25rem;
+        gap: .5rem;
         background-color: transparent;
         border: none;
         overflow: hidden;
+        border-left: 1px solid transparent;
+        padding: .5rem 1rem;
+    }
+    .tree-node:hover {
+        background-color: var(--mantle);
     }
     .node-label {
         text-wrap: nowrap;

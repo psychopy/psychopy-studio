@@ -1,6 +1,8 @@
 import { getVenv } from "./venv.js";
+import { favicon } from "../resources.js";
 import logging from "../logging.js";
 import { getSafeAddress } from "./utils.js";
+import { BrowserWindow } from "electron";
 
 
 export class PsychoJSServer {
@@ -16,11 +18,34 @@ export class PsychoJSServer {
         this.pending = []
     }
 
-    static async run(cwd) {
+    static async run(cwd, params={}) {
+        // parse params
+        params = new URLSearchParams(params)
         // create new server
         let server = new PsychoJSServer(cwd)
-        
-        return await server.start()
+        // start server
+        let address =  await server.start()
+        // open window
+        let win = new BrowserWindow({
+            icon: favicon,
+            title: "PsychoJS Experiment",
+            show: false,
+        });
+        win.maximize();
+        // load experiment
+        console.log(`http://${address}?${params.toString()}`)
+        await win.loadURL(`http://${address}?${params.toString()}`);
+        win.once("ready-to-show", win.show)
+        // behaviour when closed...
+        let finished = Promise.withResolvers();
+        win.on("close", evt => {
+            // mark as finished
+            finished.resolve()
+            // close server
+            server.stop()
+        });
+
+        return await finished.promise
     }
 
     async start() {

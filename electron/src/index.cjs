@@ -13,43 +13,20 @@ if (!fs.existsSync(path.join(app.getPath("appData"), "psychopy4"))) {
 const { handlers: pythonHandlers } = require("./python");
 const { handlers: gitHandlers } = require("./git.js")
 const logging = require("./logging.js");
-const { UsageReport } = require("./usage.js")
+const { UsageReport } = require("./usage.js");
+const { favicon } = require("./resources.js");
 const { appVersion, isDev } = require('./version.js');
+const { handlers: stateHandlers, lastState, newFrame, updateFrame, saveState } = require('./state.js');
+const { windows, newWindow, setMenu } = require("./frames.js");
+const { details: svelte, startSvelte } = require("./svelte.js");
+const { prefs, prefsFile } = require("./preferences.js");
+const { default: test } = require('node:test');
 
-// figure out best file to use for a favicon
-var favicon = path.join(__dirname, 'favicon')
-if (process.platform === "win32") {
-  favicon += ".ico"
-} else if (process.platform === "darwin") {
-  favicon += ".icns"
-} else {
-  favicon += "@1024x1024.png"
-}
-
-var svelte = {
-  address: {
-    host: "localhost",
-    port: 8003,
-  },
-  process: undefined
-};
-var windows = {
-  splash: undefined
-};
+// get a single-instance lock
+const lock = app.requestSingleInstanceLock()
 
 // redirect app gubbins to a subfolder so it's distinct from user data
 app.setPath("userData", path.join(app.getPath("appData"), "psychopy4", ".node"))
-
-// load prefs from a JSON (if there is one)
-let prefsFile = path.join(app.getPath("appData"), "psychopy4", "preferences.json");
-let prefs
-if (fs.existsSync(prefsFile)) {
-  prefs = JSON.parse(
-    fs.readFileSync(prefsFile)
-  )
-} else {
-  prefs = {}
-}
 
 // setup a clipboard
 clipboard = undefined
@@ -64,10 +41,13 @@ function onFileOpen(evt, file) {
     // do nothing if no file
     return
   }
-  if (file.endsWith(".psyexp")) {
+  if (file.startsWith("pavlovia://")) {
+    params = file.match(/pavlovia\:\/\/(?<group>.*?)\/(?<name>.*?)$/).groups
+    newWindow(`runner?projectOpen=${params.group}/${params.name}`, true, false, [800, 600])
+  } else if (file.endsWith(".psyexp")) {
     // open psyexp in Builder
     newWindow(`builder?fileOpen=${file}`, true, false)
-  } else if (startFile.endsWith(".psyrun")) {
+  } else if (file.endsWith(".psyrun")) {
     // open psyrun in Runner
     newWindow(`runner?fileOpen=${file}`, true, false)
   } else {
@@ -76,6 +56,25 @@ function onFileOpen(evt, file) {
   }
 }
 app.on("open-file", onFileOpen)
+
+// mark self as default opener for URI links
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('pavlovia', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('pavlovia')
+}
+// handle when a second instance is created via URI
+if (!lock) {
+  app.quit()
+} else {
+  if (process.platform === "darwin") {
+    app.on('open-url', (evt, url) => onFileOpen(evt, url))
+  } else {
+    app.on('second-instance', (evt, cmd, cd) => onFileOpen(evt, cmd.pop()) )
+  }
+}
 
 var started = false
 
@@ -106,178 +105,22 @@ const createWindow = () => {
     windows.splash.show();
   }
 
-  // keep track of ready statuses
-  let ready = {
-    svelte: Promise.withResolvers()
-  }
-  // if on windows, get frame to open with from argv
-  if (process.platform === "win32") {
-    onFileOpen(undefined, process.argv[isDev ? 2 : 1])
-  }
-  // start timers 
-  let mintime = new Promise((resolve, reject) => setTimeout(resolve, prefs.params?.showSplash?.val !== "False" ? 1000 : 0));
-  let maxtime = new Promise((resolve, reject) => setTimeout(resolve, 10000));
-  // start the svelte side of things
-  if (isDev) {
-    // use Vite dev server for development
-    logging.log(`Starting Vite dev server at ${svelte.address.host}:${svelte.address.port}`)
-    svelte.process = proc.exec(`vite dev --host=${svelte.address.host} --port=${svelte.address.port}`);
-    svelte.process.stdout.on("data", msg => {
-      // look for ready message
-      let readyMatch = msg.match(
-        /➜  Local:   http:\/\/(?<host>[\w\d]+):(?<port>[\w\d]+)/
-      )
-      // if this is it...
-      if (readyMatch) {
-        // store final host and port
-        svelte.address.host = readyMatch.groups.host
-        svelte.address.port = readyMatch.groups.port
-        // mark as ready
-        ready.svelte.resolve()
-        // log
-        logging.log(
-          `Started Vite dev server at ${svelte.address.host}:${svelte.address.port}`
-        )
-      }
-    })
-  } else {
-    // log run args
-    logging.log(`Running: ${process.argv.join(" | ")}`)
-    // use express to serve static files in production
-    const express = require('express');
-    const app = express();
-
-    app.use(express.static(path.join(__dirname, '../../dist')));
-
-    // API routes
-    app.get('/api/plugins', async (req, res) => {
-      try {
-        const response = await fetch('https://psychopy.org/plugins.json');
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    app.post('/api/report', express.json(), async (req, res) => {
-      try {
-        const snapshot = req.body;
-        const response = await fetch("https://api.clickup.com/api/v2/list/128673336/task", {
-          method: "POST",
-          headers: {
-            "Authorization": snapshot.token,
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            name: snapshot.title,
-            description: snapshot.description,
-            priority: snapshot.priority,
-            custom_fields: [
-              { id: "1cc82c18-79c6-470b-aa63-b39a108afe90", value: ["39244b7f-eea7-47d2-8760-418d86dc525d"] },
-              { id: "90ee49a2-01ce-49be-a3bb-c7b12160eb03", value: snapshot.email },
-              { id: "e649173f-4f1a-4275-abff-1e699962eda1", value: snapshot.version.match(/(?<=\w+)\d+$/)?.[0] || "" }
-            ]
-          })
-        });
-        const data = await response.json();
-
-        for (let [name, content] of [
-          ["last_app_load.log", snapshot.logs.app],
-          ["liaison.log", snapshot.logs.liaison],
-          ["context.json", JSON.stringify(snapshot.context, undefined, 4)]
-        ]) {
-          await fetch(`https://api.clickup.com/api/v2/task/${data.id}/comment`, {
-            method: "POST",
-            headers: {
-              "Authorization": snapshot.token,
-              "Accept": "application/json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              notify_all: false,
-              comment_text: `${name}\n---\n${content}\n`
-            })
-          });
-        }
-
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    app.get('/api/surveys', async (req, res) => {
-      try {
-        const response = await fetch(`https://pavlovia.org/api/v2/surveys?oauthToken=${req.headers.access}`);
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    app.post('/api/token/authorize', express.json(), async (req, res) => {
-      try {
-        const params = req.query;
-        const response = await fetch(`${params.root}/oauth/token`, {
-          method: "POST",
-          body: JSON.stringify({
-            client_id: params.client,
-            code: params.code,
-            grant_type: "authorization_code",
-            redirect_uri: params.redirect,
-            code_verifier: params.verifier
-          }),
-          headers: { "Content-type": "application/json; charset=UTF-8" }
-        });
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    app.post('/api/token/refresh', express.json(), async (req, res) => {
-      try {
-        const params = req.query;
-        const response = await fetch(`${params.root}/oauth/token`, {
-          method: "POST",
-          body: JSON.stringify({
-            client_id: params.client,
-            refresh_token: params.refresh,
-            grant_type: "refresh_token",
-            redirect_uri: params.redirect,
-            code_verifier: params.verifier
-          }),
-          headers: { "Content-type": "application/json; charset=UTF-8" }
-        });
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
-
-    // Handle SPA fallback without wildcard
-    app.use((req, res) => {
-      res.sendFile(path.join(__dirname, '../../dist/index.html'));
-    });
-
-    const server = app.listen(svelte.address.port, svelte.address.host, () => {
-      logging.log(`Started static server at ${svelte.address.host}:${svelte.address.port}`)
-      ready.svelte.resolve();
-    });
-
-    svelte.process = { kill: () => server.close() };
-  }
-
+  // start svelte
+  let startedSvelte = startSvelte()
+  // start timers so that we have a min time to show the splash and a max time to stop waiting for Svelte
+  let mintime = new Promise((resolve, reject) => setTimeout(
+    resolve, 
+    prefs.params?.showSplash?.val !== "False" ? 1000 : 0)
+  );
+  let maxtime = new Promise((resolve, reject) => setTimeout(
+    resolve, 
+    10000
+  ));
   // show when Svelte has loaded and min time has been reached, or when max time has been reached
   Promise.any([
     Promise.all([
       mintime,
-      ...Object.values(ready).map(val => val.promise)
+      startedSvelte
     ]),
     maxtime
   ]).then(
@@ -296,134 +139,63 @@ const createWindow = () => {
  */
 function startingWindows() {
   let targets
+  // get starting windows from prefs
   try {
     targets = JSON.parse(prefs.params?.defaultView?.val)
   } catch {
     targets = ["builder"]
   }
+  // if given a launch arg, ignore prefs
+  if ( ["--builder", "-b"].includes(process.argv[isDev ? 2 : 1]) ) {
+    targets = ["builder"]
+  } else if ( ["--coder", "-c"].includes(process.argv[isDev ? 2 : 1]) ) {
+    targets = ["coder"]
+  } else if ( ["--runner", "-r"].includes(process.argv[isDev ? 2 : 1]) ) {
+    targets = ["runner"]
+  } else if (process.argv[isDev ? 2 : 1] && process.platform === "win32") {
+    // if on windows, file to open may have been passed via args
+    onFileOpen(undefined, process.argv[isDev ? 2 : 1])
+    return
+  }
+  // open starting windows
   for (let target of targets) {
-    newWindow(target, true, false).then(
-      // show tips if requested
-      id => windows[id].webContents.send(
-        "showTips", prefs.params?.showStartupTips?.val === "True"
-      )
+    // get previous states for this target
+    let states = Object.values(lastState.frames).filter(
+      item => item.view === target
     )
+    // if no previous states, make a fresh one
+    if (!states.length) {
+      states.push({
+        pos: [null, null],
+        size: [null, null],
+        maximized: false,
+        files: [],
+        view: target
+      })
+    }
+    // create window(s)
+    for (let state of states) {
+      newWindow(
+        state.files.length ? `${state.view}?fileOpen=${state.files}` : state.view, 
+        true, 
+        state.maximized
+      ).then(id => {
+        // restore size and pos
+        if (state.size.every(item => item !== null)) {
+          windows[id].setSize(...state.size)
+        }
+        if (state.pos.every(item => item !== null)) {
+          windows[id].setPosition(...state.pos)
+        }
+        windows[id].setMax
+        // show tips if requested
+        windows[id].webContents.send(
+          "showTips", prefs.params?.showStartupTips?.val === "True"
+        )
+      })
+    }
+    
   }
-}
-
-
-async function newWindow(target = null, show = true, fullscreen = false) {
-  // create window
-  let win = new BrowserWindow({
-    icon: favicon,
-    width: 1600,
-    height: 900,
-    show: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  });
-  win.removeMenu();
-  // prevent default key behaviour for CMD+R
-  win.webContents.on("before-input-event", (evt, input) => {
-    if (input.modifiers.includes("meta") && input.key.toLowerCase() === "r") {
-      evt.preventDefault()
-    }
-  })
-  // open new windows in browser unless opened by electron
-  win.webContents.setWindowOpenHandler(
-    ({ url }) => {
-      shell.openExternal(url);
-
-      return { action: 'deny' }
-    }
-  )
-
-  // load target URL
-  let url = `http://${svelte.address.host}:${svelte.address.port}/${target || ''}`;
-  logging.log(`Loading ${url}...`)
-  win.loadURL(url);
-  // store handle against id
-  windows[win.webContents.id] = win;
-  // create promise waiting for ready event
-  let ready = Promise.withResolvers()
-  // show when ready (if requested)
-  if (show) {
-    // show once ready, if requested
-    win.once("ready-to-show", evt => {
-      logging.log(`Loaded ${url}`)
-      win.show();
-      // fulscreen if requested
-      if (fullscreen) {
-        win.maximize();
-      }
-      // give focus
-      win.focus();
-      // make sure the splash screen is closed
-      if (!windows.splash.isDestroyed()) {
-        windows.splash.close()
-      }
-      // show dev tools if debugging
-      if (prefs?.params?.debugMode?.val === "True") {
-        win.webContents.openDevTools();
-      }
-    })
-    // return ID once ready message is received (has to be sent via electron.windows.emit)
-    win.webContents.on("ipc-message", (evt, tag) => {
-      if (tag === "ready") {
-        ready.resolve(win.webContents.id)
-      }
-    })
-  } else {
-    // if not showing, return ID once ready to show
-    win.once("ready-to-show", evt => ready.resolve(win.webContents.id))
-  }
-  // wait until ready
-  return await ready.promise
-}
-
-
-/**
- * Opens a new BrowserWindow to login to Pavlovia, and waits for it to have a code in the URL
- * 
- * @param {string} url Authentication URL to use
- * @param {string} pattern Regex pattern we expect to be able to use to get the auth code
- */
-async function authenticatePavlovia(url) {
-  // create window
-  let win = new BrowserWindow({
-    icon: favicon,
-    width: 980,
-    height: 720,
-    show: true
-  });
-  win.removeMenu();
-  // Clear all storage data to force fresh login
-  await win.webContents.session.clearStorageData({
-    storages: ['cookies', 'localstorage', 'sessionstorage', 'cachestorage', 'websql', 'indexdb']
-  });
-  // load auth url
-  win.loadURL(url);
-  // construct promise for the auth code
-  let code = Promise.withResolvers()
-  // on navigate, resolve if we have a code
-  win.webContents.on("did-navigate", (evt, url) => {
-    // search the URL for the auth code
-    let params = new URLSearchParams(
-      url.replace(/https:\/\/.*?(?=\?)/, "")
-    )
-    // if we got one...
-    if (params.get("code")) {
-      // resolve the promise
-      code.resolve(
-        params.get("code")
-      )
-      // close the window
-      win.close()
-    }
-  })
-
-  return code.promise
 }
 
 
@@ -450,47 +222,13 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-// make sure the Svelte process is killed on exit
 process.on('SIGINT', app.quit);
 process.on('SIGTERM', app.quit);
-app.on("quit", (evt, code) => {
-  // close svelte
-  svelte.process.kill(0);
-})
+// save app state before closing windows on quit
+app.on("before-quit", (evt, code) => saveState());
+// make sure the Svelte process is killed on exit
+app.on("quit", (evt, code) => svelte.process?.kill?.(0));
 
-
-function getFileTree(folder, recursive = false) {
-  let output = [];
-
-  try {
-    for (let item of fs.readdirSync(folder, { recursive: false })) {
-      // construct absolute path
-      let abspath = path.join(folder, item);
-      // get stats
-      let stats = fs.statSync(abspath);
-      // construct details
-      let details = {
-        relpath: item,
-        abspath: abspath,
-      }
-      if (stats.isDirectory()) {
-        // if directory, recursively get children
-        details.children = getFileTree(abspath)
-      } else {
-        // if file, get size
-        details.size = stats.size / 1000000
-      }
-      // append
-      output.push(details)
-    }
-  } catch (err) {
-    console.error(err)
-
-    return output
-  }
-
-  return output
-}
 
 /* handlers which can be invoked by electron */
 
@@ -507,6 +245,8 @@ const handlers = {
       focus: ipcMain.handle("electron.windows.focus", (evt, id) => windows[id || evt.sender.id].focus()),
       devtools: ipcMain.handle("electron.windows.devtools", (evt, id) => windows[id || evt.sender.id].openDevTools()),
       close: ipcMain.handle("electron.windows.close", (evt, id) => windows[id || evt.sender.id].close()),
+      hideMenu: ipcMain.handle("electron.windows.hideMenu", (evt) => windows[evt.sender.id].removeMenu()),
+      setMenu: ipcMain.handle("electron.windows.setMenu", (evt, template) => setMenu(windows[evt.sender.id], template))
     },
     paths: {
       documents: ipcMain.handle("electron.paths.documents", (evt) => app.getPath("documents")),
@@ -544,13 +284,13 @@ const handlers = {
       get: ipcMain.handle("electron.clipboard.get", (evt) => clipboard),
       set: ipcMain.handle("electron.clipboard.set", (evt, value) => clipboard = value)
     },
-    authenticatePavlovia: ipcMain.handle("electron.authenticatePavlovia", (evt, url) => authenticatePavlovia(url)),
     version: ipcMain.handle("electron.version", (evt) => appVersion),
     platform: ipcMain.handle("electron.platform", (evt) => process.platform),
     quit: ipcMain.handle("electron.quit", (evt) => app.quit())
   },
   python: pythonHandlers,
-  git: gitHandlers
+  git: gitHandlers,
+  state: stateHandlers
 };
 
 // make sure user folder exists

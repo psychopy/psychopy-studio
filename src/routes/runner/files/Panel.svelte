@@ -4,6 +4,7 @@
     import { Icon } from "$lib/utils/icons";
     import { getContext } from "svelte";
     import { fileOpen } from "../callbacks.svelte";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
 </script>
@@ -24,6 +25,7 @@
                 />
                 <CompactButton 
                     icon="/icons/btn-delete.svg"
+                    tooltip={translate("Remove item")}
                     onclick={evt => delete current.runlist[parseInt(i)]}
                 />
             </div>
@@ -31,7 +33,7 @@
     </div>
     <div class=ctrls>
         <Button 
-            label="Add file"
+            label={translate("Add file")}
             icon="/icons/btn-add.svg"
             onclick={evt => fileOpen(false)}
             horizontal

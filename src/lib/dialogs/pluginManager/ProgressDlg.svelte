@@ -2,18 +2,19 @@
     import { CodeOutput } from "$lib/utils/code";
     import { MessageDialog } from "$lib/utils/dialog";
     import { python, electron } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         tag,
         shown=$bindable()
     } = $props()
     let output = $state.raw("")
-    electron.windows.listen(tag, (evt, value) => output += value)
+    electron.windows.listen($state.snapshot(tag), (evt, value) => output += value)
 </script>
 
 <MessageDialog
     bind:shown={shown}
-    title=Progress
+    title={translate("Progress")}
     buttons={{
         OK: evt => output = ""
     }}

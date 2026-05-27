@@ -2,7 +2,8 @@
     import { CompactButton } from "$lib/utils/buttons";
     import { python } from "$lib/globals.svelte";
     import { getContext } from "svelte";
-    import { fly } from "svelte/transition"
+    import { fly } from "svelte/transition";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current")
 </script>
@@ -31,7 +32,7 @@
         <CompactButton
             icon="/icons/btn-clear.svg"
             onclick={evt => current.output.alerts.length = 0}
-            tooltip="Clear alerts"
+            tooltip={translate("Clear alerts")}
         />
     </div>
 </div>

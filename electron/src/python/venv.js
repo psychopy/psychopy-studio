@@ -94,10 +94,10 @@ export class PythonVenv {
         if (!("psychopy-lib" in installed)) {
             if (this.psychopyVersion === "dev") {
                 // for dev environment, install from dev branch
-                await this.installPackage("git+https://github.com/psychopy/psychopy-lib@dev")
+                await this.installPackage("git+https://github.com/psychopy/psychopy@dev")
             } else if (prerelease) {
                 // for prerelease, install from release branch
-                await this.installPackage("git+https://github.com/psychopy/psychopy-lib@release")
+                await this.installPackage("git+https://github.com/psychopy/psychopy@release")
             } else {
                 // for released version, install from pypi
                 await this.installPackage(`psychopy-lib==${this.psychopyVersion}`)
@@ -109,8 +109,9 @@ export class PythonVenv {
      * Install a package or multiple packages to this environment
      * 
      * @param {string|array<string>} name Name, path or URL of the package to install (or an array of these, for multiple packages)
+     * @param {string} version Version to install (leave blank for latest)
      */
-    async installPackage(name) {
+    async installPackage(name, version=undefined) {
         // log start
         output(
             `uv:${name}`, `Installing ${name}...\n`
@@ -119,13 +120,18 @@ export class PythonVenv {
         if (typeof name === "string") {
             name = [name]
         }
+        // append version if given
+        let cmdname = name
+        if (version) {
+            cmdname = name.map(item => `${item}==${version}`)
+        }
         // run uv command to install
         await uv.execTracked([
-            "pip", "install", ...name, "--python", this.executable
-        ], undefined, `uv:${name}`)
+            "pip", "install", ...cmdname, "--python", this.executable
+        ], undefined, `uv:${name.join("+")}`)
         // log done
         output(
-            `uv:${name}`, `Finished installing ${name}.\n`
+            `uv:${name.join("+")}`, `Finished installing ${name}.\n`
         )
     }
 
@@ -162,7 +168,7 @@ export class PythonVenv {
         // get package list from pip
         let resp = uv.execSync([
             "pip", "list", "--python", `"${this.executable}"`, "--format", "json"
-        ])
+        ], undefined, "uv", true)
         // parse it
         let parsed = JSON.parse(resp)
         // simplify structure
@@ -185,7 +191,7 @@ export class PythonVenv {
         // use pip show to get details
         let resp = uv.execSync([
             "pip", "show", name, "--python", `"${this.executable}"`
-        ])
+        ], undefined, "uv", true)
         // parse as an object
         let local = Object.fromEntries(
             resp.matchAll(/^(.*?): (.*?)$/gm).map(val => [val[1], val[2]])
@@ -223,9 +229,10 @@ export class PythonVenv {
      * @param {array<string>} args Arguments to execute
      * @param {int} timeout Time (ms) after which to give up
      * @param {string} tag Tag to send output to (use undefined to not emit an event)
+     * @param {boolean} silent Set true to prevent output from going to stdout
      */
-    execSync(args, timeout=undefined, tag="stdout") {
-        return execSync(tag, `"${this.executable}"`, args, timeout)
+    execSync(args, timeout=undefined, tag="stdout", silent=false) {
+        return execSync(tag, `"${this.executable}"`, args, timeout, silent)
     }
 
     /**
@@ -287,7 +294,7 @@ export async function getVenv(version) {
         return venvs[version]
     } else {
         // if environment exists but no object, make one
-        for (let env of uv.getEnvironments()) {
+        for (let env of await uv.getEnvironments()) {
             if (env.psychopyVersion === version) {
                 return new PythonVenv(
                     env.pythonVersion, 

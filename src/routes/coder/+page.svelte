@@ -11,9 +11,12 @@
     import { PaneGroup, Pane, PaneResizer } from "paneforge";
     import ShellNotebook from "./shell/ShellNotebook.svelte";
     import FileExplorer from "./files/FileExplorer.svelte";
+    import OutlinePanel from "./outline/OutlinePanel.svelte";
     import { electron, python } from "$lib/globals.svelte";
     import SetupPython from "$lib/python/SetupPython.svelte";
     import TipsDialog from '$lib/dialogs/tips/TipsDialog.svelte';
+    import { updateLocale } from "$lib/translation";
+    import { translate } from "$lib/translation";
     
 
     // reference current in context for ease of access
@@ -23,7 +26,9 @@
     let params = new URLSearchParams(location.search)
     // if given a file to open, open it
     if (params.get("fileOpen")) {
-        current.openFile(params.get("fileOpen"))
+        params.get("fileOpen").split(",").forEach(
+            item => current.openFile(item)
+        )
     }
 
     // listen for messages from other windows
@@ -34,56 +39,69 @@
         electron.windows.emit("ready", true)
     }
 
+    $effect(updateLocale)
+
+    // keep app state up to date with open files
+    if (electron) {
+        $effect(() => {
+            electron.state.updateFrame(
+                {
+                    files: Object.values(current.pages).map(page => page.file?.file)
+                }
+            )
+        })
+    }
+
 </script>
 
-<title>PsychoPy Coder</title>
+<title>{translate("PsychoPy Coder")}</title>
 <Frame
     onFileDrop={(evt, file) => current.openFile(file)}
 >
     {#snippet ribbon()}
         <CoderRibbon />
     {/snippet}
-    <PaneGroup direction="vertical">
-        <Pane defaultSize={2/3}>
-            <PaneGroup direction="horizontal">
-                {#if electron}
-                    <Pane defaultSize={1/4}>
-                        <Panel
-                            title=Files
-                            hspan={1}
-                            vspan={2}
-                        >
-                            <FileExplorer />
-                        </Panel>
-                    </Pane>
-                {/if}
-                
-                <PaneResizer style="width: .3rem;"/>
-                
-                <Pane defaultSize={3/4}>
-                    <Panel
-                        title=Editor 
-                        hspan={electron ? 3 : 4} 
-                        vspan={python ? 2 : 3}
-                    >
-                        <CoderNotebook />
-                    </Panel>
-                </Pane>
-            </PaneGroup>
-        </Pane>
-
-        <PaneResizer style="height: .3rem;" />
-        {#if python?.ready}
-            <Pane defaultSize={1/3}>
-                <Panel
-                    title=Console
-                    hspan={5}
-                    vspan={1}
-                >
-                    <ShellNotebook />
+    
+    <PaneGroup direction="horizontal">
+        {#if electron}
+            <Pane defaultSize={1/5}>
+                <Panel title={translate("Files")}>
+                    <FileExplorer />
                 </Panel>
             </Pane>
         {/if}
+
+        <PaneResizer style="width: .3rem;"/>
+
+        <Pane defaultSize={3/5}>
+
+            <PaneGroup direction="vertical">
+                <Pane defaultSize={3/4}>
+                    <Panel title={translate("Editor")}>
+                        <CoderNotebook />
+                    </Panel>
+                </Pane>
+
+                <PaneResizer style="height: .3rem;"/>
+
+                {#if python?.ready}
+                    <Pane defaultSize={1/4}>
+                        <Panel title={translate("Console")}>
+                            <ShellNotebook />
+                        </Panel>
+                    </Pane>
+                {/if}
+            </PaneGroup>
+
+        </Pane>
+            
+        <PaneResizer style="width: .3rem;"/>
+            
+        <Pane defaultSize={1/5}>
+            <Panel title={translate("Outline")}>
+                <OutlinePanel />
+            </Panel>
+        </Pane>
     </PaneGroup>
     
     

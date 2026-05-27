@@ -5,12 +5,7 @@
     import { Icon } from "$lib/utils/icons";
     import { asset } from "$app/paths";
     import Theme from "$lib/utils/Theme.svelte";
-
-    // handle initial setup
-    let ready = $state({
-        status: Promise.withResolvers(),
-        message: ""
-    })
+    import { translate } from "$lib/translation";
 </script>
 
 <div class=container>
@@ -23,24 +18,24 @@
             aria-label="builder"
             onclick={evt => newWindow("builder")}
         >
-            <h3>Builder</h3>
+            <h3>{translate("Builder")}</h3>
             <Icon 
                 src="/icons/btn-builder.svg"
                 size="10rem";
             />
-            <p>Generate experiments easily using an intuitive graphical user interface (GUI).</p>
+            <p>{translate("Generate experiments easily using an intuitive graphical user interface (GUI).")}</p>
         </button>
         <button 
             class=view
             aria-label="coder"
             onclick={evt => newWindow("coder")}
         >
-            <h3>Coder</h3>
+            <h3>{translate("Coder")}</h3>
             <Icon 
                 src="/icons/btn-coder.svg"
                 size="10rem";
             />
-            <p>Write and edit code directly in a variety of languages.</p>
+            <p>{translate("Write and edit code directly in a variety of languages.")}</p>
         </button>
         {#if electron}
             <button 
@@ -48,30 +43,15 @@
                 aria-label="runner"
                 onclick={evt => newWindow("runner")}
             >
-                <h3>Runner</h3>
+                <h3>{translate("Runner")}</h3>
                 <Icon 
                     src="/icons/btn-runner.svg"
                     size="10rem";
                 />
-                <p>Coordinate running experiments and scripts and view any warnings generated.</p>
+                <p>{translate("Coordinate running experiments and scripts and view any output.")}</p>
             </button>
         {/if}
     </nav>
-    <div class=message>
-        {#await ready.status.promise}
-            {ready.message}
-        {:then}
-            Ready
-        {:catch err}
-            Failed setup: {err}
-            <Button
-                label="Try again?"
-                icon="/icons/btn-refresh.svg"
-                onclick={evt => setup()}
-                horizontal
-            />
-        {/await}
-    </div>
 
     <!-- this will setup themeing -->
     <Theme />
@@ -88,13 +68,6 @@
         align-items: center;
         justify-content: center;
         background-color: var(--mantle);
-    }
-
-    .message {
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-        align-items: center;
     }
     .background {
         position: absolute;

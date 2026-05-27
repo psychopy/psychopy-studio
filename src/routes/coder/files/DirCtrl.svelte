@@ -3,6 +3,7 @@
     import { CompactButton } from "$lib/utils/buttons";
     import path from "path-browserify";
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         value=$bindable(),
@@ -16,12 +17,14 @@
 <div class=dir-ctrl>
     <input 
         class=directory
+        style:flex-grow=1
         bind:value={value} 
+        aria-label={translate("Current file path")}
         disabled 
     />
     <CompactButton 
         icon="/icons/btn-open.svg"
-        tooltip="Open folder..."
+        tooltip={translate("Open folder...")}
         onclick={async evt => {
             // get folder path from electron dialog
             let folder = await electron.files.openDialog({
@@ -37,8 +40,17 @@
         }}
     />
     <CompactButton 
+        icon="/icons/btn-dirup.svg"
+        tooltip={translate("Up to parent directory")}
+        onclick={evt => {
+            // set
+            value = path.dirname(value)
+            onchange($state.snapshot(value))
+        }}
+    />
+    <CompactButton 
         icon="/icons/btn-target.svg"
-        tooltip="Navigate to current file"
+        tooltip={translate("Navigate to current file")}
         onclick={evt => {
             // set
             value = current.pages[current.tab].file.parent
@@ -50,8 +62,8 @@
 
 <style>
     .dir-ctrl {
-        display: grid;
-        grid-template-columns: [start] 1fr min-content min-content [end];
+        display: flex;
+        flex-direction: row;
         gap: .5rem;
         width: 100%;
         padding: .5rem;

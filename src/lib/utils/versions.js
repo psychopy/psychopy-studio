@@ -204,4 +204,27 @@ export class Version {
 
         return false
     }
+
+    /**
+     * Function which can be passed to Array.prototype.sort to sort an array of versions
+     * 
+     * @param {string|Version} a First element for comparison (see Array.prototype.sort)
+     * @param {string|Version} b Second element for comparison (see Array.prototype.sort)
+     */
+    static sorter(a, b) {
+        // make sure we have a Version object
+        try {
+            a = Version.parse(a)
+        } catch {
+            // if a isn't a version, put it at the end
+            return 1
+        }
+        // do comparison
+        try {
+            return a.olderThan(b) ? 1 : -1
+        } catch {
+            // if b isn't a version, put it at the end
+            return -1
+        }
+    }
 }

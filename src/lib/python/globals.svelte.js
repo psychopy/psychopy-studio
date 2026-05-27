@@ -2,7 +2,7 @@
 export var status = $state({
     ready: Promise.withResolvers(),
     dismiss: Promise.withResolvers(),
-    message: "Checking for Python...",
+    message: "",
     logs: "",
     dlg: {
         message: "",

@@ -2,6 +2,7 @@
     import { python } from "$lib/globals.svelte.js";
     import { CompactButton } from "$lib/utils/buttons";
     import { CodeOutput, CodeInput } from "$lib/utils/code";
+    import { translate } from "$lib/translation";
 
     let {
         id
@@ -27,13 +28,14 @@
                 <CompactButton
                     icon="/icons/btn-clear.svg"
                     onclick={evt => output.content = ""}
-                    tooltip="Clear output"
+                    tooltip={translate("Clear output")}
                 />
             {/snippet}
         </CodeOutput>
     </div>
     <CodeInput 
         bind:value={input.present}
+        label={translate("Python shell input")}
         onsubmit={evt => {
             // get command
             let cmd = $state.snapshot(input.present)

@@ -7,6 +7,7 @@
     import DklColor from "./DklColor.svelte";
     import HsvColor from "./HsvColor.svelte";
     import LmsColor from "./LmsColor.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         value=$bindable(),
@@ -30,7 +31,7 @@
 
 <Dialog
     id=color-picker
-    title="Color Picker"
+    title={translate("Color Picker")}
     onopen={evt => restore = {
         color: $state.snapshot(value),
         space: $state.snapshot(space)

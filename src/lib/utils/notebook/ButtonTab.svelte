@@ -61,11 +61,12 @@
         grid-row-start: tabs;
         border-left: 1px solid var(--overlay);
         line-height: 1em;
+        padding: .75rem;
     }
 
     button.listbook {
         grid-column-start: tabs;
         border-top: 1px solid var(--overlay);
-        padding: 0.5rem;
+        padding: 1rem;
     }
 </style>

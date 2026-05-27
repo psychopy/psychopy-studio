@@ -3,6 +3,7 @@
     import { Dialog } from "$lib/utils/dialog"
     import { ParamsDialog } from "$lib/paramCtrls";
     import { current } from "../../../routes/builder/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let {
         /** @bindable @type {Boolean} State dictating whether this dialog is shown */
@@ -28,7 +29,7 @@
 
 <Dialog
     id=find-in-experiment
-    title="Find in experiment..."
+    title={translate("Find in experiment...")}
     onopen={(evt) => searchTerm = ""}
     buttons={{
         OK: (evt) => {},
@@ -41,19 +42,19 @@
         >
             <input 
                 type=text 
-                placeholder="Search..."
+                placeholder={translate("Search...")}
                 class=search-bar
                 bind:value={searchTerm}
             >
             <ToggleButton 
                 bind:value={useRegex} 
                 icon="/icons/btn-regex.svg"
-                tooltip="Use RegEx syntax"
+                tooltip={translate("Use RegEx syntax")}
             />
             <ToggleButton 
                 bind:value={caseSensitive} 
                 icon="/icons/btn-case.svg"
-                tooltip="Use case-sensitive searching"
+                tooltip={translate("Use case-sensitive searching")}
             />
         </div>
         <div class=results-list>

@@ -4,6 +4,7 @@
     import { Button, RadioButton } from "$lib/utils/buttons";
     import { FontManager } from "./manager.svelte.js";
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         value=$bindable(),
@@ -26,7 +27,7 @@
 
 <Dialog
     id=font-manager
-    title="Font Manager"
+    title={translate("Font Manager")}
     onopen={evt => restore = $state.snapshot(value)}
     buttons={{
         OK: evt => restore = $state.snapshot(value),
@@ -68,7 +69,7 @@
                         {/each}
                         {#if FontManager[source].refresh}
                             <Button 
-                                label=Refresh
+                                label={translate("Refresh")}
                                 icon="/icons/btn-refresh.svg"
                                 onclick={evt => FontManager[source].refresh(current.experiment)}
                                 bind:awaiting={FontManager[source].scanning}

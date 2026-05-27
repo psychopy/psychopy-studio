@@ -2,6 +2,7 @@
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { CompactButton } from "$lib/utils/buttons";
     import { ColorPickerDialog } from "$lib/dialogs/colorPicker";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -32,7 +33,7 @@
 
 <CompactButton 
     icon="/icons/btn-colors.svg"
-    tooltip="Open color picker"
+    tooltip={translate("Open color picker")}
     onclick={evt => show.dialog = true}
 />
 

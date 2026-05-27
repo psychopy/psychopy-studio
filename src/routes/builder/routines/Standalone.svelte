@@ -2,6 +2,7 @@
     import { ParamsNotebook } from "$lib/paramCtrls";
     import { Button } from '$lib/utils/buttons';
     import { onMount } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         component
@@ -23,17 +24,17 @@
     <div class=standalone-routine-ctrls>
         <div class=ctrl-gap></div>
         <Button
-            label=Apply
+            label={translate("Apply")}
             primary
             horizontal
             disabled={!valid}
             onclick={(evt) => component.restore.set()} 
-        ></Button>
+        />
         <Button
-            label=Discard
+            label={translate("Discard")}
             horizontal
             onclick={(evt) => component.restore.apply()} 
-        ></Button>
+        />
     </div>
 </div>
 

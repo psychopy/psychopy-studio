@@ -3,7 +3,7 @@
     import StartStopCtrl from "./StartStopCtrl.svelte";
     import { Notebook, NotebookPage } from "$lib/utils/notebook"
     import { python } from "$lib/globals.svelte";
-    import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         element=$bindable(),
@@ -33,6 +33,8 @@
         Testing: 4
     }
 
+    // params whose content can be translated 
+    // (in the format format { param name: JS param name })
     let translatableParams = {
         "Before Experiment": "Before JS Experiment", 
         "Begin Experiment": "Begin JS Experiment", 
@@ -41,6 +43,30 @@
         "End Routine": "End JS Routine", 
         "End Experiment": "End JS Experiment"
     }
+    // categs which should be highlighted if any param has content
+    // (in the format { param name: param value => is highlighted })
+    let highlightableCategs = {
+        "Before Exp.": val => !(["", "// Translating..."].includes(val)),
+        "Begin Exp.": val => !(["", "// Translating..."].includes(val)), 
+        "Begin Routine": val => !(["", "// Translating..."].includes(val)), 
+        "Each Frame": val => !(["", "// Translating..."].includes(val)), 
+        "End Routine": val => !(["", "// Translating..."].includes(val)), 
+        "End Exp.": val => !(["", "// Translating..."].includes(val))
+    }
+    // whether highlightable categs are highlighted
+    let highlightCategs = $derived.by(() => {
+        // assume not
+        let highlights = {}
+        // iterate through categs
+        for (let [categ, params] of Object.entries(element.sortedParams)) {
+            // highlight if we have a content check method and it returns true on any param
+            highlights[categ] = Object.values(params).some(
+                param => highlightableCategs[categ]?.(param.val)
+            )
+        }
+
+        return highlights
+    })
 
     // store translated param values
     $effect(() => {
@@ -60,10 +86,10 @@
                             if (resp.success) {
                                 element.params[jskey].val = resp.result
                             } else {
-                                element.params[jskey].val = `// Error in Python code`
+                                element.params[jskey].val = `// ${translate("Error in Python code")}`
                             }
                         }).catch(
-                            err => element.params[jskey].val = `// Error in Python code`
+                            err => element.params[jskey].val = `// ${translate("Error in Python code")}`
                         )
                     }
                 }
@@ -101,6 +127,7 @@
                 ) && categ !== "uncategorised"}
                     <NotebookPage
                         label={categ}
+                        highlight={highlightCategs[categ]}
                         data={element}
                         bind:selected={
                             () => {return pageIndex === categ},
@@ -110,21 +137,23 @@
                         <div 
                             class=params-panel
                             style:flex-direction={horizontal ? "row" : "column"}
-                            style:width={horizontal ? "65rem" : "45rem"}
+                            style:min-width={horizontal ? "65rem" : "45rem"}
                         >
                             <!-- start ctrl, if needed -->
                             {#if "startVal" in params}
                                 <StartStopCtrl
-                                    name=Start
-                                    params={element.startParams}
-                                ></StartStopCtrl>
+                                    bind:valueParam={element.params.startVal}
+                                    bind:typeParam={element.params.startType}
+                                    bind:expectedParam={element.params.startEstim}
+                                />
                             {/if}
                             <!-- stop ctrl, if needed -->
                             {#if "stopVal" in params}
                                 <StartStopCtrl
-                                    name=Stop
-                                    params={element.stopParams}
-                                ></StartStopCtrl>
+                                    bind:valueParam={element.params.stopVal}
+                                    bind:typeParam={element.params.stopType}
+                                    bind:expectedParam={element.params.durationEstim}
+                                />
                             {/if}
                             <!-- other params -->
                             {#each Object.entries(params) as [name, param]}
@@ -153,6 +182,7 @@
         padding: 1rem;
         padding-bottom: 3rem;
         height: 100%;
+        width: 100%;
         min-height: 10rem;
     }
     .uncategorised-params-panel {
@@ -166,6 +196,7 @@
     .params-container {
         padding: 1rem;
         height: 100%;
+        max-width: 65rem;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;

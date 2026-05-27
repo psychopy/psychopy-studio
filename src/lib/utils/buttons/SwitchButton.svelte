@@ -38,12 +38,12 @@
             {tooltip}
         </Tooltip>
     {/if}
-    <span class="{value ? "active" : "inactive"}">{labels[0]}</span>
+    <span class="{value ? "inactive" : "active"}">{labels[0]}</span>
     <Icon
-        src="/icons/ctrl-switch-{value ? "left" : "right"}.svg"
+        src="/icons/ctrl-switch-{value ? "right" : "left"}.svg"
         size="32px"
     />
-    <span class="{value ? "inactive" : "active"}">{labels[1]}</span>
+    <span class="{value ? "active" : "inactive"}">{labels[1]}</span>
 </button>
 
 <style>

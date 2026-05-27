@@ -1,7 +1,8 @@
 <script>
     import { MessageDialog } from "$lib/utils/dialog";
     import { getContext } from "svelte";
-    import { python } from "$lib/globals.svelte"
+    import { python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current")
 
@@ -27,7 +28,7 @@
                 CANCEL: (evt) => {},
             }}
         >
-            Installing PsychoPy {current.experiment.settings.params['Use version']?.val}...
+            {translate("Installing PsychoPy {}...").replace("{}", current.experiment.settings.params['Use version']?.val)}
         </MessageDialog>
     {:then executable}
         {#await action(executable)}

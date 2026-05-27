@@ -1,5 +1,6 @@
 <script>
-    import { optionsFromParam } from "./utils.js"
+    import { optionsFromParam } from "./utils.js";
+    import { translate } from "$lib/translation";
 
     let {
         param=$bindable(),
@@ -18,7 +19,7 @@
     {...attachments}
 >
     {#await optionsFromParam(param)}
-        Loading...
+        {translate("Loading...")}
     {:then options}
         {#each options as [val, details]}
             <button
@@ -26,7 +27,7 @@
                 class:selected={param.val === val}
                 onclick={(evt) => param.val = val}
             >
-                <b>{details.label}</b>
+                <h4>{details.label}</h4>
                 <p>{details.body}</p>
                 {#if details.link}
                 <a href={details.link}>{details.linkText}</a>
@@ -34,7 +35,7 @@
             </button>
         {/each}
     {:catch}
-        Failed to load options.
+        {translate("Failed to load options.")}
     {/await}
 </div>
 

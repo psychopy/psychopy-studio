@@ -1,5 +1,6 @@
 <script>
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
 
     let {
         param=$bindable(),
@@ -10,7 +11,14 @@
     } = $props()
 
     function validateValidator(param, valid) {
-        valid.value = options.includes(param.val) || param.val === ""
+        if (options.length) {
+            valid.value = options.includes(param.val) || param.val === ""
+        } else {
+            valid.value = true
+            valid.warning = translate(
+                "No validators added, add one via the Validation section of the Components panel."
+            )
+        }
     }
 
     let current = getContext("current")
@@ -34,13 +42,16 @@
     disabled={disabled || options.length === 0} 
     bind:value={param.val}
     style:color={param.valid.value ? "inherit" : "var(--red)"}
+    id={param.name}
     {@attach element => param.registerValidator("validator", validateValidator, 0)}
     {...attachments}
 >
     <option
         value=""
         selected={param.val === ""}
-    >Do not validate</option>
+    >
+        {translate("Do not validate")}
+    </option>
     {#each options as option}
         <option 
             value={option} 

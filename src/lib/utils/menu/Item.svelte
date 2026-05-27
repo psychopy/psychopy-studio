@@ -10,10 +10,8 @@
         icon=undefined,
         /** @prop @type {String} Name of the keyboard shortcut (if any) for this menu item */
         shortcut=undefined,
-        /** 
-         * @prop @type {function} Function to call when this item is clicked, given 3 params:
-         * 
-         * @param evt {MouseEvent} Event triggered on click
+        /** * @prop @type {function} Function to call when this item is clicked, given 3 params:
+         * * @param evt {MouseEvent} Event triggered on click
          * @param data {any} Arbitrary data associated with this menu item 
          */
         onclick=(evt, data) => {},
@@ -24,7 +22,9 @@
         /** @prop @type {boolean} Is this item able to be clicked on? */
         disabled=$bindable(),
         /** @slot Render an optional submenu on this item */
-        submenu=undefined
+        submenu=undefined,
+        /** Catch-all for hover events and other attributes */
+        ...rest
     } = $props()
 
     // function to close parent
@@ -40,6 +40,7 @@
 
 <button  
     class=menu-item 
+    {...rest}
     onclick={(evt) => {
         // execute the given function, with arbitrary data given on init
         onclick(evt, data);
@@ -84,7 +85,7 @@
         background-color: transparent;
         border: none;
         border-radius: 0;
-        padding: 0.5rem 1rem;
+        padding: 0.75rem 1rem;
         transition: background-color .2s;
     }
     .menu-item .label {

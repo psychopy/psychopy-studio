@@ -4,6 +4,7 @@
     import { sanitizeJSON } from "$lib/utils/transpiler"
     import FileCtrl from "./FileCtrl.svelte";
     import { mimeTypesFromParam } from "./utils";
+    import { translate } from "$lib/translation";
 
     let {
         param=$bindable(),
@@ -76,7 +77,7 @@
                 param.val.splice(i, 1)
             }}
             disabled={disabled}
-            tooltip="Remove item"
+            tooltip={translate("Remove item")}
         />
     {/each}
     <div class=gap></div>
@@ -98,7 +99,7 @@
                     param.val.push(file.name)
                 }
             }}
-            tooltip="Add multiple items"
+            tooltip={translate("Add multiple items")}
             disabled={disabled}
     />
     <CompactButton
@@ -107,7 +108,7 @@
             // add item
             param.val.push("");
         }}
-        tooltip="Add item"
+        tooltip={translate("Add item")}
         disabled={disabled}
     />
 </div>

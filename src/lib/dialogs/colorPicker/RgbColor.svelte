@@ -1,4 +1,6 @@
 <script>
+    import { translate } from "$lib/translation";
+
     let {
         value=$bindable(),
         target="param"
@@ -22,7 +24,7 @@
     <div class=ctrls>
         <!-- red -->
         <div class=ctrl>
-            <div class=label>Red</div>
+            <div class=label>{translate("Red")}</div>
             <input 
                 type=number 
                 bind:value={rgb[0]}
@@ -33,7 +35,7 @@
         </div>
         <!-- green -->
         <div class=ctrl>
-            <div class=label>Green</div>
+            <div class=label>{translate("Green")}</div>
             <input 
                 type=number 
                 bind:value={rgb[1]}
@@ -44,7 +46,7 @@
         </div>
         <!-- blue -->
         <div class=ctrl>
-            <div class=label>Blue</div>
+            <div class=label>{translate("Blue")}</div>
             <input 
                 type=number 
                 bind:value={rgb[2]}

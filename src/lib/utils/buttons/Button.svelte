@@ -1,6 +1,9 @@
 <script>
     import Icon from "$lib/utils/icons/Icon.svelte";
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
+    import { MessageArray, Message } from "$lib/utils/message";
+    import { MessageDialog } from "$lib/utils/dialog";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {string} Label for this button */
@@ -66,9 +69,9 @@
                     // if completed/not started, regular label
                     ready: tooltip,
                     // if awaiting, regular label + cancel (if possible)
-                    awaiting: label + (cancel ? " (cancel)" : ""),
+                    awaiting: label + (cancel ? ` (${translate("cancel")})` : ""),
                     // if error, error icon
-                    error: "Failed, click to show error"
+                    error: translate("Failed, click to show error")
                 }[status]}            
             </Tooltip>
         {/if}
@@ -103,7 +106,7 @@
     <!-- error message -->
     <MessageArray>
         <Message
-            message="Error, click to show"
+            message={translate("Error, click to show")}
             icon="/icons/sym-error.svg"
             onclick={evt => show.error = true}
         />
@@ -111,7 +114,7 @@
     <!-- error dialog -->
     <MessageDialog
         bind:shown={show.error}
-        title="Error in '{label}'"
+        title={translate("Error in '{}'").replace("{}", label)}
         buttons={{
             OK: evt => awaiting = Promise.resolve(false)
         }}
@@ -187,7 +190,8 @@
     button {
         display: grid;
         align-items: center;
-        padding: .75em 1em;
+        padding: .6em .8em;
+        gap: .1rem;
         font-family: var(--body);
         max-width: 100%;
         max-height: 100%;

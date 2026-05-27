@@ -15,6 +15,53 @@
             "type": "node"
         },
         {
+            "name": "PsychopPy Studio Builder (app)",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/electron",
+            "runtimeArgs": [
+                "run",
+                "electron:start",
+                "--",
+                "--builder"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "PsychopPy Studio Coder (app)",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/electron",
+            "runtimeArgs": [
+                "run",
+                "electron:start",
+                "--",
+                "--coder"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "PsychopPy Studio Runner (app)",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "electron:start",
+                "--",
+                "--runner"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
             "name": "PsychoPy Studio (browser)",
             "request": "launch",
             "runtimeArgs": [

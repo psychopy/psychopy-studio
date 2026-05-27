@@ -31,6 +31,7 @@
     class:valid={param.valid.value} 
     class:code={param.isCode} 
     disabled={disabled}
+    id={param.name}
     {@attach element => param.registerValidator("multiText", validateMultiText, 10)}
     {...attachments}
 >

@@ -1,4 +1,6 @@
 <script>
+    import { translate } from "$lib/translation";
+
     let {
         value=$bindable(),
         target="param"
@@ -17,7 +19,7 @@
     <div class=ctrls>
         <!-- hue -->
         <div class=ctrl>
-            <div class=label>Hue</div>
+            <div class=label>{translate("Hue")}</div>
             <input 
                 type=number 
                 bind:value={hsv[0]}
@@ -27,7 +29,7 @@
         </div>
         <!-- saturation -->
         <div class=ctrl>
-            <div class=label>Saturation</div>
+            <div class=label>{translate("Saturation")}</div>
             <input 
                 type=number 
                 bind:value={hsv[1]}
@@ -37,7 +39,7 @@
         </div>
         <!-- luminance -->
         <div class=ctrl>
-            <div class=label>Value</div>
+            <div class=label>{translate("Value")}</div>
             <input 
                 type=number 
                 bind:value={hsv[2]}

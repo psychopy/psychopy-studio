@@ -9,32 +9,106 @@ import { appVersion } from "../version.js";
 
 
 export class UV {
-    // folder containing the uv executables
-    folder = path.join(
-        app.getPath("appData"), "psychopy4", ".uv"
-    )
-    // folder containing Python venvs
-    pyFolder = path.join(
-        app.getPath("appData"), "psychopy4", ".python"
-    )
-    // path to the uv executable
-    executable = path.join(
-        app.getPath("appData"), "psychopy4", ".uv", "uv"
-    )
+    // folder in which to store executables and environments
+    folder
+
+    // will resolve when a folder has been specified
+    folderSpecified = Promise.withResolvers();
+
+    /**
+     * Choose a folder for the given directory option according to the current OS.
+     * 
+     * @param {'user'|'global'|'admin'} option Named directory option, one of @enum {string} [
+     *  @value 'user' A writable user-specific folder
+     *  @value 'global' A writable folder which is common to all users
+     * ]
+     */
+    findDirectory(option) {
+        if (option === "user") {
+            // use electron-defined app data folder
+            return path.join(
+                app.getPath("appData"), "psychopy4"
+            )
+        } else if (option === "global") {
+            if (platform === "win32") {
+                // on Windows, use ProgramData
+                return path.join(
+                    process.env.ALLUSERSPROFILE, "psychopy4"
+                )
+            } else if (platform === "darwin") {
+                // on Mac, use global application support
+                return "/Library/Application Support/psychopy4"
+            } else if (platform === "linux") {
+                // on Linux, use library folder
+                return "/var/lib/psychopy4"
+            }
+        } else {
+            throw new Error(
+                "UV directory must be one of 'user', 'global'"
+            )
+        }
+    }
+
+    /**
+     * Set install directory to one of the allowed options.
+     * 
+     * @param {'user'|'global'|'admin'} option Named directory option, one of @enum {string} [
+     *  @value 'user' A writable user-specific folder
+     *  @value 'global' A writable folder which is common to all users
+     * ]
+     */
+    setDirectory(option) {
+        // set folder
+        this.folder = this.findDirectory(option)
+        // mark folder as specified
+        this.folderSpecified.resolve()
+    }
+
+    /**
+     * Subfolder for Python environments
+     */
+    get pyFolder() {
+        return path.join(
+            this.folder, ".python"
+        )
+    }
+
+    /**
+     * Subfolder for the UV executables
+     */
+    get uvFolder() {
+        return path.join(
+            this.folder, ".uv"
+        )
+    }
+
+    /**
+     * Path to the uv executable
+     */
+    get executable() {
+        return path.join(
+            this.uvFolder, "uv"
+        )
+    }
 
     /**
      * @returns {boolean} `true` if uv executables exist, `false` if they don't
      */
-    exists() {
-        return fs.globSync("uv*", {cwd: this.folder}).length
+    async exists() {
+        // wait until folder has been specified
+        await this.folderSpecified.promise
+
+        return fs.globSync("uv*", {cwd: this.uvFolder}).length
     }
 
     /**
      * Setup uv; will install if not already installed
      */
     async setup() {
+        // wait until folder has been specified
+        await this.folderSpecified.promise
         // make sure folders exist
-        for (let folder of [this.folder, this.pyFolder]) {
+        for (let folder of [this.uvFolder, this.pyFolder]) {
             if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, {
                     recursive: true
@@ -42,7 +116,7 @@ export class UV {
             }
         }
         // make sure executables exist
-        if (!this.exists()) {
+        if (!(await this.exists())) {
             await this.install()
         }
     }
@@ -51,8 +125,10 @@ export class UV {
      * Install the uv executables
      */
     async install() {
+        // wait until folder has been specified
+        await this.folderSpecified.promise
         // make sure folders exist
-        for (let folder of [this.folder, this.pyFolder]) {
+        for (let folder of [this.uvFolder, this.pyFolder]) {
             if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, {
                     recursive: true
@@ -104,20 +180,20 @@ export class UV {
                 async blob => {
                     this.output(`Finished downloading ${installers[platform][arch]}, extracting executable...`)
                     // write to a zipped file
-                    let zipfile = path.join(this.folder, installers[platform][arch]);
+                    let zipfile = path.join(this.uvFolder, installers[platform][arch]);
                     fs.writeFileSync(zipfile, await blob.bytes());
                     // extract file
                     if (path.extname(zipfile) === ".zip") {
                         // extract zip file...
                         await unzip(zipfile, {
-                            dir: this.folder
+                            dir: this.uvFolder
                         })
                     }
                     if (path.extname(zipfile) === ".gz") {
                         // extract tar.gz file...
                         untar({
                             file: zipfile,
-                            cwd: this.folder,
+                            cwd: this.uvFolder,
                             strip: 1,
                             sync: true
                         })
@@ -135,20 +211,22 @@ export class UV {
     /**
      * Get known Python environments
      */
-    getEnvironments() {
+    async getEnvironments() {
         let output = []
-        // specify Python folder
-        let folder = path.join(
-            app.getPath("appData"), "psychopy4", ".python"
-        )
+        // wait until folder has been specified
+        await this.folderSpecified.promise
+        // if there's no folder, there's no subfolders
+        if (!fs.existsSync(this.pyFolder)) {
+            return output
+        }
         // iterate through subfolders in the python folder
-        for (let subfolder of fs.readdirSync(folder)) {
+        for (let subfolder of fs.readdirSync(this.pyFolder)) {
             // reinstate .* syntax
             if (subfolder.match(/^\d+\.\d+$/)) {
                 subfolder += ".*"
             }
             // look for an executable in this folder
-            let executable = this.findPython(subfolder)
+            let executable = await this.findPython(subfolder)
             // skip this folder if it doesn't have one
             if (!executable) {
                 continue
@@ -184,7 +262,7 @@ export class UV {
         }
         // get specific folder for this version
         let folder = path.join(
-            app.getPath("appData"), "psychopy4", ".python", psychopyVersion
+            this.pyFolder, psychopyVersion
         )
         // try using UV to search for a Python executable
         try {
@@ -203,13 +281,15 @@ export class UV {
      * @returns {string} Path to the created executable
      */
     async makeExecutable(psychopyVersion=appVersion, pythonVersion="3.10") {
+        // wait until folder has been specified
+        await this.folderSpecified.promise
         // strip * if present
         if (psychopyVersion.match(/\d+\.\d+\.\*/)) {
             psychopyVersion = psychopyVersion.match(/\d+\.\d+/)[0]
         }
         // get specific folder for this version
         let folder = path.join(
-            app.getPath("appData"), "psychopy4", ".python", psychopyVersion
+            this.pyFolder, psychopyVersion
         )
         // make sure folder exists
         if (!fs.existsSync(folder)) {
@@ -235,9 +315,10 @@ export class UV {
      * @param {array<string>} args Arguments to execute
      * @param {int} timeout Time (ms) after which to give up
      * @param {string} tag Tag to send output to (use undefined to not emit an event)
+     * @param {boolean} silent Set true to prevent UV output from going to stdout
      */
-    execSync(args, timeout=undefined, tag="uv") {
-        return execSync(tag, `"${this.executable}"`, args, timeout)
+    execSync(args, timeout=undefined, tag="uv", silent=false) {
+        return execSync(tag, `"${this.executable}"`, args, timeout, silent)
     }
 
     /**

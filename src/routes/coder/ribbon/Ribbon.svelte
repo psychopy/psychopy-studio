@@ -22,8 +22,9 @@
     import Menu from "./Menu.svelte";
     import { getContext } from "svelte";
     import { IconButton, SwitchButton } from '$lib/utils/buttons';
-    import { UserCtrl } from '$lib/pavlovia/pavlovia.svelte';
+    import { UserCtrl } from '$lib/pavlovia';
     import { electron, python } from "$lib/globals.svelte";
+    import { translate } from "$lib/translation";
 
     let current = getContext("current");
 
@@ -36,34 +37,26 @@
 </script>
 
 <Ribbon>
-    <RibbonSection>
-        <IconButton 
-            icon="/icons/btn-hamburger.svg"
-            label="Menu"
-            onclick={() => show.menu = true} 
-            borderless
-        />
-        <Menu 
-            bind:shown={show.menu} 
-        />
-    </RibbonSection>
+    <Menu 
+        bind:shown={show.menu} 
+    />
     
-    <RibbonSection label=File icon="/icons/rbn-file.svg">
+    <RibbonSection label={translate("File")} icon="/icons/rbn-file.svg">
         <IconButton 
             icon="/icons/btn-new.svg" 
-            label="New file" 
+            label={translate("New file")} 
             onclick={fileNew}
             borderless
         /> 
         <IconButton 
             icon="/icons/btn-open.svg" 
-            label="Open file" 
+            label={translate("Open file")} 
             onclick={fileOpen} 
             borderless
         />
         <IconButton 
             icon="/icons/btn-save.svg" 
-            label="Save file" 
+            label={translate("Save file")} 
             onclick={fileSave}
             borderless
             disabled={
@@ -73,52 +66,52 @@
         />
         <IconButton 
             icon="/icons/btn-saveas.svg" 
-            label="Save file as"
+            label={translate("Save file as")}
             onclick={fileSaveAs} 
             borderless
             disabled={Object.values(current.pages).length === 0}
         />
     </RibbonSection>
 
-    <RibbonSection label=Edit icon="/icons/rbn-edit.svg">
+    <RibbonSection label={translate("Edit")} icon="/icons/rbn-edit.svg">
         <IconButton 
             icon="/icons/btn-undo.svg" 
-            label="Undo"
+            label={translate("Undo")}
             onclick={undo} 
             disabled={!current.pages[current.tab]?.canUndo} 
             borderless
         />
         <IconButton 
             icon="/icons/btn-redo.svg" 
-            label="Redo" 
+            label={translate("Redo")} 
             onclick={redo} 
             disabled={!current.pages[current.tab]?.canRedo} 
             borderless
         />
         <IconButton 
             icon="/icons/btn-find.svg" 
-            label="Find" 
+            label={translate("Find")} 
             onclick={find}
             disabled={!current.pages[current.tab]?.editor}
             borderless
         />
     </RibbonSection>
 
-    <RibbonSection label=Experiment icon="/icons/rbn-experiment.svg">
+    <RibbonSection label={translate("Experiment")} icon="/icons/rbn-experiment.svg">
         <SwitchButton 
             labels={["Pilot", "Run"]} 
-            tooltip="Experiment will run in {current.pages[current.tab]?.pilotMode ? "pilot" : "run"} mode"
+            tooltip={current.pages[current.tab]?.pilotMode ? "Experiment will run in pilot mode" : "Experiment will run in run mode"}
             bind:value={
-                () => current.pages[current.tab]?.pilotMode,
-                (value) => current.pages[current.tab].pilotMode = value
+                () => !current.pages[current.tab]?.pilotMode,
+                (value) => current.pages[current.tab].setPilotMode(!value)
             } 
             disabled={!current.pages[current.tab]}
-        />  
+        />
         
         {#if python?.ready}
             <IconButton 
                 icon="/icons/btn-send{current.pages[current.tab]?.pilotMode ? "pilot" : "run"}.svg" 
-                label="Send experiment to runner" 
+                label={translate("Send experiment to runner")} 
                 onclick={sendToRunner}
                 disabled={!current.pages[current.tab]?.file?.file}
                 borderless
@@ -126,12 +119,16 @@
         {/if}
     </RibbonSection>
     {#if python?.ready}
-        <RibbonSection label=Run icon="/icons/btn-runpy.svg">
+        <RibbonSection label={translate("Run")} icon="/icons/btn-runpy.svg">
             <IconButton 
                 icon="/icons/btn-{current.pages[current.tab]?.pilotMode ? "pilot" : "run"}py.svg" 
-                label="{current.pages[current.tab]?.pilotMode ? "Pilot" : "Run"} experiment locally" 
+                label={current.pages[current.tab]?.pilotMode ? translate("Pilot locally") : translate("Run locally")}
                 onclick={evt => runPython()}
-                disabled={!current.pages[current.tab]?.file?.file || current.pages[current.tab]?.file?.ext !== ".py"}
+                disabled={
+                    !current.pages[current.tab]?.file?.file || 
+                    !current.pages[current.tab]?.file?.parent || 
+                    current.pages[current.tab]?.file?.ext !== ".py"
+                }
                 bind:awaiting={awaiting.runpy}
                 cancel={evt => stopPython()}
                 borderless
@@ -139,22 +136,24 @@
         </RibbonSection>
     {/if}
 
-    <RibbonSection label=Pavlovia icon="/icons/rbn-pavlovia.svg">
-        <UserCtrl />
+    <RibbonSection label={translate("Pavlovia")} icon="/icons/rbn-pavlovia.svg">
+        <div class=padded>
+            <UserCtrl />
+        </div>
     </RibbonSection>
 
     <RibbonGap></RibbonGap>
 
-    <RibbonSection label=Views icon="/icons/rbn-windows.svg">
+    <RibbonSection label={translate("Views")} icon="/icons/rbn-windows.svg">
         <IconButton 
             icon="/icons/btn-builder.svg" 
-            label="Builder view" 
+            label={translate("Builder view")} 
             onclick={(evt) => showWindow("builder")} 
             borderless
         />
         <IconButton 
             icon="/icons/btn-coder.svg" 
-            label="Coder view" 
+            label={translate("Coder view")} 
             onclick={(evt) => showWindow("coder")} 
             borderless
             disabled
@@ -162,10 +161,17 @@
         {#if electron}
             <IconButton 
                 icon="/icons/btn-runner.svg" 
-                label="Runner view" 
+                label={translate("Runner view")} 
                 onclick={(evt) => showWindow("runner")} 
                 borderless
             />
         {/if}
     </RibbonSection>
 </Ribbon>
+
+<style>
+    .padded {
+        display: flex;
+        padding: 0 .25rem;
+    }
+</style>

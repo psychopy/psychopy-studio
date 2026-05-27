@@ -5,6 +5,7 @@
     import { Experiment } from "$lib/experiment";
     import { electron } from "$lib/globals.svelte";
     import path from "path-browserify";
+    import { translate } from "$lib/translation";
 
     let {
         user={},
@@ -80,7 +81,7 @@
 </script>
 
 <Dialog
-    title="Submit bug report"
+    title={translate("Submit bug report")}
     buttons={{
         OK: submit,
         CANCEL: evt => {}
@@ -91,28 +92,32 @@
 >
     <div class=content>
         <div class=ctrl>
-            <span>ClickUp access token (<a href="https://app.clickup.com/4570406/settings/apps" target="_blank">click here to log in and get one</a>)</span>
+            <span>
+                {translate("ClickUp access token (")}
+                <a href="https://app.clickup.com/4570406/settings/apps" target="_blank">click here</a>
+                {translate(" to log in and get one)")}
+            </span>
             <input bind:value={report.token} />
         </div>
         <div class=ctrl>
-            Provide a contact email
+            {translate("Provide a contact email")}
             <input bind:value={report.email} />
         </div>
         <div class=ctrl>
-            Briefly summarise the bug
+            {translate("Briefly summarise the bug")}
             <input bind:value={report.title} />
         </div>
         <div class=ctrl>
-            Provide a more detailed description (optional)
+            {translate("Provide a more detailed description (optional)")}
             <textarea bind:value={report.description} ></textarea>
         </div>
         <div class=ctrl>
-            How severe is the bug?
+            {translate("How severe is the bug?")}
             <select bind:value={report.priority}>
-                <option value={1}>Totally prevents me from progressing</option>
-                <option value={2}>Requires a hacky workaround to progress</option>
-                <option value={3}>Can progress but there's confusing errors/warnings</option>
-                <option value={4}>Works but something is unintuitive / could be prettier</option>
+                <option value={1}>{translate("Totally prevents me from progressing")}</option>
+                <option value={2}>{translate("Requires a hacky workaround to progress")}</option>
+                <option value={3}>{translate("Can progress but there's confusing errors/warnings")}</option>
+                <option value={4}>{translate("Works but something is unintuitive / could be prettier")}</option>
             </select>
         </div>
     </div>
@@ -121,9 +126,9 @@
 <MessageDialog
     bind:shown={err.shown}
 >
-    <p>Failed to send report.</p>
+    <p>{translate("Failed to send report.")}</p>
     <pre>{err.ECODE}: {err.message}</pre>
-    <p>Click below to download the report so you can send it manually:</p>
+    <p>{translate("Click below to download the report so you can send it manually:")}</p>
     <Button 
         label="Download"
         icon="/icons/btn-download.svg"

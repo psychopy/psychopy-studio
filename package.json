@@ -1,7 +1,7 @@
 {
 	"name": "psychopy-studio",
 	"author": "Open Science Tools Ltd.",
-	"version": "2026.1.3",
+	"version": "2026.2.0",
 	"description": "Open-source package for creating experiments in behavioral science.",
 	"main": "electron/src/index.cjs",
 	"type": "module",
@@ -11,14 +11,16 @@
 		"productName": "PsychoPy Studio",
 		"executableName": "PsychoPy Studio",
 		"artifactName": "PsychoPy_Studio_${version}.${ext}",
-		"copyright": "Copyright PsychoPy® 2024 Open Science Tools Ltd.",
+		"copyright": "Copyright PsychoPy® 2026 Open Science Tools Ltd.",
 		"asar": true,
 		"publish": [],
 		"directories": {
 			"output": "out"
 		},
 		"nsis": {
-			"perMachine": true
+			"oneClick": false,
+			"allowElevation": true,
+			"selectPerMachineByDefault": true
 		},
 		"win": {
 			"target": [
@@ -102,7 +104,7 @@
 					"type": "file"
 				},
 				{
-					"x": 360,
+					"x": 420,
 					"y": 260,
 					"type": "link",
 					"path": "/Applications"
@@ -127,30 +129,38 @@
 		"dev": "concurrently \"npm run svelte:dev\" \"wait-on http://localhost:5173 && npm run electron:start\""
 	},
 	"devDependencies": {
-		"@electron/fuses": "^1.8.0",
+		"@electron/fuses": "^2.1.1",
 		"@fontsource/fira-mono": "^5.0.0",
 		"@neoconfetti/svelte": "^2.0.0",
-		"@sveltejs/adapter-auto": "^4.0.0",
+		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.16.0",
-		"@sveltejs/vite-plugin-svelte": "^5.0.0",
-		"electron": "38.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"concurrently": "^9.2.1",
+		"electron": "^38.8.6",
 		"electron-builder": "*",
+		"estree-walker": "^3.0.3",
+		"i18next-cli": "^1.50.3",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
-		"vite": "^6.0.0"
+		"vite": "^8.0.9",
+		"wait-on": "^9.0.6"
 	},
 	"dependencies": {
+		"@lezer/javascript": "^1.5.4",
+		"@lezer/python": "^1.1.18",
 		"@monaco-editor/loader": "^1.5.0",
+		"@unly/universal-language-detector": "^2.0.3",
 		"express": "^5.1.0",
 		"extract-zip": "2.0.1",
+		"i18next": "^26.0.4",
 		"isomorphic-git": "^1.35.1",
 		"json-schema-default": "^1.0.2",
 		"jsonschema": "^1.5.0",
-		"marked": "^16.3.0",
+		"marked": "^18.0.2",
 		"mime": "^4.1.0",
-		"monaco-editor": "^0.52.2",
+		"monaco-editor": "^0.55.1",
 		"paneforge": "^1.0.2",
 		"path-browserify": "^1.0.1",
 		"tar": "^7.5.2",

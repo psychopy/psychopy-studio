@@ -143,6 +143,7 @@ export class Experiment {
     constructor(filename) {
         // create attributes
         this.settings = new Component("SettingsComponent")
+        this.settings.exp = this
         this.flow = new Flow(this);
         // starting defaults
         this.reset()
@@ -166,7 +167,7 @@ export class Experiment {
     /**
      * Reset this Experiment as if from new
      */
-    reset(keepHistory=false) {
+    reset(keepHistory=false, defaultRoutine=true) {
         // clear file
         this.file = {
             file: undefined,
@@ -188,10 +189,12 @@ export class Experiment {
         // clear the flow
         this.flow.clear()
         // add a default routine
-        this.routines['trial'] = new Routine();
-        this.routines['trial'].exp = this;
-        this.routines['trial'].settings.params['name'].val = "trial";
-        this.flow.flat.push(this.routines['trial'])
+        if (defaultRoutine) {
+            this.routines['trial'] = new Routine();
+            this.routines['trial'].exp = this;
+            this.routines['trial'].settings.params['name'].val = "trial";
+            this.flow.flat.push(this.routines['trial'])
+        }
     }
 
     /**
@@ -225,13 +228,18 @@ export class Experiment {
         return results
     }
 
-    pilotMode = $derived(this.settings.params['runMode'].val)
+    pilotMode = $derived(![true, "true", "True", 1, "1"].includes(this.settings.params['runMode']?.val))
 
     getPilotMode() {
         return this.settings.params['runMode'].val
     }
 
     setPilotMode(value) {
+        // convert to integer for inter-language compatibility
+        if ([true, false].includes(value)) {
+            value = value ? 0 : 1
+        }
+        // set param val
         this.settings.params['runMode'].val = value
     }
 
@@ -277,7 +285,7 @@ export class Experiment {
      */
     fromJSON(node) {
         // reset experiment
-        this.reset(true)
+        this.reset(true, false)
         // set basic attributes
         this.file = parsePath(node.filename);
         this.version = node.version;
@@ -309,7 +317,7 @@ export class Experiment {
             node = document.getElementsByTagName("PsychoPy2experiment")[0];
         }
         // reset experiment
-        this.reset()
+        this.reset(true, false)
         // get version
         this.version = node.getAttribute("version");
         // get settings
@@ -333,7 +341,9 @@ export class Experiment {
             routine.exp = this;
             routine.fromXML(routineNode);
             // make sure name matches node name (in case experiment was made before Routine Settings existed)
-            routine.settings.params['name'].val = routineNode.getAttribute("name")
+            if (routine.settings) {
+                routine.settings.params['name'].val = routineNode.getAttribute("name")
+            }
             // parse and append node
             this.routines[routine.name] = routine
         }
@@ -449,7 +459,7 @@ export class Experiment {
             args: ["prefs.setDevicesFile", path.join(
                 await electron.paths.user(), "devices.json"
             )]
-        }, 10000).catch(
+        }).catch(
             err => console.error([`Failed to set devices file`, err])
         )
 
@@ -604,12 +614,7 @@ export class Experiment {
                 100000
             )
             // start a server
-            let address = await python.psychojs.run(this.file.parent)
-            // open experiment in browser
-            let params = new URLSearchParams(
-                this.pilotMode ? {__pilotToken: "local"} : {}
-            )
-            window.open(`http://${address}?${params.toString()}`)
+            return await python.psychojs.run(this.file.parent, {__pilotToken: "local"})
         } else {
             // todo: Run in JS on Pavlovia (not pilot)
         }

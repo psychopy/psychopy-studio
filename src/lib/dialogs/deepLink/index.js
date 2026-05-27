@@ -1,0 +1,1 @@
+export { default as DeepLink } from "./DeepLink.svelte";

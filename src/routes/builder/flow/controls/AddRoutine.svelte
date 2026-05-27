@@ -5,6 +5,7 @@
     import { ParamsNotebook } from '$lib/paramCtrls/index.js';
     import { Button } from '$lib/utils/buttons';
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
     
@@ -17,9 +18,9 @@
 >
     <!-- button to open add Routine menu -->
     <Button 
-        label="Add Routine"
+        label={translate("Add Routine")}
         icon="/icons/btn-routine.svg"
-        tooltip="Add a Routine to the experiment flow"
+        tooltip={translate("Add a Routine to the experiment flow")}
         onclick={() => {
             // open the "add routine" menu
             showMenu = true
@@ -33,7 +34,7 @@
         bind:shown={showMenu}
     >
         <MenuItem 
-            label="New Routine..."
+            label={translate("New Routine...")}
             onclick={() => {
                 // create blank Routine
                 current.inserting = new Routine()
@@ -57,7 +58,7 @@
 {#if current.inserting instanceof Routine}
     <Dialog 
         id=new-routine
-        title="New Routine" 
+        title={translate("New Routine")}
         bind:shown={showNewRoutineDialog} 
         onopen={() => current.inserting.settings.restore.set()}
         buttons={{
