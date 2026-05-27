@@ -6,11 +6,15 @@
         shown=$bindable(false),
         /** @prop @type {number} Delay before showing this tooltip */
         delay = 0.5,
+        /** @prop @type {number} Width (px) at which to start wrapping text */
+        maxWidth = 400,
         /** @prop @type {string} Where to show the tooltip, relative to its parent */
         position = "right",
         /** @interface */
         children
     } = $props()
+
+    let width = $state.raw();
 </script>
 
 {#if shown}
@@ -25,8 +29,16 @@
             "left": "auto calc(100% + .5rem) auto auto",
             "right": "auto auto auto calc(100% + .5rem)",
         }[position]}
+        style:max-width="{maxWidth}px"
     >
-        {@render children?.()}
+        <div 
+            class=tooltip-content
+            bind:clientWidth={width}
+            style:text-wrap={width >= maxWidth ? "wrap" : "nowrap"}
+            style:width={width >= maxWidth ? `${maxWidth}px` : "auto"}
+        >
+            {@render children?.()}
+        </div>
     </div>
 {/if}
 
@@ -38,7 +50,6 @@
         background-color: var(--outline);
         color: var(--text-on-outline);
         overflow: hidden;
-        text-wrap: nowrap;
         max-width: 35rem;
     }
 </style>
