@@ -27,7 +27,7 @@ export class PythonScript {
         // execute asynchronously
         this.process = proc.spawn(
             this.venv.executable, 
-            [file, ...this.args], 
+            ["-u", file, ...this.args], 
             {cwd: folder}
         )
         // pass output to front end
