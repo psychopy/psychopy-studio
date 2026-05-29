@@ -56,9 +56,7 @@ export const handlers = {
     scripts: {
         run: ipcMain.handle("python.scripts.run", async (evt, venv, file, ...args) => {
             let script = new PythonScript(await getVenv(venv), file, args);
-            script.start()
-
-            return script.id
+            return await script.run()
         }),
         finished: ipcMain.handle("python.scripts.finished", async (evt, venv, id) => await (await getVenv(venv)).scripts[id].finished.promise),
         stop: ipcMain.handle("python.scripts.stop", async (evt, venv, id) => (await getVenv(venv)).scripts[id].stop())
