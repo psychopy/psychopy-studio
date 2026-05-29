@@ -103,37 +103,39 @@
     label={parsePath(value || "").name}
     open={top}
 >
-    {#await electron.files.scandir(value)}
-        {translate("Scanning...")}
-    {:then files}
-        {#each files as file}
-            {#await electron.files.stat(
-                path.join(value, file)
-            ) then stat}
-                {#if stat.isDirectory}
-                    <FolderNode
-                        value={path.join(value, file)}
-                    />
-                {:else}
+    {#key value}
+        {#await electron.files.scandir(value)}
+            {translate("Scanning...")}
+        {:then files}
+            {#each files as file}
+                {#await electron.files.stat(
+                    path.join(value, file)
+                ) then stat}
+                    {#if stat.isDirectory}
+                        <FolderNode
+                            value={path.join(value, file)}
+                        />
+                    {:else}
+                        <TreeNode 
+                            label={file}
+                            icon="/icons/filetypes/{fileIcons[parsePath(file || "").ext] || "unknown"}.svg"
+                            data={parsePath(path.join(value, file))}
+                            onselect={selectFile}
+                            onactivate={openFile}
+                        />
+                    {/if}
+                {:catch err}
                     <TreeNode 
-                        label={file}
-                        icon="/icons/filetypes/{fileIcons[parsePath(file || "").ext] || "unknown"}.svg"
-                        data={parsePath(path.join(value, file))}
-                        onselect={selectFile}
-                        onactivate={openFile}
+                        label={translate("Protected file")}
+                        disabled
                     />
-                {/if}
-            {:catch err}
-                <TreeNode 
-                    label={translate("Protected file")}
-                    disabled
-                />
-            {/await}
-        {/each}
-    {:catch err}
-        <TreeNode 
-            label={translate("Could not access files")}
-            disabled
-        />
-    {/await}
+                {/await}
+            {/each}
+        {:catch err}
+            <TreeNode 
+                label={translate("Could not access files")}
+                disabled
+            />
+        {/await}
+    {/key}
 </TreeBranch>
