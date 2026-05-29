@@ -35,7 +35,7 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        height: 100%;
+        min-height: 100%;
         background-color: var(--base);
     }
 </style>

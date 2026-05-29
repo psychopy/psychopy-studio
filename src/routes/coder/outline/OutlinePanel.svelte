@@ -28,7 +28,6 @@
 <style>
     .panel {
         background-color: var(--base);
-        min-height: 100%;
         box-sizing: border-box;
     }
     .message {
