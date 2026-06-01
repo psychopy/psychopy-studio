@@ -196,7 +196,7 @@
     .params-container {
         padding: 1rem;
         height: 100%;
-        max-width: 65rem;
+        width: 100%;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
