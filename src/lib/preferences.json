@@ -412,6 +412,29 @@
                 "enabled": []
             }
         },
+        "audioLib": {
+            "val": "sounddevice",
+            "valType": "str",
+            "inputType": "choice",
+            "categ": "Hardware",
+            "updates": null,
+            "allowedUpdates": null,
+            "allowedVals": [
+                "ptb", 
+                "sounddevice"
+            ],
+            "allowedLabels": [
+                "psychtoolbox",
+                "sounddevice"
+            ],
+            "label": "Audio library",
+            "hint": "Python library to use for playing and recording audio",
+            "plugin": null,
+            "depends": {
+                "shown": [],
+                "enabled": []
+            }
+        },
         "audioDriver": {
             "val": [
                 "Primary Sound",
@@ -425,8 +448,8 @@
             "allowedUpdates": null,
             "allowedVals": [],
             "allowedLabels": [],
-            "label": "audio Driver",
-            "hint": "Audio driver to use",
+            "label": "Audio driver",
+            "hint": "Underlying audio architecture to use",
             "plugin": null,
             "depends": {
                 "shown": [],
@@ -442,8 +465,8 @@
             "allowedUpdates": null,
             "allowedVals": ["python:///psychopy.experiment.components.sound:SpeakerDeviceBackend"],
             "allowedLabels": [],
-            "label": "Default audio device",
-            "hint": "Audio device to use by default",
+            "label": "Default speaker device",
+            "hint": "Speaker to use by default",
             "plugin": null,
             "depends": {
                 "shown": [],
