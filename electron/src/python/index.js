@@ -58,7 +58,6 @@ export const handlers = {
             let script = new PythonScript(await getVenv(venv), file, args);
             return await script.run()
         }),
-        finished: ipcMain.handle("python.scripts.finished", async (evt, venv, id) => await (await getVenv(venv)).scripts[id].finished.promise),
         stop: ipcMain.handle("python.scripts.stop", async (evt, venv, id) => (await getVenv(venv)).scripts[id].stop())
     },
     psychojs: {
