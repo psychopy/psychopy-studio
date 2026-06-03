@@ -546,7 +546,6 @@ export class Experiment {
             "--prefs-json",
             await electron.paths.prefs()
         )
-        await python.scripts.finished(version, this.running)
         // mark finished
         this.running = undefined
         await python.output.stdout.send(
