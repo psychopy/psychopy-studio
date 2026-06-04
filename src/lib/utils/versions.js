@@ -1,10 +1,18 @@
 export function ppy2py(version) {
     // make sure we have a Version object
-    version = Version.parse(version)
+    if (version === "dev") {
+        // if version is dev, behave as if it's the newest possible version
+        version = {
+            newerThan: ppy => true
+        }
+    } else {
+        version = Version.parse(version)
+    }
     // at what version of PsychoPy we updated to each version of Python
     let updates = [
         ["2022.1.0", "3.8"],
-        ["2024.2.0", "3.10"]
+        ["2024.2.0", "3.10"],
+        ["2026.2.0", "3.11"]
     ]
     // start off as 3.8
     let output = "3.8"

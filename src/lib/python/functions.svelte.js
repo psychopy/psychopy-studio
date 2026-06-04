@@ -81,7 +81,7 @@ export async function installPython(version=undefined, forceReinstall=false) {
     let pyVersion
     if (version === "dev") {
         // for dev or app, assume python 3.10
-        pyVersion = "3.10"
+        pyVersion = ppy2py("dev")
     } else {
         // make sure we have a Version object
         version = Version.parse(version)
