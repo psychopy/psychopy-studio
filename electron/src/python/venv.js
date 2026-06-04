@@ -94,10 +94,10 @@ export class PythonVenv {
         if (!("psychopy-lib" in installed)) {
             if (this.psychopyVersion === "dev") {
                 // for dev environment, install from dev branch
-                await this.installPackage("git+https://github.com/psychopy/psychopy@dev")
+                await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/dev.zip")
             } else if (prerelease) {
                 // for prerelease, install from release branch
-                await this.installPackage("git+https://github.com/psychopy/psychopy@release")
+                await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/release.zip")
             } else {
                 // for released version, install from pypi
                 await this.installPackage(`psychopy-lib==${this.psychopyVersion}`)
