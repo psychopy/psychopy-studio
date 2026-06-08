@@ -380,6 +380,28 @@ export async function listGroups(username) {
 }
 
 
+/**
+ * List surveys accessible to a given user
+ */
+export async function listSurveys(username) {
+    // create URL
+    let url = new URL(`https://pavlovia.org/api/v2/surveys`)
+    // apply auth
+    if (username && username in users) {
+        url.searchParams.set(
+            "oauthToken", 
+            await users[username].getToken()
+        )
+    }
+    // get surveys
+    return await fetch(
+        url.toString()
+    ).then(
+        resp => resp.json()
+    )
+}
+
+
 export async function newProject(details, folder, username) {
     // initialise local repo
     await git.init({ 
@@ -688,6 +710,7 @@ export const handlers = {
     clearUsers: ipcMain.handle("git.clearUsers", (evt) => clearUsers()),
     listUsers: ipcMain.handle("git.listUsers", (evt) => Object.keys(users)),
     listGroups: ipcMain.handle("git.listGroups", (evt, username) => listGroups(username)),
+    listSurveys: ipcMain.handle("git.listSurveys", (evt, username) => listSurveys(username)),
     getUserInfo: ipcMain.handle("git.getUserInfo", (evt, username) => users[username]?.profile),
     getRemote: ipcMain.handle("git.getRemote", (evt, folder, user) => getRemote(folder, user)),
     getProjectInfo: ipcMain.handle("git.getProjectInfo", (evt, details, username) => getProjectInfo(details, username)),
