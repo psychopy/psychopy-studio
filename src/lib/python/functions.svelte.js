@@ -95,6 +95,15 @@ export async function installPython(version=undefined, forceReinstall=false) {
         }
         // get python version matching psychopy version
         pyVersion = ppy2py(version)
+        // on MacOS ARM, enforce an Intel executable for pre-2026.2 versions
+        let systemInfo = await python.uv.systemInfo()
+        if (
+            version.olderThan("2026.2.0")
+            && systemInfo.platform === "darwin" 
+            && systemInfo.arch === "arm64"
+        ) {
+            pyVersion = `cpython-${pyVersion}-macos-x86_64-none`
+        }
         // convert back to string (serializable)
         version = version.format()
     }

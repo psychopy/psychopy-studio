@@ -65,6 +65,16 @@ export class UV {
     }
 
     /**
+     * Information about the current system
+     */
+    get systemInfo() {
+        return {
+            platform: platform,
+            arch: arch
+        }
+    }
+
+    /**
      * Subfolder for Python environments
      */
     get pyFolder() {
@@ -297,14 +307,31 @@ export class UV {
                 recursive: true
             })
         }
-        // on MacOS ARM, enforce an Intel executable
-        if (platform === "darwin" && arch === "arm64") {
-            pythonVersion = `cpython-${pythonVersion}-macos-x86_64-none`
+        try {
+            await this.execTracked([
+                "venv", folder, "--python", pythonVersion, "--clear"
+            ])
+        } catch (err) {
+            // on Mac, we might need to install Rosetta first
+            if (
+                err.code === 86 
+                && platform === "darwin" 
+                && arch === "arm64"
+            ) {
+                // install Rosetta
+                await execTracked(
+                    "UV", 
+                    "/usr/sbin/softwareupdate", 
+                    ["--install-rosetta", "--agree-to-license"]
+                )
+                // make venv again - this time with Rosetta
+                await this.execTracked([
+                    "venv", folder, "--python", pythonVersion, "--clear"
+                ])
+            } else {
+                throw err
+            }
         }
-        // make a new venv
-        await this.execTracked([
-            "venv", folder, "--python", pythonVersion, "--clear"
-        ])
         // return its path
         return this.findPython(psychopyVersion)
     }

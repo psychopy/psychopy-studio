@@ -74,6 +74,7 @@ const python = {
   uv: {
     folder: () => ipcRenderer.invoke("python.uv.folder").then(resp => resp),
     executable: () => ipcRenderer.invoke("python.uv.executable").then(resp => resp),
+    systemInfo: () => ipcRenderer.invoke("python.uv.systemInfo").then(resp => resp),
     exists: () => ipcRenderer.invoke("python.uv.exists").then(resp => resp),
     findDirectory: (option) => ipcRenderer.invoke("python.uv.findDirectory", option).then(resp => resp),
     setDirectory: (option) => ipcRenderer.invoke("python.uv.setDirectory", option).then(resp => resp),
