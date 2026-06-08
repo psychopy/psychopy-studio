@@ -2,6 +2,7 @@
     import SingleLineCtrl from "./SingleLineCtrl.svelte"
     import { CompactButton, RadioButton } from "$lib/utils/buttons"
     import { getContext } from "svelte";
+    import { git } from "$lib/globals.svelte";
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
     import { translate } from "$lib/translation";
 
@@ -23,20 +24,6 @@
     let selected = $state({
         survey: undefined
     });
-
-    async function getSurveys() {
-        // request from Pavlovia
-        let data = await fetch(
-            "/api/surveys",
-            {
-                headers: current.user.token
-            }
-        ).then(
-            resp => resp.json()
-        )
-
-        return data.surveys
-    }
 </script>
 
 <SingleLineCtrl 
@@ -71,10 +58,12 @@
             <a href="https://pavlovia.org/dashboard?tab=4" target="_blank">here</a>
         </p>
         <div class=choice-group>
-            {#await getSurveys()}
+            {#await git.listSurveys(
+                $state.snapshot(current.user)
+            )}
                 {translate("Loading surveys...")}
-            {:then surveys}
-                {#each surveys as survey}
+            {:then resp}
+                {#each resp.surveys as survey}
                     <RadioButton
                         bind:selection={selected.survey}
                         value={survey}
