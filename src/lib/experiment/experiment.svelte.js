@@ -470,7 +470,7 @@ export class Experiment {
                 "currentExperiment",
                 "psychopy.experiment:Experiment"
             ]
-        }, 10000).catch(
+        }).catch(
             reason => console.error(reason)
         )
         // load from file
@@ -480,7 +480,7 @@ export class Experiment {
                 "currentExperiment.loadFromXML",
                 $state.snapshot(this.file.file)
             ]
-        }, 10000).catch(
+        }).catch(
             reason => console.error(reason)
         )
         // write script
@@ -494,7 +494,7 @@ export class Experiment {
                 modular: true,
                 expPath: this.file.file
             }
-        }, 10000).catch(
+        }).catch(
             reason => console.error(reason)
         )
         // save to python/js file
