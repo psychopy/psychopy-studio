@@ -127,6 +127,36 @@ export async function installPython(version=undefined, forceReinstall=false) {
 
 
 export async function installPsychoPy(version=undefined, forceReinstall=false) {
+
+    /**
+     * Function which takes an array of package versions and checks that install is complete
+     * 
+     * @param {object} packages Object mapping package names to installed versions
+     */
+    function checkPackages(packages) {
+        // if liaison isn't present, fail
+        if (!("liaison-py" in packages)) {
+            return false
+        }
+        // if requested psychopy is dev, just check whether psychopy is installed
+        if (version === "dev") {
+            return "psychopy-lib" in packages || "psychopy" in packages
+        }
+        // get target and installed versions of PsychoPy version
+        let target = Version.parse(version)
+        let installed = Version.parse(packages['psychopy-lib'] || packages['psychopy'])
+        // if target patch version is *, only compare major and minor
+        if (target.patch === Infinity) {
+            installed.patch = Infinity
+        }
+        // compare
+        return (
+            target.major === installed.major &&
+            target.minor === installed.minor &&
+            target.patch === installed.patch
+        )
+    }
+
     // sanitize version
     version = await sanitizeVersion(version)
     // is this a prerelease version?
@@ -144,9 +174,7 @@ export async function installPsychoPy(version=undefined, forceReinstall=false) {
         version = Version.parse(version).format("patch")
     } catch {}
     // do we already have psychopy?
-    let hasPsychoPy = await python.venv.getPackages(version).then(
-        packages => "liaison-py" in packages && (packages.psychopy === version || version === "dev")
-    )
+    let hasPsychoPy = await python.venv.getPackages(version).then(checkPackages)
     // if installed and not forcing a reinstall, do nothing
     if (!forceReinstall && hasPsychoPy) {
         return hasPsychoPy
@@ -162,9 +190,7 @@ export async function installPsychoPy(version=undefined, forceReinstall=false) {
     // install packages
     await python.venv.setup(version, prerelease)
     // make sure install worked
-    hasPsychoPy = await python.venv.getPackages(version).then(
-        packages => "liaison-py" in packages && (packages.psychopy === version || version === "dev")
-    )
+    hasPsychoPy = await python.venv.getPackages(version).then(checkPackages)
     if (!hasPsychoPy) {
         throw Error("PsychoPy failed to install")
     }
