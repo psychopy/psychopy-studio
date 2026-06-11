@@ -67,8 +67,14 @@
         disabled={!current.project}
     />
     <MenuSeparator/>
+    <MenuItem 
+        label={translate("Browse demos")}
+        icon="/icons/btn-demos.svg" 
+        onclick={evt => window.open("https://pavlovia.org/explore/demos", "_blank")}
+        borderless
+    />
     <MenuItem
-        label={translate("Search projects...")}
+        label={translate("Search projects")}
         icon="/icons/btn-find.svg"
         onclick={(evt) => window.open("https://pavlovia.org/explore", "_blank")}
     />
