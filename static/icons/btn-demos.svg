@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="btn-demos" transform="matrix(0.124893,0,0,0.124893,0,0)">
+        <rect x="0" y="0" width="256" height="256" style="fill:none;"/>
+        <g transform="matrix(0.968784,0,0,0.929752,24.423761,9.463221)">
+            <path d="M197.827,240L48,240C30.339,240 16,225.661 16,208C16,190.339 30.339,176 48,176L197.827,176C179.799,197.028 179.99,218.364 197.827,240Z" style="fill:var(--outline);fill-opacity:0.5;stroke:var(--outline);stroke-width:21px;"/>
+        </g>
+        <g transform="matrix(0.968784,0,0,0.929752,24.423761,9.463221)">
+            <path d="M48,16L197.827,16L197.827,176L48,176C30.339,176 16,190.339 16,208L16,48C16,30.339 30.339,16 48,16Z" style="fill:none;stroke:var(--outline);stroke-width:21px;"/>
+        </g>
+        <g transform="matrix(0.790191,0,0,0.790191,156.683409,84.278235)">
+            <path d="M0,27.674L-58.458,63.083C-67.374,68.483 -78.767,62.064 -78.767,51.64L-78.767,-19.177C-78.767,-29.601 -67.374,-36.021 -58.458,-30.62L0,4.788C8.596,9.995 8.596,22.467 0,27.674" style="fill:var(--green);fill-rule:nonzero;"/>
+            <clipPath id="_clip1">
+                <path d="M0,27.674L-58.458,63.083C-67.374,68.483 -78.767,62.064 -78.767,51.64L-78.767,-19.177C-78.767,-29.601 -67.374,-36.021 -58.458,-30.62L0,4.788C8.596,9.995 8.596,22.467 0,27.674" clip-rule="nonzero"/>
+            </clipPath>
+            <g clip-path="url(#_clip1)">
+                <g transform="matrix(0,1,1,0,-39.7073,-49.0331)">
+                    <path d="M62.87,-62.87C28.023,-62.87 -0.226,-34.722 -0.226,-0C-0.226,34.723 28.023,62.87 62.87,62.87C97.717,62.87 125.966,34.723 125.966,-0C125.966,-34.722 97.717,-62.87 62.87,-62.87" style="fill:var(--green);fill-rule:nonzero;"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
