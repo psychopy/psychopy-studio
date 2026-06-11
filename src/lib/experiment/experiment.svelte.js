@@ -483,6 +483,27 @@ export class Experiment {
         }).catch(
             reason => console.error(reason)
         )
+        // clear use version param (as version is handled by studio)
+        await python.liaison.send(version, {
+            command: "init",
+            args: [
+                "useVersion",
+                "currentExperiment.settings.params.__getitem__",
+                "Use version",
+            ]
+        }).catch(
+            reason => console.error(reason)
+        )
+        await python.liaison.send(version, {
+            command: "run",
+            args: [
+                "useVersion.__setattr__",
+                "val",
+                ""
+            ]
+        }).catch(
+            reason => console.error(reason)
+        )
         // write script
         let script = await python.liaison.send(version, {
             command: "run",
