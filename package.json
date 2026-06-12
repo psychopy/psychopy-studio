@@ -159,7 +159,7 @@
 		"isomorphic-git": "^1.38.3",
 		"json-schema-default": "^1.0.2",
 		"jsonschema": "^1.5.0",
-		"marked": "^18.0.4",
+		"marked": "^18.0.5",
 		"mime": "^4.1.0",
 		"monaco-editor": "^0.55.1",
 		"paneforge": "^1.0.2",
