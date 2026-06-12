@@ -5,6 +5,7 @@
     import Info from "$lib/utils/tooltip/Info.svelte";
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
     import { slide } from "svelte/transition";
+    import { translate } from "$lib/translation";
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -31,7 +32,7 @@
     <div class=output>
         {#if param.val}
             {#await python.liaison.send("app", {
-                command: "run",
+                command: "try",
                 args: [
                     "psychopy.data.utils:importConditions"
                 ],
@@ -41,15 +42,15 @@
                 }
             })}
                 Loading...
-            {:then conditions}
-                {#if conditions}
-                    {conditions[0].length} conditions, with {conditions[1].length} parameters 
+            {:then resp}
+                {#if resp.success}
+                    {resp.result[0].length} conditions, with {resp.result[1].length} parameters 
                     <Info>
                         <div 
                             class=more-info
                             transition:slide={{axis: "x", delay: 0.5}}
                         >
-                            {conditions[1].join(", ")}
+                            {resp.result[1].join(", ")}
                         </div>
                     </Info>
                 {/if}
