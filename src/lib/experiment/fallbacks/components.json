@@ -11707,24 +11707,6 @@
                     "enabled": []
                 }
             },
-            "HTML path": {
-                "val": "",
-                "valType": "str",
-                "inputType": "single",
-                "categ": "Online",
-                "updates": null,
-                "allowedUpdates": null,
-                "allowedVals": [],
-                "allowedLabels": [],
-                "ctrlParams": {},
-                "label": "Output path",
-                "hint": "Place the HTML files will be saved locally ",
-                "plugin": null,
-                "depends": {
-                    "shown": [],
-                    "enabled": []
-                }
-            },
             "exportHTML": {
                 "val": "on Sync",
                 "valType": "str",
