@@ -93,7 +93,7 @@
                     <Button 
                         label={translate("Help")}
                         onclick={() => {
-                            window.open(buttons.HELP, '_blank').focus();
+                            window.open(buttons.HELP, '_blank');
                         }} 
                         horizontal
                     />
