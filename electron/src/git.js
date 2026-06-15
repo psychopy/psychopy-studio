@@ -509,10 +509,14 @@ export async function getProjectInfo({
 }, username) {
     // if given a folder, get group and name from that
     if (folder && (!group || !name)) {
-        let remote = new URL(
-            await getRemote(folder, username)
-        )
-        let parts = remote.pathname.match(/\/(?<group>.+?)\/(?<name>.+?)\.git/).groups
+        // get remote
+        let remote = await getRemote(folder, username)
+        // if no remote, abort
+        if (!remote) {
+            return
+        }
+        // get parts from remote
+        let parts = new URL(remote).pathname.match(/\/(?<group>.+?)\/(?<name>.+?)\.git/).groups
         group = parts.group
         name = parts.name
     }
