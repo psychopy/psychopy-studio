@@ -37,7 +37,7 @@
     <div class=content>
         <div class=instructions>
             <p>
-                Installing the PsychoPy library from Git allows you to test out fixes and changes to the PsychoPy library from within PsychoPy Studio. This is not recommended for general use, only if you are testing a fix from the developers or wanting to <a href="https://psychopy.org/contributing">contribute to PsychoPy</a>.
+                Installing the PsychoPy library from Git allows you to test out fixes and changes to the PsychoPy library from within PsychoPy Studio. This is not recommended for general use, only if you are testing a fix from the developers or wanting to <a href="https://psychopy.org/developers">contribute to PsychoPy</a>.
             </p>
             <p>
                 Installing PsychoPy this way requires you to have <a href="https://git-scm.com/install/">Git installed on your system</a>.
