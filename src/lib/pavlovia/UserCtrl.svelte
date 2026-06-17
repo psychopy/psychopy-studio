@@ -23,7 +23,6 @@
         {#await git.getUserInfo($state.snapshot(current.user)) then profile}
             <DropdownButton
                 label={profile?.username || translate("No user")}
-                icon={profile?.avatar_url}
                 onclick={(evt) => {
                     if (profile) {
                         window.open(profile.web_url);
