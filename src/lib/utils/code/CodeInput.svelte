@@ -1,6 +1,9 @@
 <script>
+    import { translate } from "$lib/translation"
+
     let {
         value=$bindable(),
+        placeholder=translate("Type here..."),
         label=undefined,
         onsubmit=evt => {},
         onprevious=evt => {},
@@ -13,6 +16,7 @@
 <textarea 
     bind:this={ctrl}
     bind:value={value}
+    placeholder={placeholder}
     aria-label={label}
     onkeypress={evt => {
         // on submit...
