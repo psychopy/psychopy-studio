@@ -143,7 +143,7 @@
 		"estree-walker": "^3.0.3",
 		"i18next-cli": "^1.61.0",
 		"svelte": "^5.0.0",
-		"svelte-check": "^4.0.0",
+		"svelte-check": "^4.6.0",
 		"typescript": "^6.0.3",
 		"vite": "^8.0.9",
 		"wait-on": "^9.0.6"
