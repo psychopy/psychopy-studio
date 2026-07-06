@@ -460,8 +460,8 @@ export async function newProject(details, folder, username) {
         remote: "origin",
         url: `${server}/${details.group}/${details.name}.git`
     })
-    // make folder ready for isomorphic git
-    sanitize(folder)
+    // setup gitignore
+    setupGitIgnore(folder)
     // store reference
     projects[`${details.group}/${details.name}`] = folder
     saveProjects()
@@ -484,20 +484,32 @@ export async function newProject(details, folder, username) {
 }
 
 /**
+ * Create a .gitignore file with the standard ignored files for PsychoPy
+ * 
+ * @param {string} folder Folder in which to create the gitignore file
+ */
+function setupGitIgnore(folder) {
+    // only proceed if there isn't already a .gitignore (user may have made their own)
+    if (
+        fs.existsSync(path.join(folder, ".gitignore"))
+    ) {
+        return
+    }
+    // write file
+    fs.writeFileSync(
+        path.join(folder, ".gitignore"),
+        gitignoreText
+    )
+}
+
+/**
  * Make sure a local git repo is compatible with isomorphic git
  * 
  * @param {string} folder Folder containing the repo
  */
 async function sanitize(folder) {
     // make sure we have a .gitignore
-    if (
-        !fs.existsSync(path.join(folder, ".gitignore"))
-    ) {
-        fs.writeFileSync(
-            path.join(folder, ".gitignore"),
-            gitignoreText
-        )
-    }
+    setupGitIgnore(folder)
     // get remote url
     let url = await git.getConfig({
         fs,
