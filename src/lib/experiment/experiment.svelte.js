@@ -162,7 +162,11 @@ export class Experiment {
         // assign parentage
         routine.exp = this
         // handle namespace conflicts
-        routine.settings.params['name'].val = this.resolveNameConflict(routine.name)
+        if (routine.settings) {
+            routine.settings.params['name'].val = this.resolveNameConflict(routine.name)
+        } else if (routine.params) {
+            routine.params['name'].val = this.resolveNameConflict(routine.name)
+        }
         // for each Component...
         if (routine.components) {
             for (let comp of routine.components) {

@@ -4,7 +4,7 @@ import { current } from './globals.svelte.js';
 import path from "path-browserify";
 import { newWindow, openIn, showDevTools } from "$lib/utils/views.svelte"
 import { browseFileOpen, browseFileSave, parsePath } from "$lib/utils/files.js";
-import { Routine, Component, HasParams } from "$lib/experiment"
+import { Routine, StandaloneRoutine, Component, HasParams } from "$lib/experiment"
 import { prefs } from "$lib/preferences.svelte";
 import { translate } from "$lib/translation";
 
@@ -178,7 +178,7 @@ export async function pasteRoutine() {
     if (clipboard.tag === "Routine") {
         element = new Routine()
     } else {
-        element = new HasParams(clipboard.tag)
+        element = new StandaloneRoutine(clipboard.tag)
     }
     element.fromJSON(clipboard)
     // if element isn't a Routine, abort
