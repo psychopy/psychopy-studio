@@ -410,6 +410,7 @@ export class HasParams {
             for (let val of targets) {
                 // convert val and term to string
                 val = String(val)
+                let original = String(val)
                 searchTerm = String(searchTerm)
                 // if ignoring case, convert val and term to lowercase
                 if (!caseSensitive) {
@@ -447,9 +448,9 @@ export class HasParams {
                     let match = {
                         breadcrumbs: {},
                         text: {
-                            before: val.slice(0, found.index),
-                            text: found.text,
-                            after: val.slice(found.index + found.text.length)
+                            before: original.slice(0, found.index),
+                            text: original.slice(found.index, found.index + found.text.length),
+                            after: original.slice(found.index + found.text.length)
                         }
                     };
                     // add breadcrumbs
