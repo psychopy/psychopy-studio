@@ -408,10 +408,13 @@ export class HasParams {
                 );
             }
             for (let val of targets) {
+                // convert val and term to string
+                val = String(val)
+                searchTerm = String(searchTerm)
                 // if ignoring case, convert val and term to lowercase
                 if (!caseSensitive) {
-                    val = String(val).toLowerCase();
-                    searchTerm = String(searchTerm).toLowerCase();
+                    val = val.toLowerCase();
+                    searchTerm = searchTerm.toLowerCase();
                 }
                 // placeholders for match details
                 let found = {
