@@ -12,6 +12,51 @@ import { favicon } from "./resources.js";
 // set server URL and client ID
 const server = "https://gitlab.pavlovia.org"
 const client = "944b87ee0e6b4f510881d6f6bc082f64c7bba17d305efdb829e6e0e7ed466b34"
+// default gitignore content
+const gitignoreText = `
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Backup files
+*.bak
+~$*.xls*
+~$*.doc*
+~$*.ppt*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtual Environment files
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# OS generated files
+.DS_Store
+.directory
+.gdb_history
+ehthumbs.db
+Icon?
+*.orig
+old
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# lib files used for local debugging
+/lib/
+/html/lib/
+`
 
 
 class User {
@@ -415,6 +460,8 @@ export async function newProject(details, folder, username) {
         remote: "origin",
         url: `${server}/${details.group}/${details.name}.git`
     })
+    // make folder ready for isomorphic git
+    sanitize(folder)
     // store reference
     projects[`${details.group}/${details.name}`] = folder
     saveProjects()
@@ -442,6 +489,15 @@ export async function newProject(details, folder, username) {
  * @param {string} folder Folder containing the repo
  */
 async function sanitize(folder) {
+    // make sure we have a .gitignore
+    if (
+        !fs.existsSync(path.join(folder, ".gitignore"))
+    ) {
+        fs.writeFileSync(
+            path.join(folder, ".gitignore"),
+            gitignoreText
+        )
+    }
     // get remote url
     let url = await git.getConfig({
         fs,
@@ -461,6 +517,7 @@ async function sanitize(folder) {
             value: url + ".git"
         })
     }
+
 }
 
 
