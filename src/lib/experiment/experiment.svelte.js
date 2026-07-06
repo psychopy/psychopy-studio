@@ -153,6 +153,29 @@ export class Experiment {
         }
     }
 
+    /**
+     * Add a Routine to this experiment. Handles namespace conflicts and assigning parentage.
+     * 
+     * @param {Routine|StandaloneRoutine} routine Routine to add
+     */
+    addRoutine(routine) {
+        // assign parentage
+        routine.exp = this
+        // handle namespace conflicts
+        routine.settings.params['name'].val = this.resolveNameConflict(routine.name)
+        // for each Component...
+        if (routine.components) {
+            for (let comp of routine.components) {
+                // assign parentage
+                comp.exp = this
+                // handle namespace conflicts
+                comp.params['name'].val = this.resolveNameConflict(comp.name)
+            }
+        }
+        // add Routine
+        this.routines[routine.name] = routine
+    }
+
     /** 
      * Get a path relative to this experiment's root folder 
      */

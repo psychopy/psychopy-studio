@@ -185,16 +185,10 @@ export async function pasteRoutine() {
     if (![Routine, HasParams].some(cls => element instanceof cls)) {
         return
     }
-    // make name valid
-    let name = current.experiment.resolveNameConflict(element.name)
-    // set name
-    if (element instanceof Routine) {
-        element.settings.params['name'].val = name
-    } else {
-        element.params['name'].val = name
-    }
-    // add to experiment and select
-    current.experiment.routines[element.name] = current.routine = element
+    // add to experiment
+    current.experiment.addRoutine(element)
+    // select
+    current.routine = element
 }
 
 /**
