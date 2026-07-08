@@ -49,7 +49,6 @@
         {
             "name": "PsychopPy Studio Runner (app)",
             "request": "launch",
-            "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
                 "run",
                 "electron:start",

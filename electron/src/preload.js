@@ -74,6 +74,7 @@ const python = {
   uv: {
     folder: () => ipcRenderer.invoke("python.uv.folder").then(resp => resp),
     executable: () => ipcRenderer.invoke("python.uv.executable").then(resp => resp),
+    systemInfo: () => ipcRenderer.invoke("python.uv.systemInfo").then(resp => resp),
     exists: () => ipcRenderer.invoke("python.uv.exists").then(resp => resp),
     findDirectory: (option) => ipcRenderer.invoke("python.uv.findDirectory", option).then(resp => resp),
     setDirectory: (option) => ipcRenderer.invoke("python.uv.setDirectory", option).then(resp => resp),
@@ -104,7 +105,6 @@ const python = {
   },
   scripts: {
     run: (venv, file, ...args) => ipcRenderer.invoke("python.scripts.run", venv, file, ...args).then(resp => resp),
-    finished: (venv, id) => ipcRenderer.invoke("python.scripts.finished", venv, id).then(resp => resp),
     stop: (venv, id) => ipcRenderer.invoke("python.scripts.stop", venv, id).then(resp => resp),
   },
   psychojs: {
@@ -123,6 +123,7 @@ const git = {
   clearUsers: () => ipcRenderer.invoke("git.clearUsers").then(resp => resp),
   listUsers: () => ipcRenderer.invoke("git.listUsers").then(resp => resp),
   listGroups: (username) => ipcRenderer.invoke("git.listGroups", username).then(resp => resp),
+  listSurveys: (username) => ipcRenderer.invoke("git.listSurveys", username).then(resp => resp),
   getUserInfo: (username) => ipcRenderer.invoke("git.getUserInfo", username).then(resp => resp),
   getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user).then(resp => resp),
   getProjectInfo: (details, username) => ipcRenderer.invoke("git.getProjectInfo", details, username).then(resp => resp),

@@ -18,9 +18,11 @@
 </script>
 
 <div class=standalone-routine-canvas>
-    <ParamsNotebook 
-        bind:element={component}
-    />
+    <div class=notebook-container>
+        <ParamsNotebook 
+            bind:element={component}
+        />
+    </div>
     <div class=standalone-routine-ctrls>
         <div class=ctrl-gap></div>
         <Button
@@ -56,6 +58,11 @@
         align-items: end;
         padding-bottom: 2rem;
     }
+
+    .notebook-container {
+        max-width: 55rem;
+    }
+
     .ctrl-gap {
         flex-grow: 1;
     }

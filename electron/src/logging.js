@@ -60,9 +60,12 @@ export function log(msg, tag=undefined, target="lastAppLoad", echo=true) {
     }
     // log to console
     if (echo) {
-        console.log(
-            msg.length > 100 ? `${msg.slice(0, 50)}...${msg.slice(-50)}` : msg
-        )
+        try {
+            // this will fail if the packaged app is closing, as console is gone
+            console.log(
+                msg.length > 100 ? `${msg.slice(0, 50)}...${msg.slice(-50)}` : msg
+            )
+        } catch {}
     }
     
     // make sure we have a newline

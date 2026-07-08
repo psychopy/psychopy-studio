@@ -32,25 +32,15 @@ export class Script {
             console.error("Script running is not available in browser.")
             return
         }
-        // mark started
-        await python.output.stdout.send(
-            `--- Started ${this.file.name} ---`
-        )
         // run script
-        this.running = await python.scripts.run(
+        this.running = python.scripts.run(
             version,
             this.file.file,  
             ...(this.pilotMode ? ["--pilot"] : []),
             "--prefs-json",
             await electron.paths.prefs()
         )
-        // await finished
-        await python.scripts.finished(version, this.running)
-        // mark finished
-        this.running = undefined
-        await python.output.stdout.send(
-            `--- Finished ${this.file.name} ---`
-        )
+        await this.running
     }
 
     /**

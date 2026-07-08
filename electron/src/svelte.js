@@ -151,14 +151,6 @@ function setupAPI(server) {
     });
     console.log("Mapped API: Submit a bug report to ClickUp")
 
-    // API for getting user's surveys
-    server.get('/api/surveys', async (req, res) => await apiGet(
-        req,
-        res,
-        `https://pavlovia.org/api/v2/surveys?oauthToken=${req.headers.access}`
-    ));
-    console.log("Mapped API: Get user's Pavlovia surveys")
-
     // handle SPA fallback without wildcard
     server.use((req, res) => {
         res.sendFile(path.join(import.meta.dirname, '../../dist/index.html'));

@@ -13,48 +13,35 @@ export class PythonScript {
         this.args = args
         // populated upon start
         this.process = undefined
-        // generate random id
-        this.id = randomUUID()
-        // setup completion promises
-        this.started = Promise.withResolvers()
-        this.started.promise.finally(
-            evt => {
-                output("stdout", "---")
-                output("stdout", `Running ${this.file}...`)
-                this.venv.scripts[this.id] = this
-            }
-        )
-        this.finished = Promise.withResolvers()
-        this.finished.promise.then(
-            evt => output("stdout", `Finished running ${this.file}`)
-        ).catch(
-            err => output("stderr", `Failed to run ${file}: ${err.message}`)
-        ).finally(
-            evt => {
-                delete this.venv.shells[this.id]
-                output("stdout", "---")
-            }
-        )
+        this.finished = undefined
     }
 
-    start() {
+    async run() {
+        // setup promise to track progress
+        this.finished = Promise.withResolvers()
+        // mark started
+        output("stdout", `--- Started ${this.file} ---`)
         // split file into name and dir
         let folder = path.dirname(this.file)
         let file = path.basename(this.file)
         // execute asynchronously
         this.process = proc.spawn(
             this.venv.executable, 
-            [file, ...this.args], 
+            ["-u", file, ...this.args], 
             {cwd: folder}
         )
-        // log start
-        this.started.resolve()
         // pass output to front end
         this.process.stdout.on("data", evt => output("stdout", evt))
         this.process.stderr.on("data", evt => output("stderr", evt))
         // await completion/error
         this.process.on("exit", (code, signal) => this.finished.resolve([code, signal]))
         this.process.on("error", err => this.finished.reject(err))
+        // wait until finished
+        let result = await this.finished.promise
+        // mark finished
+        output("stdout", `--- Finished ${this.file} ---`)
+
+        return result
     }
 
     stop() {

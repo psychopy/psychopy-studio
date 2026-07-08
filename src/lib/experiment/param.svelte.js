@@ -349,6 +349,8 @@ export class HasParams {
         this.iconSVG = template.iconSVG || template.iconFile;
         // set plugin
         this.plugin = template.plugin;
+        // set help link
+        this.helpLink = template.helpLink;
         // set legacy params
         this.legacyParams = template.legacyParams || [];
         // clear params

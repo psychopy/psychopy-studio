@@ -34,6 +34,7 @@ export const handlers = {
     uv: {
         folder: ipcMain.handle("python.uv.folder", (evt) => uv.folder),
         executable: ipcMain.handle("python.uv.executable", (evt) => uv.executable),
+        systemInfo: ipcMain.handle("python.uv.systemInfo", (evt) => uv.systemInfo),
         findDirectory: ipcMain.handle("python.uv.findDirectory", (evt, option) => uv.findDirectory(option)),
         setDirectory: ipcMain.handle("python.uv.setDirectory", (evt, option) => uv.setDirectory(option)),
         exists: ipcMain.handle("python.uv.exists", (evt) => uv.exists()),
@@ -56,11 +57,8 @@ export const handlers = {
     scripts: {
         run: ipcMain.handle("python.scripts.run", async (evt, venv, file, ...args) => {
             let script = new PythonScript(await getVenv(venv), file, args);
-            script.start()
-
-            return script.id
+            return await script.run()
         }),
-        finished: ipcMain.handle("python.scripts.finished", async (evt, venv, id) => await (await getVenv(venv)).scripts[id].finished.promise),
         stop: ipcMain.handle("python.scripts.stop", async (evt, venv, id) => (await getVenv(venv)).scripts[id].stop())
     },
     psychojs: {
