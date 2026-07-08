@@ -359,6 +359,35 @@ export function clearProjects() {
 }
 
 
+/**
+ * Get the details of a specific group
+ * 
+ * @param {string} group Group to get details for
+ * @param {string} username Username to use for authentication
+ * 
+ * @returns {object|undefined} Either an object with group info in, or undefined is group not found
+ */
+export async function getGroup(group, username) {
+    // create URL
+    let url = new URL(`${server}/api/v4/groups/${group}`)
+    // apply auth
+    if (username && username in users) {
+        url.searchParams.set(
+            "access_token", 
+            await users[username].getToken()
+        )
+    }
+    // get groups
+    let resp = await fetch(
+        url.toString()
+    )
+    // if we got one, return its info
+    if (resp.ok) {
+        return await resp.json()
+    }
+}
+
+
 export async function listGroups(username) {
     // create URL
     let url = new URL(`${server}/api/v4/groups`)
@@ -524,8 +553,10 @@ export async function getProjectInfo({
     if (!group || !name) {
         return
     }
+    // check whether group is a group or user
+    let isGroup = await getGroup(group, username)
     // create search url
-    let url = new URL(`https://gitlab.pavlovia.org/api/v4/users/${group}/projects?search=${name}`)
+    let url = new URL(`https://gitlab.pavlovia.org/api/v4/${isGroup ? "groups" : "users"}/${group}/projects?search=${name}`)    
     // apply auth
     if (username && username in users) {
         url.searchParams.set(

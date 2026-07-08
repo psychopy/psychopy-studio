@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "PsychopPy Studio (app)",
+            "name": "PsychopPy Studio",
             "request": "launch",
             "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
@@ -15,7 +15,23 @@
             "type": "node"
         },
         {
-            "name": "PsychopPy Studio Builder (app)",
+            "name": "Stroop in PsychopPy Studio",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/electron",
+            "runtimeArgs": [
+                "run",
+                "electron:start",
+                "--",
+                "pavlovia://demos/stroop"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "PsychopPy Studio Builder",
             "request": "launch",
             "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
@@ -31,7 +47,7 @@
             "type": "node"
         },
         {
-            "name": "PsychopPy Studio Coder (app)",
+            "name": "PsychopPy Studio Coder",
             "request": "launch",
             "cwd": "${workspaceFolder}/electron",
             "runtimeArgs": [
@@ -47,7 +63,7 @@
             "type": "node"
         },
         {
-            "name": "PsychopPy Studio Runner (app)",
+            "name": "PsychopPy Studio Runner",
             "request": "launch",
             "runtimeArgs": [
                 "run",
