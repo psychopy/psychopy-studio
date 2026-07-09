@@ -135,7 +135,7 @@
 		"@neoconfetti/svelte": "^2.0.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-static": "^3.0.9",
-		"@sveltejs/kit": "^2.63.0",
+		"@sveltejs/kit": "^2.69.1",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"concurrently": "^9.2.1",
 		"electron": "^42.4.1",
