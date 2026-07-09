@@ -207,7 +207,8 @@
         border-right: none;
         margin-right: -1px;
     }
-    .notebook-tab:hover {
+    .notebook-tab:hover,
+    .notebook-tab:focus {
         background-color: var(--mantle);
         background: var(--mantle) linear-gradient(transparent 0%, transparent 75%, rgba(0, 0, 0, 0.01) 100%);
     }
