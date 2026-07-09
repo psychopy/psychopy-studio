@@ -74,9 +74,11 @@
         {#await git.getProjectInfo({
             group: project.split("/")[0],
             name: project.split("/")[1]
-        }, $state.snapshot(current.user)) then info}
+        }, $state.snapshot(current.user))}
+            {translate("Getting project info...")}
+        {:then info}
             <div class=project-title>
-                {#if info.avatar_url}
+                {#if info?.avatar_url}
                     <img 
                         style:height=8rem
                         src={info.avatar_url} 
