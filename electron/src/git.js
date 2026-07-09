@@ -374,8 +374,6 @@ export async function listGroups(username) {
         url.toString()
     ).then(
         resp => resp.json()
-    ).then(
-        resp => resp?.[0]
     )
 }
 
