@@ -56,6 +56,7 @@
         background-color: var(--blue);
         transition: left .5s, right .5s;
         border-radius: 2rem;
+        border: 1px solid var(--blue);
     }
 
     .label {
@@ -82,6 +83,20 @@
     }
     button.switch-ctrl:disabled {
         opacity: .5;
+    }
+
+    button.switch-ctrl:hover,
+    button.switch-ctrl:focus {
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.05);
+    }
+    button.switch-ctrl:focus {
+        border-color: var(--blue);
+    }
+
+    button.switch-ctrl:hover .indicator,
+    button.switch-ctrl:focus .indicator {
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.1);
+        border-color: var(--outline);
     }
 
 </style>
