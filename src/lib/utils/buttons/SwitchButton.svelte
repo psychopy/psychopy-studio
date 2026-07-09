@@ -40,8 +40,8 @@
     <div class="label left {value ? "inactive" : "active"}">{labels[0]}</div>
     <div 
         class=indicator 
-        style:left={value ? "calc(50% - .25rem)" : ".25rem"}
-        style:right={value ? ".25rem" : "calc(50% - .25rem)"}
+        style:left={value ? "50%" : ".25rem"}
+        style:right={value ? ".25rem" : "50%"}
         class:left={value} 
         class:right={!value}
     ></div>
@@ -57,6 +57,7 @@
         transition: left .5s, right .5s;
         border-radius: 2rem;
         border: 1px solid var(--blue);
+        box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.05)
     }
 
     .label {
