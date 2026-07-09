@@ -47,7 +47,7 @@
 <EntryPoint routine={component.routine} index={component.index}></EntryPoint>
 
 <!-- icon & name -->
-<label 
+<button 
     class=comp-name 
     for={component.params['name'].val} 
     style="opacity: {component.disabled ? 0.3 : 1}"
@@ -58,7 +58,8 @@
     ondragend={() => current.moving = undefined} 
     onmouseenter={() => hovered = true}
     onmouseleave={() => hovered = false}
-    role="none"
+    onfocusin={() => hovered = true}
+    onfocusout={() => hovered = false}
     oncontextmenu={oncontextmenu}
     style:grid-row-start={component.index + 3}
 >    
@@ -66,7 +67,7 @@
     <Icon 
         src={component.iconSVG}
     />
-</label>
+</button>
 
 <!-- bars representing this on the timeline -->
 
@@ -264,5 +265,6 @@
         padding: .5rem 1rem;
         justify-self: right;
         border-radius: .5rem;
+        background-color: transparent;
     }
 </style>
