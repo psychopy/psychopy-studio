@@ -189,6 +189,8 @@ export async function pasteRoutine() {
     current.experiment.addRoutine(element)
     // select
     current.routine = element
+
+    return element
 }
 
 /**

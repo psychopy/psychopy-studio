@@ -1,6 +1,9 @@
 <script>
     import { LoopInitiator, LoopTerminator, Routine, StandaloneRoutine } from '$lib/experiment';
+    import { pasteRoutine } from "../callbacks.svelte";
+    import { Menu, MenuItem } from '$lib/utils/menu';
     import { getContext } from "svelte";
+    import { translate } from "$lib/translation";
     
     let current = getContext("current");
     
@@ -9,6 +12,14 @@
     } = $props()
 
     let hovered = $state(false);
+    
+    let contextMenu = $state({
+        shown: false,
+        pos: {
+            x: undefined,
+            y: undefined
+        }
+    });
 
     let moving = $derived(
         current.moving && [
@@ -96,9 +107,36 @@
         onclick={insertHere}
         aria-label="Entry point"
         tabindex={moving || inserting ? 0 : -1}
+        oncontextmenu={(evt) => {
+            evt.preventDefault();
+            // show menu
+            contextMenu.shown = true;
+            // set its position to the mouse pos
+            contextMenu.pos.x = evt.pageX;
+            contextMenu.pos.y = evt.pageY;
+        }}
     >
     </button>
 </div>
+
+<!-- context menu -->
+<Menu 
+    bind:shown={contextMenu.shown} 
+    bind:position={contextMenu.pos}
+>
+    <MenuItem 
+        icon="/icons/btn-paste.svg"
+        label={translate("Paste Routine")}
+        onclick={evt => {
+            pasteRoutine().then(
+                routine => {
+                    current.inserting = routine
+                    insertHere()
+                }
+            )
+        }}
+    />
+</Menu>
 
 <style>
     .entry-point {
