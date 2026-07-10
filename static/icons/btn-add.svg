@@ -5,10 +5,10 @@
         <g id="light-btn-add" serif:id="light/btn-add" transform="matrix(0.451519,0,0,0.451519,144,0)">
             <rect x="0" y="0" width="70.872" height="70.866" style="fill:none;"/>
             <g transform="matrix(1.81207,0,0,2.1808,-254.495,-1.33514)">
-                <path d="M160,7.72L160,26" style="fill:none;stroke:rgb(37,169,234);stroke-width:8.84px;"/>
+                <path d="M160,7.72L160,26" style="fill:none;stroke:var(--blue);stroke-width:8.84px;"/>
             </g>
             <g transform="matrix(1.10957e-16,-1.81207,2.1808,1.33536e-16,-1.33224,325.364)">
-                <path d="M160,7.72L160,26" style="fill:none;stroke:rgb(37,169,234);stroke-width:8.84px;"/>
+                <path d="M160,7.72L160,26" style="fill:none;stroke:var(--blue);stroke-width:8.84px;"/>
             </g>
         </g>
     </g>

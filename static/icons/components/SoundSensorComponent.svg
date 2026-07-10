@@ -15,7 +15,7 @@
                     <circle cx="17" cy="39" r="2" style="fill:var(--outline);fill-opacity:0.5;"/>
                 </g>
                 <g transform="matrix(2,0,0,2,-8.5,-40)">
-                    <circle cx="17" cy="39" r="2" style="fill:rgb(37,169,234);"/>
+                    <circle cx="17" cy="39" r="2" style="fill:var(--blue);"/>
                 </g>
             </g>
             <g id="Microphone-Component" serif:id="Microphone Component" transform="matrix(0.435842,0,0,0.435842,-2.53378,17.0846)">

@@ -12,7 +12,7 @@
                     <path d="M286.794,426.414L301,426.414L301,452L251,452L251,426.414L265.206,426.414" style="fill:none;stroke:var(--outline);stroke-width:7.57px;"/>
                 </g>
                 <g transform="matrix(2.23106e-16,-1.82165,-1.8218,-2.23088e-16,19.0206,47.9331)">
-                    <ellipse cx="6.793" cy="0" rx="6.794" ry="6.794" style="fill:var(--blue);stroke:rgb(37,169,234);stroke-width:5.04px;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+                    <ellipse cx="6.793" cy="0" rx="6.794" ry="6.794" style="fill:var(--blue);stroke:var(--blue);stroke-width:5.04px;stroke-linejoin:miter;stroke-miterlimit:10;"/>
                 </g>
                 <g transform="matrix(0.940171,-2.8721e-32,-4.9576e-32,1.33179,63.4702,16.6587)">
                     <path d="M0,10.79L-10.653,21.443C-11.724,22.514 -13.453,22.514 -14.524,21.443L-25.164,10.79C-26.894,9.073 -25.675,6.135 -23.235,6.135L-1.929,6.135C0.51,6.135 1.717,9.073 0,10.79" style="fill:var(--outline);fill-rule:nonzero;"/>
