@@ -16,22 +16,22 @@
                     <g clip-path="url(#_clip2)">
                         <g id="table1" serif:id="table" transform="matrix(1.04447,0,0,1.46012,-2.07934,-7.87495)">
                             <g transform="matrix(1,0,0,1,0,-29.0989)">
-                                <rect x="22.778" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="22.778" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                             <g transform="matrix(1,0,0,1,0,-29.0989)">
-                                <rect x="30.773" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="30.773" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                             <g transform="matrix(1,0,0,1,0,-29.0989)">
-                                <rect x="38.768" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="38.768" y="46.214" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                             <g transform="matrix(1,0,0,1,0,-14.0249)">
-                                <rect x="22.778" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="22.778" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                             <g transform="matrix(1,0,0,1,0,-14.0249)">
-                                <rect x="30.773" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="30.773" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                             <g transform="matrix(1,0,0,1,0,-14.0249)">
-                                <rect x="38.768" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:rgb(107,204,116);stroke-width:3px;"/>
+                                <rect x="38.768" y="38.677" width="7.995" height="7.537" style="fill:none;stroke:var(--green);stroke-width:3px;"/>
                             </g>
                         </g>
                     </g>
