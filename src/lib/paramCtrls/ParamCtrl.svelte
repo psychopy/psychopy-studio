@@ -106,7 +106,7 @@
         style:flex-grow={grow ? 1 : 0}
         {...attachments}
     >
-        <label 
+        <button 
             class=param-label 
             for={param.name}
             style:grid-column-start={inline ? "gap" : "label"}
@@ -125,7 +125,7 @@
                     {param.hint}
                 </Tooltip>
             {/if}
-        </label>
+        </button>
         {#if param.allowedUpdates && param.allowedUpdates.length > 0}
             <select 
                 class=param-updates 
@@ -195,6 +195,12 @@
         flex-direction: row;
         align-items: stretch;
         height: 100%;
+    }
+
+    .param-label {
+        display: inline;
+        background: transparent;
+        padding: 0;
     }
 
     .warning {
