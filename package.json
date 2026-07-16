@@ -137,7 +137,7 @@
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.69.1",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
-		"concurrently": "^9.2.1",
+		"concurrently": "^10.0.3",
 		"electron": "^42.4.1",
 		"electron-builder": "*",
 		"estree-walker": "^3.0.3",
