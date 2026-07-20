@@ -1,7 +1,7 @@
 <script>
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button, CompactButton } from "$lib/utils/buttons";
-    import { mimeTypesFromParam } from "./utils";
+    import { mimeTypesFromParam } from "./utils.svelte";
     import { browseFileOpen } from "$lib/utils/files.js";
     import { getContext } from "svelte";
 

@@ -1,7 +1,7 @@
 <script>
     import { translate } from "$lib/translation";
     import { CompactButton } from "$lib/utils/buttons";
-    import { iterateName } from "./utils.js";
+    import { iterateName } from "./utils.svelte.js";
     import { sanitizeJSON } from "$lib/utils/transpiler"
 
     let {

@@ -1,5 +1,5 @@
 <script>
-    import { optionsFromParam } from "./utils.js";
+    import { optionsFromParam } from "./utils.svelte.js";
     import { translate } from "$lib/translation";
 
     let {
