@@ -1,5 +1,6 @@
 import { electron, python } from "$lib/globals.svelte";
 import { Param } from "$lib/experiment/param.svelte";
+import { translate} from "$lib/translation"
 
 
 /**
@@ -117,6 +118,11 @@ export async function optionsFromParam(param) {
         }
         // add allowed vals & labels to options
         for (let i in param.allowedVals) {
+            // handle None
+            if (param.allowedVals[i] === null && param.allowedLabels[i] === null) {
+                param.allowedLabels[i] = translate("Default")
+            }
+            // add values
             output.push(
                 [param.allowedVals[i], param.allowedLabels[i]]
             );
