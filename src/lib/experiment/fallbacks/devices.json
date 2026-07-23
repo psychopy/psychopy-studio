@@ -163,52 +163,6 @@
             }
         }
     },
-    "SerialDeviceBackend": {
-        "__class__": "psychopy.experiment.components.serialOut:SerialDeviceBackend",
-        "__name__": "SerialDeviceBackend",
-        "label": "Serial Device",
-        "device": "psychopy.hardware.serialdevice.SerialDevice",
-        "plugin": null,
-        "profile": {},
-        "params": {
-            "name": {
-                "val": "",
-                "valType": "str",
-                "inputType": "name",
-                "categ": null,
-                "updates": null,
-                "allowedUpdates": null,
-                "allowedVals": [],
-                "allowedLabels": [],
-                "ctrlParams": {},
-                "label": "Device label",
-                "hint": "A name to refer to this device by in Device Manager.",
-                "plugin": null,
-                "depends": {
-                    "shown": [],
-                    "enabled": []
-                }
-            },
-            "timeout": {
-                "val": "",
-                "valType": "code",
-                "inputType": "single",
-                "categ": "Basic",
-                "updates": null,
-                "allowedUpdates": null,
-                "allowedVals": [],
-                "allowedLabels": [],
-                "ctrlParams": {},
-                "label": "Timeout",
-                "hint": "Time at which to give up listening for a response (leave blank for no limit)",
-                "plugin": null,
-                "depends": {
-                    "shown": [],
-                    "enabled": []
-                }
-            }
-        }
-    },
     "SpeakerDeviceBackend": {
         "__class__": "psychopy.experiment.components.sound:SpeakerDeviceBackend",
         "__name__": "SpeakerDeviceBackend",
@@ -277,6 +231,154 @@
                 "ctrlParams": {},
                 "label": "Resample",
                 "hint": "If the sample rate of a clip doesn't match the sample rate of the speaker, should we resample it to match?",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            }
+        }
+    },
+    "SerialDeviceBackend": {
+        "__class__": "psychopy.experiment.components.serialOut:SerialDeviceBackend",
+        "__name__": "SerialDeviceBackend",
+        "label": "Serial Device",
+        "device": "psychopy.hardware.serialdevice.SerialDevice",
+        "plugin": null,
+        "profile": {},
+        "params": {
+            "name": {
+                "val": "",
+                "valType": "str",
+                "inputType": "name",
+                "categ": null,
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "Device label",
+                "hint": "A name to refer to this device by in Device Manager.",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "timeout": {
+                "val": "",
+                "valType": "code",
+                "inputType": "single",
+                "categ": "Basic",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "Timeout",
+                "hint": "Time at which to give up listening for a response (leave blank for no limit)",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "eol": {
+                "val": "$'\\n'",
+                "valType": "str",
+                "inputType": "single",
+                "categ": "Basic",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "EOL (end-of-line) character",
+                "hint": "Character automatically added to end of each message - leave blank for no EOL",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "overrideBaudrate": {
+                "val": "",
+                "valType": "code",
+                "inputType": "single",
+                "categ": "Overrides",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "Baudrate override",
+                "hint": "Override the device's reported baudrate",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "overrideByteSize": {
+                "val": "",
+                "valType": "code",
+                "inputType": "single",
+                "categ": "Overrides",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "Byte size override",
+                "hint": "Override the device's reported byte size",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "overrideStopBits": {
+                "val": "",
+                "valType": "code",
+                "inputType": "single",
+                "categ": "Overrides",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [],
+                "allowedLabels": [],
+                "ctrlParams": {},
+                "label": "Stop bits override",
+                "hint": "Override the device's reported stop bits",
+                "plugin": null,
+                "depends": {
+                    "shown": [],
+                    "enabled": []
+                }
+            },
+            "overrideParity": {
+                "val": null,
+                "valType": "str",
+                "inputType": "choice",
+                "categ": "Overrides",
+                "updates": null,
+                "allowedUpdates": null,
+                "allowedVals": [
+                    null,
+                    "N",
+                    "E",
+                    "O",
+                    "M"
+                ],
+                "allowedLabels": [
+                    "",
+                    "N (none)",
+                    "E (even)",
+                    "O (odd)",
+                    "M (mask)"
+                ],
+                "ctrlParams": {},
+                "label": "Parity override",
+                "hint": "Override the device's reported parity settings",
                 "plugin": null,
                 "depends": {
                     "shown": [],
