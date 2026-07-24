@@ -1,6 +1,6 @@
 import { uv } from "./uv.js";
 import { execSync, execTracked, output } from "./utils.js";
-import { appVersion } from "../version.js";
+import { appVersion, parseVersion } from "../version.js";
 import logging from "../logging.js";
 import proc from "child_process";
 import process from "process";
@@ -91,7 +91,7 @@ export class PythonVenv {
             }
         }
         // install psychopy library
-        if (!("psychopy-lib" in installed)) {
+        if (!("psychopy" in installed || "psychopy-lib" in installed)) {
             if (this.psychopyVersion === "dev") {
                 // for dev environment, install from dev branch
                 await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/dev.zip")
@@ -100,7 +100,12 @@ export class PythonVenv {
                 await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/release.zip")
             } else {
                 // for released version, install from pypi
-                await this.installPackage(`psychopy-lib==${this.psychopyVersion}`)
+                let pkg = "psychopy"
+                if (parseVersion(this.psychopyVersion) < parseVersion("2026.2.0")) {
+                    // older versions need to use psychopy-lib rather than psychopy to avoid installing wx
+                    pkg += "-lib"
+                }
+                await this.installPackage(`${pkg}==${this.psychopyVersion}`)
             }
         }
     }

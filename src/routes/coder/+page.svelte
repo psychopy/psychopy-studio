@@ -65,7 +65,10 @@
     <PaneGroup direction="horizontal">
         {#if electron}
             <Pane defaultSize={1/5}>
-                <Panel title={translate("Files")}>
+                <Panel 
+                    title={translate("Files")}
+                    shortcut=f
+                >
                     <FileExplorer />
                 </Panel>
             </Pane>
@@ -77,7 +80,10 @@
 
             <PaneGroup direction="vertical">
                 <Pane defaultSize={3/4}>
-                    <Panel title={translate("Editor")}>
+                    <Panel 
+                        title={translate("Editor")}
+                        shortcut=e
+                    >
                         <CoderNotebook />
                     </Panel>
                 </Pane>
@@ -86,7 +92,10 @@
 
                 {#if python?.ready}
                     <Pane defaultSize={1/4}>
-                        <Panel title={translate("Console")}>
+                        <Panel 
+                            title={translate("Console")}
+                            shortcut=c
+                        >
                             <ShellNotebook />
                         </Panel>
                     </Pane>
@@ -98,7 +107,10 @@
         <PaneResizer style="width: .3rem;"/>
             
         <Pane defaultSize={1/5}>
-            <Panel title={translate("Outline")}>
+            <Panel 
+                title={translate("Outline")}
+                shortcut=o
+            >
                 <OutlinePanel />
             </Panel>
         </Pane>
