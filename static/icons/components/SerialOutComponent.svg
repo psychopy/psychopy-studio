@@ -8,7 +8,7 @@
         </clipPath>
         <g clip-path="url(#_clip1)">
             <g transform="matrix(0.910099,0,0,0.339546,-69.626,-101.979)">
-                <rect x="92.801" y="439.678" width="45.205" height="21.205" style="fill:rgb(37,169,234);"/>
+                <rect x="92.801" y="439.678" width="45.205" height="21.205" style="fill:var(--blue);"/>
             </g>
             <g transform="matrix(0.910099,0,0,0.679091,-69.626,-251.27)">
                 <rect x="92.801" y="439.678" width="45.205" height="21.205" style="fill:none;stroke:var(--outline);stroke-width:5.52px;"/>

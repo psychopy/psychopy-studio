@@ -61,6 +61,9 @@
 </div>
 
 <style>
+    input {
+        color:var(--text);
+    }
     .dir-ctrl {
         display: flex;
         flex-direction: row;
