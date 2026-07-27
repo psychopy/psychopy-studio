@@ -1,7 +1,7 @@
 <script>
     import { Button, DropdownButton } from "$lib/utils/buttons";
     import { MenuItem } from "$lib/utils/menu";
-    import { Version } from "$lib/utils/versions.js";
+    import semver from "semver";
     import { getContext } from "svelte";
     import { python } from "$lib/globals.svelte";
     import ProgressDlg from "../ProgressDlg.svelte";
@@ -73,7 +73,7 @@
             }
         )
 
-        return Object.keys(resp.releases).sort(Version.sorter)
+        return Object.keys(resp.releases).sort(semver.compare).toReversed()
     }
 
 </script>
@@ -113,7 +113,7 @@
                             {/await}
                         </DropdownButton>
                         {#await getVersions(plugin) then versions}
-                            {#if Version.parse(versions[0]).newerThan(siblings.installed[plugin.pipname])}
+                            {#if semver.parse(versions[0]) > siblings.installed[plugin.pipname]}
                                 <Button
                                     label={translate("Update")}
                                     icon="/icons/btn-refresh.svg"

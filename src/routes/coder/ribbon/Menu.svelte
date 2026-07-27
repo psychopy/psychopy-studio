@@ -7,7 +7,7 @@
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { setupPython } from "$lib/python";
-    import { Version } from "$lib/utils/versions";
+    import semver from "semver";
     import Demos from "./Demos.svelte";
     import { translate } from "$lib/translation";
 
@@ -111,7 +111,7 @@
 
         {#if electron}
             {#await electron.version() then version}
-                {#if version === "dev" || Version.parse(version).extra}
+                {#if version === "dev" || semver.parse(version).prerelease}
                     <MenuSeparator />
                     
                     <MenuItem
