@@ -5,7 +5,7 @@
         <g id="sym-dot-blue" transform="matrix(0.451519,0,0,0.451519,280,36.0013)">
             <rect x="0" y="0" width="70.872" height="70.866" style="fill:none;"/>
             <g transform="matrix(3.87581,0,0,3.87581,-638.954,-121.558)">
-                <circle cx="174" cy="40.504" r="8" style="fill:rgb(37,169,234);"/>
+                <circle cx="174" cy="40.504" r="8" style="fill:var(--blue);"/>
             </g>
         </g>
     </g>
