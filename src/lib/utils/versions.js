@@ -29,7 +29,7 @@ export function ppy2py(version) {
 
 export class Version {
     // regex for a valid version
-    static pattern = /(?<major>\d+)\.(?<minor>\d+)(?:\.(?<patch>(?:\d+|\*))(?<extra>[\d\w]+)?)?/
+    static pattern = /(?<major>\d+)\.(?<minor>\d+)(?:\.(?<patch>(?:\d+|\*))(?<extra>[\d\w-\.]+)?)?/
 
     constructor(version) {
         // parse with regex
