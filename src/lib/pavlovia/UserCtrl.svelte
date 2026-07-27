@@ -18,68 +18,67 @@
     )
 </script>
 
-{#await loading then loaded}
-    {#key current.user}
-        {#await git.getUserInfo($state.snapshot(current.user)) then profile}
-            <DropdownButton
-                label={profile?.username || translate("No user")}
-                onclick={(evt) => {
-                    if (profile) {
-                        window.open(profile.web_url);
-                    }
-                }}
-                disabled={!profile}
+
+{#key current.user}
+    {#await git.getUserInfo($state.snapshot(current.user)) then profile}
+        <DropdownButton
+            label={profile?.username || translate("No user")}
+            onclick={(evt) => {
+                if (profile) {
+                    window.open(profile.web_url);
+                }
+            }}
+            disabled={!profile}
+        >
+            <MenuItem
+                label={translate("Edit user...")}
+                icon="/icons/btn-edit.svg"
+                onclick={evt => window.open("https://gitlab.pavlovia.org/-/profile", "_blank")}
+            />
+            <SubMenu 
+                label={translate("Switch user...")}
             >
-                <MenuItem
-                    label={translate("Edit user...")}
-                    icon="/icons/btn-edit.svg"
-                    onclick={evt => window.open("https://gitlab.pavlovia.org/-/profile", "_blank")}
-                />
-                <SubMenu 
-                    label={translate("Switch user...")}
-                >
-                    {#await git.listUsers() then users}
-                        {#each users as username}
-                            <MenuItem
-                                label={username}
-                                onclick={evt => current.user = username}
-                            />
-                        {/each}
-                    {/await}
+                {#await git.listUsers() then users}
+                    {#each users as username}
+                        <MenuItem
+                            label={username}
+                            onclick={evt => current.user = username}
+                        />
+                    {/each}
                     <MenuSeparator />
-                    <MenuItem
-                        label={translate("New user...")}
-                        onclick={async evt => {
-                            let user = await git.login()
-                            if (user) {
-                                current.user = user
-                            }
-                        }}
-                    />
-                </SubMenu>
-                <MenuSeparator />
-                {#if current.user}
-                    <MenuItem
-                        label={translate("Logout")}
-                        onclick={evt => {
-                            current.user = undefined;
-                            git.clearUsers();
-                        }}
-                    />
-                {:else}
-                    <MenuItem
-                        label={translate("Login")}
-                        onclick={async evt => {
-                            let users = await git.listUsers();
-                            if (users.length) {
-                                current.user = users[0]
-                            } else {
-                                current.user = await git.login()
-                            }
-                        }}
-                    />
-                {/if}
-            </DropdownButton>
-        {/await}
-    {/key}
-{/await}
+                {/await}
+                <MenuItem
+                    label={translate("New user...")}
+                    onclick={async evt => {
+                        let user = await git.login()
+                        if (user) {
+                            current.user = user
+                        }
+                    }}
+                />
+            </SubMenu>
+            <MenuSeparator />
+            {#if current.user}
+                <MenuItem
+                    label={translate("Logout")}
+                    onclick={evt => {
+                        current.user = undefined;
+                        git.clearUsers();
+                    }}
+                />
+            {:else}
+                <MenuItem
+                    label={translate("Login")}
+                    onclick={async evt => {
+                        let users = await git.listUsers();
+                        if (users.length) {
+                            current.user = users[0]
+                        } else {
+                            current.user = await git.login()
+                        }
+                    }}
+                />
+            {/if}
+        </DropdownButton>
+    {/await}
+{/key}
