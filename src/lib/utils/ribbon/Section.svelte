@@ -1,5 +1,6 @@
 <script>
     import { Icon } from "$lib/utils/icons";
+    import { getContext, onMount } from "svelte";
 
     let {
         /** @prop @type {string} Label for this section */
@@ -9,11 +10,24 @@
         /** @interface */
         children=undefined
     } = $props()
+
+    let ribbon = getContext("ribbon")
     
+    // handle of this sections's HTML element
+    let handle = $state.raw()
+    // tracks when the Alt key is pressed (for visual indicators)
+    let altKey = $state.raw(false)
+    // shortcut of a ribbon section is its position in the ribbon (1-index)
+    let index = $derived(
+        Array.from(
+            ribbon?.getElementsByClassName?.("ribbon-section") || []
+        ).indexOf(handle)
+    )
 </script>
 
 <div
     class=ribbon-section
+    bind:this={handle}
 >
     {@render children?.()}
     <div
@@ -26,9 +40,45 @@
         {:else}
             <div></div>
         {/if}
-        {label}
+        <span>
+            {label}
+            {#if altKey}
+                [<u>{index}</u>]
+            {/if}
+        </span>
     </div>
 </div>
+
+<svelte:window 
+    onkeydown={evt => {
+        // mark alt pressed
+        if (evt.key === "Alt") {
+            altKey = true
+        }
+        // focus first child
+        if (altKey && evt.key === String(index)) {
+            for (
+                let child of Array.from(
+                    handle.getElementsByTagName("*")
+                )
+                .filter(
+                    child => child.tabIndex >= 0 && !child.disabled
+                ).toSorted(
+                    (a, b) => a.tabIndex - b.tabIndex
+                )
+            ) {
+                child.focus()
+                break
+            }
+        }
+    }}
+    onkeyup={evt => {
+        // mark alt released
+        if (evt.key === "Alt") {
+            altKey = false
+        }
+    }}
+/>
 
 <style>
     .ribbon-section {
