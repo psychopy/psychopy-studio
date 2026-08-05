@@ -77,7 +77,10 @@ export class Param {
             shown: [],
             enabled: []
         };
+        // other params in the same object (Component, Routine, etc.)
         this.siblings = {};
+        // other information which may be relevant to live updating this param's control (e.g. device profile)
+        this.context = {};
     }
 
     /**

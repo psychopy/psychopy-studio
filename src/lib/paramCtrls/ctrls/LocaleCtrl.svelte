@@ -54,7 +54,7 @@
 
 
 <style>
-    .param-device-input {
+    .param-locale-input {
         flex-grow: 1;
     }
 </style>

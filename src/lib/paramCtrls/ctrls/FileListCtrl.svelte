@@ -3,7 +3,7 @@
     import { CompactButton } from "$lib/utils/buttons";
     import { sanitizeJSON } from "$lib/utils/transpiler"
     import FileCtrl from "./FileCtrl.svelte";
-    import { mimeTypesFromParam } from "./utils";
+    import { mimeTypesFromParam } from "./utils.svelte";
     import { translate } from "$lib/translation";
 
     let {
