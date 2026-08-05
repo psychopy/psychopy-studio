@@ -18,7 +18,6 @@
         fileOpen,
         fileSave,
         fileSaveAs,
-        quit,
         // run
         togglePiloting,
         // view
@@ -69,11 +68,6 @@
             shortcut="saveAs"
             onclick={fileSaveAs} 
         />
-        <MenuItem
-            label={translate("Close window")}
-            onclick={close}
-            shortcut="close"
-        />
 
         <MenuSeparator />
 
@@ -87,29 +81,51 @@
             onclick={evt => prefs.reset()}
         />
 
-        {#if electron}
-            {#await electron.version() then version}
-                {#if version === "dev" || Version.parse(version).extra}
-                    <MenuSeparator />
-                    
-                    <MenuItem
-                        label={translate("Report bug")}
-                        onclick={evt => show.bugReport = true}
-                    />
-                {/if}
+        <MenuSeparator />
 
-                <MenuSeparator />
-
-                <MenuItem
-                    label={translate("Quit")}
-                    onclick={quit}
-                    shortcut="quit"
-                />
-            {/await}
-        {/if}
+        <MenuItem
+            label={translate("Minimize window")}
+            role="minimize"
+        />
+        <MenuItem
+            label={translate("Close window")}
+            onclick={window.close}
+            role="close"
+        />
+        <MenuItem
+            label={translate("Quit")}
+            shortcut="quit"
+            role="quit"
+        />
     </SubMenu>
-
+    
     <SubMenu label={translate("View")} icon="/icons/rbn-windows.svg">
+        <MenuItem 
+            label={translate("Reload window")}
+            role="reload"
+        />
+        <MenuItem 
+            label={translate("Force reload window")}
+            role="forceReload"
+        />
+
+        <MenuSeparator />
+
+        <MenuItem
+            label={translate("Zoom in")}
+            role="zoomIn"
+        />
+        <MenuItem
+            label={translate("Zoom out")}
+            role="zoomOut"
+        />
+        <MenuItem
+            label={translate("Reset zoom")}
+            role="resetZoom"
+        />
+
+        <MenuSeparator />
+
         <MenuItem 
             label={translate("Show Builder")}
             onclick={evt => showWindow("builder")}
@@ -124,7 +140,8 @@
         <MenuItem 
             label={translate("Show developer tools")}
             onclick={showDevTools}
-            shortcut="showDevTools"
+            shortcut="showDevTools",
+            role="toggleDevTools"
         />
     </SubMenu>
 
@@ -194,6 +211,10 @@
     </SubMenu>
 
     <SubMenu label={translate("Help")}>
+        <MenuItem
+            label={translate("App info")}
+            role="about"
+        />
         <MenuItem 
             label={translate("PsychoPy Homepage")}
             onclick={evt => open("https://www.psychopy.org/")}
@@ -213,6 +234,14 @@
                     label="{translate("PsychoPy")} {version}"
                     disabled
                 />
+                {#if version === "dev" || Version.parse(version).extra}
+                    <MenuSeparator />
+                    
+                    <MenuItem
+                        label={translate("Report bug")}
+                        onclick={evt => show.bugReport = true}
+                    />
+                {/if}
             {/await}
         {/if}
     </SubMenu>
