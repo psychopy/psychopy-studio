@@ -1,6 +1,7 @@
 import { uv } from "./uv.js";
 import { execSync, execTracked, output } from "./utils.js";
-import { appVersion, parseVersion } from "../version.js";
+import { appVersion } from "../version.js";
+import semver from "semver";
 import logging from "../logging.js";
 import proc from "child_process";
 import process from "process";
@@ -101,7 +102,7 @@ export class PythonVenv {
             } else {
                 // for released version, install from pypi
                 let pkg = "psychopy"
-                if (parseVersion(this.psychopyVersion) < parseVersion("2026.2.0")) {
+                if (semver.parse(this.psychopyVersion) < "2026.2.0") {
                     // older versions need to use psychopy-lib rather than psychopy to avoid installing wx
                     pkg += "-lib"
                 }

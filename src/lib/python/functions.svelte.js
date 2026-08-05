@@ -1,6 +1,7 @@
 import { status } from "./globals.svelte.js"
 import { electron, python } from "$lib/globals.svelte";
-import { Version, ppy2py } from "$lib/utils/versions.js";
+import { ppy2py } from "$lib/utils/versions.js";
+import semver from "semver";
 import { translate } from "$lib/translation";
 
 
@@ -74,31 +75,34 @@ export async function installPython(version=undefined, forceReinstall=false) {
     // sanitize version
     version = await sanitizeVersion(version)
     // remove any dogfood details from version
-    try {
-        version = Version.parse(version).format("patch")
-    } catch {}
+    if (semver.parse(version)) {
+        version = semver.parse(
+            version,
+            { includePrerelease: false }
+        ).format()
+    }
     // get python version
     let pyVersion
     if (version === "dev") {
         // for dev or app, assume python 3.10
         pyVersion = ppy2py("dev")
     } else {
-        // make sure we have a Version object
-        version = Version.parse(version)
+        // make sure we have a Version objects
+        version = semver.parse(version)
         // oldest version we can do is 2022.1 as it's the first to use Python >3.8
-        if (version.olderThan("2022.1.0")) {
+        if (version < "2022.1.0") {
             console.warn(
                 `Version ${version.format()} of PsychoPy is not supported in PsychoPy Studio as it `
                 + `cannot run in Python >=3.8. Using the oldest compatible version (2022.1).`
             )
-            version = new Version("2022.1.*")
+            version = semver.parse("2022.1.4")
         }
         // get python version matching psychopy version
         pyVersion = ppy2py(version)
         // on MacOS ARM, enforce an Intel executable for pre-2026.2 versions
         let systemInfo = await python.uv.systemInfo()
         if (
-            version.olderThan("2026.2.0")
+            version < "2026.2.0"
             && systemInfo.platform === "darwin" 
             && systemInfo.arch === "arm64"
         ) {
@@ -152,12 +156,8 @@ export async function installPsychoPy(version=undefined, forceReinstall=false) {
             return "psychopy-lib" in packages || "psychopy" in packages
         }
         // get target and installed versions of PsychoPy version
-        let target = Version.parse(version)
-        let installed = Version.parse(packages['psychopy-lib'] || packages['psychopy'])
-        // if target patch version is *, only compare major and minor
-        if (target.patch === Infinity) {
-            installed.patch = Infinity
-        }
+        let target = semver.parse(version)
+        let installed = semver.parse(packages['psychopy-lib'] || packages['psychopy'])
         // compare
         return (
             target.major === installed.major &&
@@ -172,15 +172,15 @@ export async function installPsychoPy(version=undefined, forceReinstall=false) {
     let prerelease
     if (version === "dev") {
         prerelease = true
-    } else if (Version.parse(version).extra) {
+    } else if (semver.parse(version).prerelease) {
         prerelease = true
-        version = Version.parse(version).format("patch")
+        version = semver.parse(version, { includePrerelease: false }).format()
     } else {
         prerelease = false
     }
     // remove any dogfood details from version
     try {
-        version = Version.parse(version).format("patch")
+        version = semver.parse(version, { includePrerelease: false }).format()
     } catch {}
     // do we already have psychopy?
     let hasPsychoPy = await python.venv.getPackages(version).then(checkPackages)
