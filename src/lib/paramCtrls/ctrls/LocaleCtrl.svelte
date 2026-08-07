@@ -1,5 +1,6 @@
 <script>
-    import { locales, getLocale, setLocale } from "$lib/translation"
+    import { locales, getLocale, setLocale } from "$lib/translation";
+    import { getByTag } from "locale-codes";
 
     let {
         param=$bindable(),
@@ -27,18 +28,33 @@
     <option
         value="system locale"
         selected={param.val === ""}
-    >System language</option>
+    >
+        System language
+    </option>
     {#each locales as option}
+        {@const language = getByTag(option.replace("_", "-"))}
         <option 
             value={option} 
             selected={param.val === option}
-        >{option}</option>
+        >
+            {#if language}
+                {language.name}
+                {#if language.local && language.local !== language.name}
+                    {language.local}
+                {/if}
+                {#if language.location}
+                    ({language.location})
+                {/if}
+            {:else}
+                {option}
+            {/if}
+        </option>
     {/each}
 </select>
 
 
 <style>
-    .param-device-input {
+    .param-locale-input {
         flex-grow: 1;
     }
 </style>

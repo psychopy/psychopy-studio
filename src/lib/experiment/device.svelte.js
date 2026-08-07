@@ -5,6 +5,19 @@ export class Device extends HasParams {
     constructor(tag, profile) {
         super(tag);
         this.profile = profile;
+        // add device profile items to param siblings
+        for (let param of Object.values(this.params)) {
+            Object.assign(param.context, this.profile)
+        }
+    }
+
+    reset() {
+        // reset as normal
+        super.reset()
+        // add device profile items to param siblings
+        for (let param of Object.values(this.params)) {
+            Object.assign(param.context, this.profile)
+        }
     }
 
     /**

@@ -66,7 +66,8 @@
         border-left: 1px solid transparent;
         padding: .5rem 1rem;
     }
-    .tree-node:hover {
+    .tree-node:hover,
+    .tree-node:focus {
         background-color: var(--mantle);
     }
     .node-label {

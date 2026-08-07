@@ -3,6 +3,8 @@
         "__class__": "psychopy.experiment.loops:TrialHandler",
         "__name__": "TrialHandler",
         "plugin": null,
+        "label": "Loop",
+        "hidden": false,
         "params": {
             "name": {
                 "val": "trials",
@@ -72,7 +74,7 @@
                 "allowedVals": [],
                 "allowedLabels": [],
                 "ctrlParams": {
-                    "template": "F:\\GitHub\\psychopy\\psychopy\\experiment\\loopTemplate.xltx"
+                    "template": "loopTemplate.xltx"
                 },
                 "label": "Conditions",
                 "hint": "Name of a file specifying the parameters for each condition (.csv, .xlsx, or .pkl). Browse to select a file. Right-click to preview file contents, or create a new file.",
@@ -181,6 +183,8 @@
         "__class__": "psychopy.experiment.loops:StairHandler",
         "__name__": "StairHandler",
         "plugin": null,
+        "label": "Staircase",
+        "hidden": false,
         "params": {
             "name": {
                 "val": "stair",
@@ -390,6 +394,8 @@
         "__class__": "psychopy.experiment.loops:MultiStairHandler",
         "__name__": "MultiStairHandler",
         "plugin": null,
+        "label": "Interleaved staircases",
+        "hidden": false,
         "params": {
             "name": {
                 "val": "stair",
@@ -517,7 +523,7 @@
                 "allowedVals": [],
                 "allowedLabels": [],
                 "ctrlParams": {
-                    "template": "F:\\GitHub\\psychopy\\psychopy\\experiment\\staircaseTemplate.xltx"
+                    "template": "staircaseTemplate.xltx"
                 },
                 "label": "Conditions",
                 "hint": "An xlsx or csv file specifying the parameters for each condition",
@@ -542,7 +548,7 @@
                 "allowedVals": [],
                 "allowedLabels": [],
                 "ctrlParams": {
-                    "template": "F:\\GitHub\\psychopy\\psychopy\\experiment\\questTemplate.xltx"
+                    "template": "questTemplate.xltx"
                 },
                 "label": "Conditions",
                 "hint": "An xlsx or csv file specifying the parameters for each condition",
@@ -567,7 +573,7 @@
                 "allowedVals": [],
                 "allowedLabels": [],
                 "ctrlParams": {
-                    "template": "F:\\GitHub\\psychopy\\psychopy\\experiment\\questPlusTemplate.xltx"
+                    "template": "questPlusTemplate.xltx"
                 },
                 "label": "Conditions",
                 "hint": "An xlsx or csv file specifying the parameters for each condition",

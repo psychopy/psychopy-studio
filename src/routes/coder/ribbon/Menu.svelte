@@ -7,7 +7,7 @@
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { setupPython } from "$lib/python";
-    import { Version } from "$lib/utils/versions";
+    import semver from "semver";
     import Demos from "./Demos.svelte";
     import { translate } from "$lib/translation";
 

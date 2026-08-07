@@ -1,5 +1,5 @@
 <script>
-    import { optionsFromParam } from "./utils.js";
+    import { optionsFromParam } from "./utils.svelte.js";
 
     let {
         param=$bindable(),
@@ -19,7 +19,16 @@
     })
 
     function validateChoice(param, valid) {
-        if (Array.isArray(param.allowedVals) && !param.allowedVals.includes(param.val)) {
+        // skip if no allowed vals
+        if (!Array.isArray(param.allowedVals)) {
+            return
+        }
+        // stringify allowed values for comparison
+        let allowedVals = param.allowedVals.map(
+            val => String(val)
+        )
+        // if not allowed, issue warning
+        if (!allowedVals.includes(String(param.val))) {
             valid.warning = `${param.val} not in list of allowed values`
         }
     }
@@ -39,10 +48,17 @@
         <option>Loading...</option>
     {:then options}
         {#each options as [val, label]}
-            <option 
-                value={val} 
-                selected={param.val === val}
-            >{label}</option>
+            {#if Array.isArray(val)}
+                <option 
+                    value={String(val)} 
+                    selected={String(param.val) === String(val)}
+                >{label}</option>
+            {:else}
+                <option 
+                    value={val} 
+                    selected={param.val === val}
+                >{label}</option>
+            {/if}
         {/each}
     {:catch}
         <option 

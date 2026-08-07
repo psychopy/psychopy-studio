@@ -1,5 +1,5 @@
 <script>
-    import { Version } from "$lib/utils/versions.js";
+    import semver from "semver";
     import { translate } from "$lib/translation";
 
     let {
@@ -22,22 +22,23 @@
             {method: "GET"}
         );
         let versions = (await resp.json()).map(
-            ver => new Version(ver.name)
-        ).toSorted(
-            (a, b) => a.olderThan(b) ? 1 : -1 
-        )
+            ver => semver.parse(ver.name)
+        ).toSorted(semver.compare).toReversed()
         // sort by version
         options = {}
         for (let ver of versions) {
+            let minor = `${ver.major}.${ver.minor}`
             // if minor version not included yet, add a field for it
-            if (!(ver.format("minor") in options)) {
-                options[ver.format("minor")] = []
+            if (!(minor in options)) {
+                options[minor] = []
             }
             // add to minor version's field
-            options[ver.format("minor")].push(
+            options[minor].push(
                 [ver.format(), ver.format()]
             )
         }
+
+        return options
     })
 </script>
 

@@ -151,7 +151,7 @@
     button.primary {
         color: var(--text-on-blue);
         background-color: var(--blue);
-        border-width: 0;
+        border: 1px solid var(--blue);
     }
     button:enabled:hover.primary, button:enabled:focus.primary,
     button:enabled:hover.affirmative, button:enabled:focus.affirmative,
@@ -185,7 +185,11 @@
         box-shadow: 
             inset 1px 1px 10px rgba(0, 0, 0, 0.05)
         ;
-    }    
+    }
+    button:enabled:hover.primary,
+    button:enabled:focus.primary {
+        border-color: var(--outline);
+    }  
     
     button {
         display: grid;

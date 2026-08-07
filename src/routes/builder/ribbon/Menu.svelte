@@ -10,7 +10,7 @@
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
     import { setupPython } from "$lib/python";
-    import { Version } from "$lib/utils/versions";
+    import semver from "semver";
     import { translate } from "$lib/translation";
 
     import {
