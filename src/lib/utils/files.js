@@ -59,7 +59,8 @@ export function electronFilters(filters) {
 
 export async function browseFileOpen(
     filters=[],
-    defaultPath=""
+    defaultPath="",
+    selectMultiple=false
 ) {
     let output
     if (electron) {
@@ -67,33 +68,49 @@ export async function browseFileOpen(
         if (await electron.platform() === "win32") {
             defaultPath = defaultPath.replaceAll("/", "\\")
         }
+        // work out properties for dialog
+        let properties = ["openFile", "createDirectory"]
+        if (selectMultiple) {
+            properties.push("multiSelections")
+        }
         // get file path from electron dialog
-        let file = await electron.files.openDialog({
-            properties: ["openFile", "createDirectory"],
+        let files = await electron.files.openDialog({
+            properties: properties,
             defaultPath: defaultPath,
             filters: electronFilters(filters)
         })
         // abort if no file
-        if (file === undefined) {
+        if (files === undefined) {
             return
         }
         // parse
-        output = parsePath(file[0])
+        output = files.map(
+            file => parsePath(file)
+        )
     } else {
         // get file handle from system dialog
-        let handle = await window.showOpenFilePicker({
-            types: filters
+        let handles = await window.showOpenFilePicker({
+            types: filters,
+            multiple: selectMultiple
         }).catch(err => undefined);
         // abort if no file
-        if (handle === undefined) {
+        if (handles === undefined) {
             return
         }
         // get file blob from handle
-        let file = await handle[0].getFile();
-        // parse file
-        output = parsePath(file.name)
-        // add handle
-        output.handle = file;
+        output = []
+        for (let handle of handles) {
+            let file = await handle.getFile();
+            // parse file
+            output = parsePath(file.name)
+            // add handle
+            output.handle = file;
+        }
+    }
+
+    // reduce to a single file if multiselect not enabled
+    if (!selectMultiple) {
+        output = output[0]
     }
 
     return output
