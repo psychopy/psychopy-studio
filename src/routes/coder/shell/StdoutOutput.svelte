@@ -14,8 +14,6 @@
         (evt, message) => stdout.push(`${message}\n`)
     )
 
-    $inspect(stdout)
-
 </script>
 
 
