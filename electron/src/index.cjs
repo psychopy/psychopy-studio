@@ -41,8 +41,8 @@ function onFileOpen(evt, file) {
     // do nothing if no file
     return
   }
-  if (file.startsWith("pavlovia://")) {
-    params = file.match(/pavlovia\:\/\/(?<group>.*?)\/(?<name>.*?)$/).groups
+  if (file.startsWith("psychopy-studio://")) {
+    params = file.match(/psychopy-studio\:\/\/(?<group>.*?)\/(?<name>.*?)$/).groups
     newWindow(`runner?projectOpen=${params.group}/${params.name}`, true, false, [800, 600])
   } else if (file.endsWith(".psyexp")) {
     // open psyexp in Builder
@@ -60,10 +60,10 @@ app.on("open-file", onFileOpen)
 // mark self as default opener for URI links
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('pavlovia', process.execPath, [path.resolve(process.argv[1])])
+    app.setAsDefaultProtocolClient('psychopy-studio', process.execPath, [path.resolve(process.argv[1])])
   }
 } else {
-  app.setAsDefaultProtocolClient('pavlovia')
+  app.setAsDefaultProtocolClient('psychopy-studio')
 }
 // handle when a second instance is created via URI
 if (!lock) {
