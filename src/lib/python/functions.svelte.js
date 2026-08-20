@@ -42,10 +42,11 @@ async function sanitizeVersion(version) {
  * @param {boolean} forceReinstall Set as `true` to force UV to reinstall even if already installed
  */
 export async function installUV(forceReinstall=false) {
-    let hasUV = await python.uv.exists().catch(handleError)
+    // check whether UV exists and is up to date...
+    let needsInstall = await python.uv.needsUpdate().catch(handleError)
     // if already installed and not forcing reinstall, return
-    if (!forceReinstall && hasUV) {
-        return hasUV
+    if (!forceReinstall && !needsInstall) {
+        return !needsInstall
     }
     // open dialog to show progress
     status.message = translate("Downloading UV (a Python installer)...")
@@ -59,7 +60,7 @@ export async function installUV(forceReinstall=false) {
     await python.uv.install().catch(handleError)
     status.dlg.busy = false
     // make sure install worked
-    hasUV = await python.uv.exists().catch(handleError)
+    let hasUV = await python.uv.exists().catch(handleError)
     if (!hasUV) {
         throw Error("UV failed to install")
     }
