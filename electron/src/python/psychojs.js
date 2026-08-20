@@ -2,8 +2,32 @@ import { getVenv } from "./venv.js";
 import { favicon } from "../resources.js";
 import logging from "../logging.js";
 import { getSafeAddress } from "./utils.js";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, Menu } from "electron";
 
+// template for the PsychoJS window menu
+const menuTemplate = [
+    ...(
+        process.platform === 'darwin'
+        ? [{ role: 'appMenu' }]
+        : []
+    ),
+    {
+        label: 'View',
+        submenu: [
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+        ],
+    },
+    {
+        label: 'Window',
+        submenu: [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            { role: 'close' }
+        ]
+    },
+]
 
 export class PsychoJSServer {
     constructor(cwd) {
@@ -32,6 +56,15 @@ export class PsychoJSServer {
             show: false,
         });
         win.maximize();
+        // setup window menu
+        let menu = Menu.buildFromTemplate(menuTemplate)
+        win.setMenu(menu)
+        // on mac, we have to setup menu to update on focus (Windows and Linux windows have their own menu)
+        if (process.platform === "darwin") {
+            win.on("focus", evt => {
+                Menu.setApplicationMenu(menu)
+            })
+        }
         // load experiment
         console.log(`http://${address}?${params.toString()}`)
         await win.loadURL(`http://${address}?${params.toString()}`);

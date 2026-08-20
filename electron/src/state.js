@@ -66,13 +66,19 @@ if (!fs.existsSync(lastStateFile)) {
 }
 
 // load last state from file
-export var lastState = {};
-Object.assign(
-    lastState,
-    JSON.parse(
-        fs.readFileSync(lastStateFile)
+export var lastState = {
+    frames: {}
+};
+try {
+    Object.assign(
+        lastState,
+        JSON.parse(
+            fs.readFileSync(lastStateFile)
+        )
     )
-)
+} catch (err) {
+    console.error("Failed to load previous app state.", err)
+}
 
 
 export const handlers = {

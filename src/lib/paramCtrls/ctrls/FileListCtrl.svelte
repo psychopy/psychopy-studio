@@ -4,7 +4,10 @@
     import { sanitizeJSON } from "$lib/utils/transpiler"
     import FileCtrl from "./FileCtrl.svelte";
     import { mimeTypesFromParam } from "./utils.svelte";
+    import { browseFileOpen } from "$lib/utils/files.js";
+    import path from "path-browserify";
     import { translate } from "$lib/translation";
+    import { getContext } from "svelte";
 
     let {
         param=$bindable(),
@@ -13,6 +16,8 @@
         /** @interface */
         ...attachments
     } = $props()
+
+    let current = getContext("current");
     
     // make sure param val is always a list rather than a string
     $effect(() => {
@@ -39,9 +44,6 @@
             items.push(item)
             $effect(() => {
                 param.val[i] = item.val;
-                if (typeof item.val === "object") {
-                    console.log(param.val.flat())
-                }
             })
         }
         
@@ -86,17 +88,18 @@
             onclick={async (evt) => {
                 // do we have mime types from the param?
                 let types = mimeTypesFromParam(param)
-                // get file handle from system dialog
-                let handles = await window.showOpenFilePicker({
-                    types: types,
-                    multiple: true
-                });
-                // get all files
-                for (let handle of handles) {
-                    // get file blob from handle
-                    let file = await handle.getFile();
-                    // get name from blob
-                    param.val.push(file.name)
+                // open file browser
+                let files = await browseFileOpen(types, current.experiment?.file?.parent, true)
+                // apply to param
+                for (let file of files) {
+                    // make relative
+                    let rel = path.relative(current.experiment?.file?.parent, file.file)
+                    // use absolute if in a different folder
+                    if (rel.startsWith("..")) {
+                        param.val.push(file.file)
+                    } else {
+                        param.val.push(rel)
+                    }
                 }
             }}
             tooltip={translate("Add multiple items")}
