@@ -2,7 +2,7 @@ import { app } from 'electron';
 import { platform , arch } from "process";
 import path from "path";
 import fs from "fs";
-import unzip from "extract-zip";
+import { extract as unzip } from "@electron-internal/extract-zip";
 import { extract as untar } from "tar";
 import { execSync, execTracked, output } from "./utils.js";
 import { appVersion } from "../version.js";
