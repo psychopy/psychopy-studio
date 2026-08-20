@@ -116,8 +116,7 @@
         <Pane defaultSize={1/3}>
             <Panel
                 title=Files
-                hspan={1}
-                vspan={1}
+                shortcut=f
             >
                 <FilesPanel />
             </Panel>
@@ -128,8 +127,7 @@
         <Pane defaultSize={2/3}>
             <Panel
                 title=Output 
-                hspan={2}
-                vspan={1}
+                shortcut=o
             >
                 <Notebook>
                     <NotebookPage

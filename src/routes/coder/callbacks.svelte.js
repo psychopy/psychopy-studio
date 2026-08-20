@@ -121,6 +121,10 @@ export async function runPython(version) {
         return
     }
     if (current.pages[current.tab]) {
+        // save script
+        await fileSave()
+        // focus stdout
+        current.shelltab = "stdout"
         // run script
         await current.pages[current.tab].runPython(version)
     }    

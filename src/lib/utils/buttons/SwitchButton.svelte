@@ -1,5 +1,4 @@
 <script>
-    import { Icon } from "$lib/utils/icons";
     import Tooltip from "$lib/utils/tooltip/Tooltip.svelte";
 
     let {
@@ -38,45 +37,67 @@
             {tooltip}
         </Tooltip>
     {/if}
-    <span class="{value ? "inactive" : "active"}">{labels[0]}</span>
-    <Icon
-        src="/icons/ctrl-switch-{value ? "right" : "left"}.svg"
-        size="32px"
-    />
-    <span class="{value ? "active" : "inactive"}">{labels[1]}</span>
+    <div class="label left {value ? "inactive" : "active"}">{labels[0]}</div>
+    <div 
+        class=indicator 
+        style:left={value ? "50%" : ".25rem"}
+        style:right={value ? ".25rem" : "50%"}
+        class:left={value} 
+        class:right={!value}
+    ></div>
+    <div class="label right {value ? "active" : "inactive"}">{labels[1]}</div>
 </button>
 
 <style>
-    button {
-        position: relative;
-        background-color: transparent;
-        padding: 0.25rem;
-        margin: 0;
-        grid-row-start: buttons;
-        padding-bottom: 0.5rem;
-        border: none;
-        outline: none;
-        z-index: 1;
+    .indicator {
+        position: absolute;
+        top: .25rem; bottom: .25rem;
+        z-index: -1;
+        background-color: var(--blue);
+        transition: left .5s, right .5s;
+        border-radius: 2rem;
+        border: 1px solid var(--blue);
+        box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.05)
     }
-    button:disabled {
+
+    .label {
+        margin: 0 1rem;
+        transition: color 1s;
+    }
+    .label.active {
+        color: var(--text-on-blue);
+    }
+
+    button.switch-ctrl  {
+        display: grid;
+        position: relative;
+        padding: 0 .25rem;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        justify-items: center;
+        grid-template-columns: 50% 50%;
+        background-color: transparent;
+        border-radius: 2rem;
+        z-index: 0;
+        border: 1px solid var(--overlay);
+    }
+    button.switch-ctrl:disabled {
         opacity: .5;
     }
 
-    button.switch-ctrl {
-        display: grid;
-        grid-template-columns: auto min-content auto;
-        grid-gap: .5rem;
-        align-items: center;
-        color: var(--text);
+    button.switch-ctrl:hover,
+    button.switch-ctrl:focus {
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.05);
     }
-    button.switch-ctrl:hover {
-        color: var(--text);
-        background-color: transparent;
+    button.switch-ctrl:focus {
+        border-color: var(--blue);
     }
-    button.switch-ctrl:enabled .active {
-        opacity: 100%;
+
+    button.switch-ctrl:hover .indicator,
+    button.switch-ctrl:focus .indicator {
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.1);
+        border-color: var(--outline);
     }
-    button.switch-ctrl:enabled .inactive {
-        opacity: 50%;
-    }
+
 </style>

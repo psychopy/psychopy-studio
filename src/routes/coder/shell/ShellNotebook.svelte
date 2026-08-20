@@ -2,23 +2,37 @@
     import { Notebook, NotebookPage, ButtonTab } from "$lib/utils/notebook";
     import { python } from "$lib/globals.svelte";
     import Shell from "./Shell.svelte";
+    import StdoutOutput from "./StdoutOutput.svelte";
+    import { translate } from "$lib/translation";
+    import { getContext } from "svelte";
 
-    let shells = $state({})
-
-    // start off with a Python shell
-    let currentTab = $state.raw();
+    let shells = $state({});
+    let current = getContext("current");
     
     // start off with one shell
     python.shell.open("app").then(
         id => {
             shells[id] = "Python";
-            currentTab = id;
+            current.shelltab = id;
         }
     );
 </script>
 
 
 <Notebook>
+    <NotebookPage
+        label={translate("Stdout")}
+        bind:selected={
+            () => current.shelltab === "stdout",
+            (value) => {
+                if (value) {
+                    current.shelltab = "stdout"
+                }
+            }
+        }
+    >
+        <StdoutOutput />
+    </NotebookPage>
     {#each Object.entries(shells) as [id, label]}
         <NotebookPage
             label={label}
@@ -27,10 +41,10 @@
                 delete shells[id]
             }}
             bind:selected={
-                () => currentTab === id,
+                () => current.shelltab === id,
                 (value) => {
                     if (value) {
-                        currentTab = id
+                        current.shelltab = id
                     }
                 }
             }

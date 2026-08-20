@@ -199,6 +199,8 @@ export class Liaison {
         await Promise.allSettled(this.pending).catch(err => {})
         // generate random ID
         let msgid = crypto.randomUUID()
+        // start timer
+        let startTime = performance.now()
         // log message
         logging.log(msg,`SENT\t${msgid}`, "liaison", false)
         // send message with ident
@@ -231,12 +233,12 @@ export class Liaison {
             // resolve or reject
             if ("response" in data) {
                 // log reply
-                logging.log(data.response, `RECEIVED\t${msgid}`, "liaison", false)
+                logging.log(data.response, `RECEIVED\t${performance.now() - startTime}ms\t${msgid}`, "liaison", false)
                 // resolve
                 promise.resolve(data.response)
             } else {
                 // log error
-                logging.log(data.error, `ERROR\t${msgid}`, "liaison", false)
+                logging.log(data.error, `ERROR\t${performance.now() - startTime}ms\t${msgid}`, "liaison", false)
                 // reject
                 promise.reject(data)
             }
