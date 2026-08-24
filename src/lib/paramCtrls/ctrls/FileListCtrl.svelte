@@ -21,7 +21,10 @@
 
     let entryPoints = $state([]);
     let dragging = $state.raw(undefined);
-    let selected = $state([]);
+    let selected = $state({
+        last: undefined,
+        all: []
+    });
     let editing = $state([]);
     
     // make sure param val is always a list rather than a string
@@ -106,7 +109,6 @@
             // get indices to move to and from
             let fromIndex = dragging;
             let toIndex = entryPoints.indexOf(evt.target)
-            console.log(fromIndex, toIndex)
             // get item to move
             let item = param.val[fromIndex]
             // if splice changes the indices, adjust
@@ -158,15 +160,38 @@
                 />
             {:else}
                 <button
-                    class:selected={selected[i]}
+                    class:selected={selected.all[i]}
                     class:code={item.isCode}
                     onclick={evt => {
-                        // toggle item select
-                        selected[i] = !selected[i]
-                        // if not holding shift, deselect other items
-                        if (selected[i] && !evt.shiftKey) {
-                            for (let ii in selected) {
-                                selected[ii] = ii === i
+                        // different behaviour according to modifier keys
+                        if (evt.shiftKey) {
+                            if (selected.last === undefined) {
+                                // if first selection, select and store last
+                                selected.all[i] = true
+                                selected.last = i
+                            } else {
+                                // if subsequent selection, select all inbetween
+                                selected.all = []
+                                let ii
+                                for (ii = Math.min(i, selected.last); ii <= Math.max(i, selected.last); ++ii) {
+                                    selected.all[ii] = true
+                                }
+                            }
+                        } else if (evt.ctrlKey) {
+                            // if ctrl, only toggle
+                            selected.all[i] = !selected.all[i]
+                        } else {
+                            if (selected.all[i]) {
+                                // if selected, deselect
+                                selected.all = []
+                                selected.last = undefined
+                            } else {
+                                // if not selected, select exclusively
+                                let ii
+                                for (ii = 0; ii < items.length; ++ii) {
+                                    selected.all[ii] = ii === parseInt(i)
+                                }
+                                selected.last = i
                             }
                         }
                         // apply any items currently being edited
@@ -200,7 +225,6 @@
                 // apply to param
                 for (let file of files) {
                     // make relative
-                    console.log(file)
                     let rel = file.file
                     if (current.experiment?.file?.parent) {
                         rel = path.relative(current.experiment?.file?.parent, file.file)
@@ -227,14 +251,14 @@
             tooltip={translate("Add item")}
             disabled={disabled}
         />
-        {#if selected.some(val => val)}
+        {#if selected.all.some(val => val)}
             <CompactButton
                 icon="/icons/btn-delete.svg"
                 onclick={(evt) => {
                     // for selection...
-                    for (let i of Object.keys(selected).toReversed()) {
+                    for (let i of Object.keys(selected.all).toReversed()) {
                         // go in reverse order so we don't mess up indices
-                        if (selected[i]) {
+                        if (selected.all[i]) {
                             // delete item
                             param.val.splice(i, 1)
                             // clear editing
@@ -242,7 +266,8 @@
                         }
                     }
                     // reset selection
-                    selected = []
+                    selected.all = []
+                    selected.last = undefined
                 }}
                 tooltip={translate("Delete selected")}
                 disabled={disabled}
@@ -255,7 +280,8 @@
     onclick={evt => {
         // deselect on click off
         if (!handle?.contains?.(evt.target)) {
-            selected = []
+            selected.all = []
+            selected.last = undefined
         }
     }}
 />
