@@ -661,7 +661,7 @@ export class Experiment {
                 100000
             )
             // start a server
-            return await python.psychojs.run(this.file.parent, {__pilotToken: "local"})
+            return await python.psychojs.run($state.snapshot(this.file.parent), {__pilotToken: "local"})
         } else {
             // todo: Run in JS on Pavlovia (not pilot)
         }
