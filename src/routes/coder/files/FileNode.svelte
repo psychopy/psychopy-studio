@@ -3,6 +3,7 @@
     import { TreeNode } from "$lib/utils/tree";
     import { parsePath } from "$lib/utils/files";
     import path from "path-browserify";
+    import { electron } from "$lib/globals.svelte";
     import { getContext } from "svelte";
     import { translate } from "$lib/translation";
 
@@ -94,6 +95,14 @@
         // otherwise, open it
         current.openFile(data)
     }
+
+    let contextMenu = $state({
+        shown: false,
+        pos: {
+            x: undefined,
+            y: undefined
+        }
+    })
 </script>
 
 
@@ -103,4 +112,25 @@
     data={parsePath(value)}
     onselect={selectFile}
     onactivate={openFile}
+    oncontextmenu={(evt, data) => {
+        evt.preventDefault();
+        // show menu
+        contextMenu.shown = true;
+        // set its position to the mouse pos
+        contextMenu.pos.x = evt.pageX;
+        contextMenu.pos.y = evt.pageY;
+    }}
 />
+
+<Menu
+    bind:shown={contextMenu.shown}
+    bind:position={contextMenu.pos}
+>
+    <MenuItem 
+        label={translate("Reveal in file explorer")}
+        onclick={async (evt, data) => {
+            await electron.files.showItemInFolder(value)
+            contextMenu.shown = false
+        }}
+    />
+</Menu>
