@@ -15,6 +15,7 @@
         // file
         fileNew,
         fileOpen,
+        folderOpen,
         fileSave,
         fileSaveAs,
         revealFolder,
@@ -66,6 +67,11 @@
             label={translate("Open file")} 
             shortcut="open"
             onclick={fileOpen} 
+        />
+        <MenuItem 
+            icon="/icons/btn-open.svg" 
+            label={translate("Open folder")} 
+            onclick={folderOpen} 
         />
         <MenuItem 
             icon="/icons/btn-save.svg" 
