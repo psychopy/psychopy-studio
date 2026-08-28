@@ -42,6 +42,8 @@
 <style>
     textarea {
         field-sizing: content;
+        box-sizing: border-box;
+        min-height: 2em;
         font-family: var(--mono);
         resize: none;
     }
