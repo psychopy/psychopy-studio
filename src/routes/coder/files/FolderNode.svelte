@@ -1,20 +1,37 @@
 <script>
+    import { Menu, MenuItem } from "$lib/utils/menu";
     import FolderNode from "./FolderNode.svelte";
     import FileNode from "./FileNode.svelte";
     import { TreeBranch, TreeNode } from "$lib/utils/tree";
     import { parsePath } from "$lib/utils/files";
     import path from "path-browserify";
-    import { getContext } from "svelte";
+    import { electron } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
 
     let {
         value=$bindable(),
         top=false
     } = $props();
+
+    let contextMenu = $state({
+        shown: false,
+        pos: {
+            x: undefined,
+            y: undefined
+        }
+    })
 </script>
 
 <TreeBranch
     label={parsePath(value || "").name}
+    oncontextmenu={(evt, data) => {
+        evt.preventDefault();
+        // show menu
+        contextMenu.shown = true;
+        // set its position to the mouse pos
+        contextMenu.pos.x = evt.pageX;
+        contextMenu.pos.y = evt.pageY;
+    }}
     open={top}
 >
     {#key value}
@@ -49,3 +66,16 @@
         {/await}
     {/key}
 </TreeBranch>
+
+<Menu
+    bind:shown={contextMenu.shown}
+    bind:position={contextMenu.pos}
+>
+    <MenuItem 
+        label={translate("Reveal in file explorer")}
+        onclick={async (evt, data) => {
+            await electron.files.showItemInFolder(value)
+            contextMenu.shown = false
+        }}
+    />
+</Menu>

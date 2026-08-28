@@ -8,6 +8,7 @@
         icon=undefined,
         onselect=(evt, data) => {},
         onactivate=(evt, data) => {},
+        oncontextmenu=(evt, data) => {},
         open=$bindable(false),
         /** @interface */
         children
@@ -25,6 +26,7 @@
             onselect(evt, data)
         }}
         onactivate={onactivate}
+        oncontextmenu={oncontextmenu}
     >
         <!-- arrow showing open state -->
         {#snippet chevron()}
