@@ -40,6 +40,22 @@ export async function fileOpen() {
     current.openFile(file)
 }
 
+export async function folderOpen() {
+    // get folder path from electron dialog
+    let folder = await electron.files.openDialog({
+        properties: ["openDirectory"],
+        defaultPath: $state.snapshot(current.directory)
+    })
+    // abort if no file
+    if (folder === undefined) {
+        return
+    }
+    // set value
+    current.directory = folder[0]
+
+    return folder[0]
+}
+
 export async function revealFolder() {
     if (electron && current.pages[current.tab].file) {
         electron.files.showItemInFolder(current.pages[current.tab].file.file)

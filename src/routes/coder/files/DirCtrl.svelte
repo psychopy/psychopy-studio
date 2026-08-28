@@ -4,6 +4,7 @@
     import path from "path-browserify";
     import { getContext } from "svelte";
     import { translate } from "$lib/translation";
+    import { folderOpen } from "../callbacks.svelte.js";
 
     let {
         value=$bindable(),
@@ -26,17 +27,10 @@
         icon="/icons/btn-open.svg"
         tooltip={translate("Open folder...")}
         onclick={async evt => {
-            // get folder path from electron dialog
-            let folder = await electron.files.openDialog({
-                properties: ["openDirectory"]
-            })
-            // abort if no file
-            if (folder === undefined) {
-                return
-            }
-            // set value
-            value = folder[0]
-            onchange($state.snapshot(value))
+            // open using standard callback
+            let value = folderOpen()
+            // execute onchange function
+            onchange(value)
         }}
     />
     <CompactButton 
