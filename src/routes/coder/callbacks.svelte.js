@@ -40,6 +40,19 @@ export async function fileOpen() {
     current.openFile(file)
 }
 
+export async function folderOpen() {
+    // get folder path from electron dialog
+    let folder = await electron.files.openDialog({
+        properties: ["openDirectory"]
+    })
+    // abort if no file
+    if (folder === undefined) {
+        return
+    }
+    // set value
+    current.directory = folder[0]
+}
+
 export async function revealFolder() {
     if (electron && current.pages[current.tab].file) {
         electron.files.showItemInFolder(current.pages[current.tab].file.file)
@@ -121,6 +134,10 @@ export async function runPython(version) {
         return
     }
     if (current.pages[current.tab]) {
+        // save script
+        await fileSave()
+        // focus stdout
+        current.shelltab = "stdout"
         // run script
         await current.pages[current.tab].runPython(version)
     }    

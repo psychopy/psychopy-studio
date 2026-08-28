@@ -7,7 +7,7 @@
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { setupPython } from "$lib/python";
-    import { Version } from "$lib/utils/versions";
+    import semver from "semver";
     import Demos from "./Demos.svelte";
     import { translate } from "$lib/translation";
 
@@ -15,10 +15,10 @@
         // file
         fileNew,
         fileOpen,
+        folderOpen,
         fileSave,
         fileSaveAs,
         revealFolder,
-        quit,
         // edit
         undo,
         redo,
@@ -69,6 +69,11 @@
             onclick={fileOpen} 
         />
         <MenuItem 
+            icon="/icons/btn-open.svg" 
+            label={translate("Open folder")} 
+            onclick={folderOpen} 
+        />
+        <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
             shortcut="save"
@@ -93,7 +98,7 @@
         />
         <MenuItem
             label={translate("Close window")}
-            onclick={close}
+            onclick={window.close}
             shortcut="close"
         />
 
@@ -109,26 +114,22 @@
             onclick={evt => prefs.reset()}
         />
 
-        {#if electron}
-            {#await electron.version() then version}
-                {#if version === "dev" || Version.parse(version).extra}
-                    <MenuSeparator />
-                    
-                    <MenuItem
-                        label={translate("Report bug")}
-                        onclick={evt => show.bugReport = true}
-                    />
-                {/if}
-                
-                <MenuSeparator />
+        <MenuSeparator />
 
-                <MenuItem
-                    label={translate("Quit")}
-                    onclick={quit}
-                    shortcut="quit"
-                />
-            {/await}
-        {/if}
+        <MenuItem
+            label={translate("Minimize window")}
+            role="minimize"
+        />
+        <MenuItem
+            label={translate("Close window")}
+            onclick={close}
+            role="close"
+        />
+        <MenuItem
+            label={translate("Quit")}
+            shortcut="quit"
+            role="quit"
+        />
     </SubMenu>
 
     <SubMenu label={translate("Edit")} icon="/icons/rbn-edit.svg">
@@ -138,6 +139,7 @@
             disabled={!current.pages[current.tab]?.canUndo}
             onclick={undo}
             shortcut="undo"
+            role="undi"
         />
         <MenuItem 
             label={translate("Redo")}
@@ -145,8 +147,29 @@
             onclick={redo}
             disabled={!current.pages[current.tab]?.redo}
             shortcut="redo"
+            role="redo"
         />
+
         <MenuSeparator />
+
+        <MenuItem 
+            label={translate("Cut text")}
+            icon="/icons/btn-cut.svg"
+            role="cut"
+        />
+        <MenuItem 
+            label={translate("Copy text")}
+            icon="/icons/btn-copy.svg"
+            role="copy"
+        />
+        <MenuItem 
+            label={translate("Paste text")}
+            icon="/icons/btn-paste.svg"
+            role="paste"
+        />
+
+        <MenuSeparator />
+
         <MenuItem 
             label={translate("Find")}
             icon="/icons/btn-find.svg"
@@ -157,6 +180,32 @@
     </SubMenu>
 
     <SubMenu label={translate("View")} icon="/icons/rbn-windows.svg">
+        <MenuItem 
+            label={translate("Reload window")}
+            role="reload"
+        />
+        <MenuItem 
+            label={translate("Force reload window")}
+            role="forceReload"
+        />
+
+        <MenuSeparator />
+
+        <MenuItem
+            label={translate("Zoom in")}
+            role="zoomIn"
+        />
+        <MenuItem
+            label={translate("Zoom out")}
+            role="zoomOut"
+        />
+        <MenuItem
+            label={translate("Reset zoom")}
+            role="resetZoom"
+        />
+
+        <MenuSeparator />
+
         <MenuItem 
             label={translate("Show Builder")}
             onclick={evt => showWindow("builder")}
@@ -172,6 +221,7 @@
             label={translate("Show developer tools")}
             onclick={showDevTools}
             shortcut="showDevTools"
+            role="toggleDevTools"
         />
     </SubMenu>
 
@@ -238,6 +288,10 @@
     </SubMenu>
 
     <SubMenu label={translate("Help")}>
+        <MenuItem
+            label={translate("App info")}
+            role="about"
+        />
         <MenuItem 
             label={translate("PsychoPy Homepage")}
             onclick={evt => open("https://www.psychopy.org/")}
@@ -257,6 +311,14 @@
                     label="{translate("PsychoPy")} {version}"
                     disabled
                 />
+                {#if version === "dev" || Version.parse(version).extra}
+                    <MenuSeparator />
+                    
+                    <MenuItem
+                        label={translate("Report bug")}
+                        onclick={evt => show.bugReport = true}
+                    />
+                {/if}
             {/await}
         {/if}
     </SubMenu>

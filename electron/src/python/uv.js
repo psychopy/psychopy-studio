@@ -15,6 +15,9 @@ export class UV {
     // will resolve when a folder has been specified
     folderSpecified = Promise.withResolvers();
 
+    // defines the version of UV to install
+    version = "0.12.5"
+
     /**
      * Choose a folder for the given directory option according to the current OS.
      * 
@@ -132,6 +135,20 @@ export class UV {
     }
 
     /**
+     * Check whether UV needs updating
+     */
+    async needsUpdate() {
+        // if not installed, then it does need an update
+        if (!(await this.exists())) {
+            return true
+        }
+        // get current version
+        let installed = this.execSync(["self", "version"])
+        // check if it's the same one indicated by Studio
+        return !installed.includes(this.version)
+    }
+
+    /**
      * Install the uv executables
      */
     async install() {
@@ -183,7 +200,7 @@ export class UV {
         this.output(`Downloading UV for ${platform} (${arch})...`)
         try {
             await fetch(
-                `https://github.com/astral-sh/uv/releases/download/0.8.18/${installers[platform][arch]}`
+                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installers[platform][arch]}`
             ).then(
                 resp => resp.blob()
             ).then(
