@@ -53,7 +53,8 @@
 }
 #content {
     position: relative;
-    background-color: var(--crust)
+    background-color: var(--crust);
+    overflow-y: hidden;
 }
 .hover-indicator {
     position: absolute;

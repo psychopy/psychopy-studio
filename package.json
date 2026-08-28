@@ -165,7 +165,8 @@
 		"semver": "^7.8.5",
 		"tar": "^7.5.22",
 		"tcp-port-used": "^1.0.3",
-		"xml-formatter": "^3.6.5"
+		"xml-formatter": "^3.6.5",
+		"@electron-internal/extract-zip": "*"
 	},
 	"optionalDependencies": {
 		"@rollup/rollup-linux-x64-gnu": "*",
