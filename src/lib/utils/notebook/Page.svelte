@@ -88,6 +88,12 @@
     class:listbook={siblings.book === "listbook"}
     class:notebook={siblings.book === "notebook"}
     onclick={evt => selected = true}
+    onauxclick={evt => {
+        // do close method
+        close(evt);
+        // select default tab
+        siblings.selected.index = undefined;
+    }}
     oncontextmenu={(evt) => {
         evt.preventDefault();
         contextMenuParams.pos.x = evt.pageX;
