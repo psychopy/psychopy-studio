@@ -8,6 +8,7 @@ export let current = $state({
     pages: [],
     tab: 0,
     shelltab: "stdout",
+    directory: undefined,
     openFile: async file => {
         if (typeof file === "string") {
             file = parsePath(file)

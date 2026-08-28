@@ -7,24 +7,20 @@
 
     let current = getContext("current")
 
-    let directory = $state.raw()
-
-    // let tree = $derived(transformTree(directory.files))
-
     // start off with home directory
     electron.paths.documents().then(
-        resp => directory = resp
+        resp => current.directory = resp
     )
 </script>
 
 <div class=file-explorer>
     <DirCtrl 
-        bind:value={directory}
+        bind:value={current.directory}
     />
 
     <TreeRoot>
         <FolderNode
-            bind:value={directory}
+            bind:value={current.directory}
             top
         />
     </TreeRoot>
