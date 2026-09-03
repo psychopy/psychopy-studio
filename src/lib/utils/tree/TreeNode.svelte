@@ -8,6 +8,7 @@
         icon=undefined,
         onselect=(evt, data) => {},
         onactivate=(evt, data) => {},
+        oncontextmenu=(evt, data) => {},
         disabled=false,
         /** @interface */
         chevron
@@ -35,6 +36,7 @@
             onactivate(evt, data)
         }
     }}
+    oncontextmenu={evt => oncontextmenu(evt, data)}
     class:selected={siblings.selected === handle}
     disabled={disabled}
 >
