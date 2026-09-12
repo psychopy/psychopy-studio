@@ -26,19 +26,37 @@
     });
 </script>
 
-<SingleLineCtrl 
-    param={param} 
-    disabled={disabled}
-    {@attach element => param.registerValidator("survey", validateSurvey, -5)}
-    {...attachments}
-/>
-
-<CompactButton 
-    icon="/icons/btn-find.svg"
-    tooltip={translate("Browse your projects on Pavlovia")}
-    onclick={(evt) => showSurveysDlg = true}
-    disabled={disabled || current.user === undefined}
-/>
+<div class=wrapper>
+    <SingleLineCtrl 
+        param={param} 
+        disabled={disabled}
+        {@attach element => param.registerValidator("survey", validateSurvey, -5)}
+        {...attachments}
+    />
+    <CompactButton 
+        icon="/icons/btn-find.svg"
+        tooltip={translate("Browse your projects on Pavlovia")}
+        onclick={(evt) => showSurveysDlg = true}
+        disabled={disabled || current.user === undefined}
+    />
+    <div class=output>
+        {#await git.listSurveys(
+            $state.snapshot(current.user)
+        ) then resp}
+            {#each resp.surveys as survey}
+                {#if survey.surveyId === param.val}
+                    <a href="https://pavlovia.org/surveys/{survey.surveyId}">
+                        {survey.surveyName}
+                    </a>
+                    by
+                    <a href="https://gitlab.pavlovia.org/{survey.creatorUsername}">
+                        {survey.creatorUsername}
+                    </a>
+                {/if}
+            {/each}
+        {/await}
+    </div>
+</div>
 
 <Dialog
     id=browse-surveys
@@ -105,6 +123,23 @@
 
     p.error {
         color: var(--red);
+    }
+
+    .wrapper {
+        flex-grow: 1;
+        display: grid;
+        grid-template-columns: 1fr min-content;
+        grid-template-rows: min-content min-content;
+        gap: .5rem;
+    }
+
+    .output {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        gap: .5rem;
+        align-items: center;
+        padding: 0 1rem;
     }
 
 </style>
