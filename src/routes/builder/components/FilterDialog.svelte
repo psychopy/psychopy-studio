@@ -46,7 +46,7 @@
                 checked={filter && !filter.includes("PsychoPy") && filter.includes("PsychoJS")}
             />
             <label for=component-filter-js>
-                P{translate("PsychoJS (online)")}
+                {translate("PsychoJS (online)")}
             </label>
 
             <input 
