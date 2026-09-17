@@ -1,5 +1,7 @@
 <script>
     import { DropdownButton } from "$lib/utils/buttons";
+    import { MessageDialog } from "$lib/utils/dialog"
+    import { marked } from "marked";
     import { getContext, onMount } from "svelte";
     import { MenuItem, MenuSeparator, SubMenu } from "$lib/utils/menu";
     import { git } from "$lib/globals.svelte";
@@ -16,6 +18,23 @@
             users => current.user = current.user ? current.user : users?.[0]
         )
     )
+
+    let warnings = $state({
+        show: false,
+        text: ""
+    })
+
+    function validateUsername(user) {
+        // username can't be all numbers
+        if (user.match(/^\d+$/)) {
+            warnings.show = true
+            warnings.text = translate(
+                "Pavlovia usernames should not be all numbers.\n\nResolve online at [pavlovia.org](https://gitlab.pavlovia.org/-/profile/account)."
+            )
+        }
+    }
+
+    
 </script>
 
 
@@ -50,10 +69,16 @@
                 <MenuItem
                     label={translate("New user...")}
                     onclick={async evt => {
+                        // do login
                         let user = await git.login()
+                        // if successful...
                         if (user) {
+                            // update current user info
                             current.user = user
+                            // confirm that username is okay
+                            validateUsername(user)
                         }
+                        
                     }}
                 />
             </SubMenu>
@@ -81,4 +106,14 @@
             {/if}
         </DropdownButton>
     {/await}
+
+    <MessageDialog
+        title={translate("User warning")}
+        buttons={{
+            OK: evt => {},
+        }}
+        bind:shown={warnings.show}
+    >
+        {@html marked(warnings.text)}
+    </MessageDialog>
 {/key}
