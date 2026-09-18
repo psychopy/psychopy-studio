@@ -10,7 +10,8 @@
     import path from "path-browserify";
 
     let {
-        project
+        project,
+        shown=$bindable()
     } = $props();
 
     let projectsLoaded = $state.raw(
@@ -18,7 +19,6 @@
     )
 
     let current = getContext("current");
-    let shown = $state.raw(project);
 
     async function fileOpen(folder) {
         // browse files

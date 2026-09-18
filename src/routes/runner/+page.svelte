@@ -188,5 +188,6 @@
     <!-- this will handle opening Pavlovia projects from a URI -->
     <DeepLink 
         project={params.get("projectOpen")}
+        shown={params.get("projectOpen")}
     />
 </Frame>
