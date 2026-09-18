@@ -50,40 +50,20 @@ export function py2js(val) {
 export function sanitizeJSON(val) {
     // make sure val is a string
     val = String(val)
-    // sanitize object...
-    val = String(val).replaceAll(
-        // identify key:value pairs with single quotes
-        /'(.*?)': *'(.*?)'/g, 
-        (_, key, val) => {
-            // escape any double quotes inside the key and value
-            key = key.replaceAll(
-                /(?<!\\)"/g,
-                "\\\""
-            )
-            val = val.replaceAll(
-                /(?<!\\)"/g,
-                "\\\""
-            )
-            // return the key:value pair with double quotes (i.e. JSON friendly)
-            return `"${key}": "${val}"`
+    // replace unescaped single quotes with double quotes for JSON compatibility
+    return val.replace(
+        /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'/g,
+        (_, dq, sq) => {
+            // return anything already in doublequotes as-is
+            if (dq !== undefined) {
+                return `"${dq}"`
+            }
+            // escaped single quotes don't need escaping within doublequotes...
+            let content = sq.replaceAll("\\'", "'")
+            // ... but double quotes do
+            content = content.replaceAll(/(?<!\\)"/g, "\\\"")
+            
+            return `"${content}"`
         }
     )
-    // sanitize array...
-    if (String(val).match(/^\[.*\]$/s)) {
-        val = String(val).replaceAll(
-            // identify values with single quotes
-            /'(.*?)'/g,
-            (_, inner) => {
-                // escape any double quotes
-                inner = inner.replaceAll(
-                    /(?<!\\)"/g,
-                    "\\\""
-                )
-                // wrap in double quotes (i.e. JSON friendly)
-                return `"${inner}"`
-            }
-        )
-    }
-
-    return val
 }
