@@ -264,7 +264,7 @@ export class StandaloneRoutine extends HasParams {
     }
 
     /**
-     * Mimicks Routine.updateTargets, but as StandaloneRoutine has no children,
+     * Mimics Routine.updateTargets, but as StandaloneRoutine has no children,
      * returns `[this]` if this Routine can be an update target (which currently
      *  none can)
      */

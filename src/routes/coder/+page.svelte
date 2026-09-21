@@ -120,7 +120,7 @@
         bind:shown={current.tip.shown}
     />
 
-    <!-- this will setup themeing -->
+    <!-- this will setup theming -->
     <Theme />
     <!-- this will setup keyboard shortcuts -->
     <Shortcuts

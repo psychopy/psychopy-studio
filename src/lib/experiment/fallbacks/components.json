@@ -459,7 +459,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -1046,7 +1046,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -5579,7 +5579,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -6202,7 +6202,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -10924,7 +10924,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -11166,7 +11166,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Skip if...",
-                "hint": "Skip this Routine if the value in this contorl evaluates to True. Leave blank to not skip.",
+                "hint": "Skip this Routine if the value in this control evaluates to True. Leave blank to not skip.",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -15078,7 +15078,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
@@ -15931,7 +15931,7 @@
                 "allowedLabels": [],
                 "ctrlParams": {},
                 "label": "Draggable?",
-                "hint": "Should this stimulus be moveble by clicking and dragging?",
+                "hint": "Should this stimulus be movable by clicking and dragging?",
                 "plugin": null,
                 "depends": {
                     "shown": [],
