@@ -1,6 +1,14 @@
 [codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = .git,.gitignore,.gitattributes,*.svg,package-lock.json,*.css,.codespellrc
+skip = .git,.git-meta,.gitignore,.gitattributes,*.svg,package-lock.json,*.css,.codespellrc
 check-hidden = true
-# ignore-regex = 
-# ignore-words-list =
+# ignore-regex =
+ignore-words-list =
+  # exported function name in src/lib/utils/views.svelte.js, used throughout
+  # src/ to open a file in a given view (builder/coder/runner)
+  openin,
+  # variable name for an XMLSerializer instance in experiment.svelte.js
+  ser,
+  # Core Audio Format file extension, listed among audio depends in
+  # src/lib/experiment/fallbacks/components.json
+  caf
