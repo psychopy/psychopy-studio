@@ -11,7 +11,7 @@
         icon=undefined,
         /** @binding Control whether this page is selected */
         selected=$bindable(),
-        /** @prop @type {boolean} Whetehr this tab should be highlighted */
+        /** @prop @type {boolean} Whether this tab should be highlighted */
         highlight=false,
         /** @prop @type {function|undefined} Function to close the tab (setting this will show the 
          * close button) */

@@ -144,7 +144,7 @@ export class Flow {
                 continue;
             } else if ("ref" in profile) {
                 // if profile is a ref to a non-existent object, error
-                throw Error(`Reference to nonexistant Routine ${profile.ref} in flow`);
+                throw Error(`Reference to nonexistent Routine ${profile.ref} in flow`);
             }
             // if profile is a loop initiator, recreate it
             if (LoopInitiator.tags.includes(profile.tag)) {
@@ -161,7 +161,7 @@ export class Flow {
             if (profile.tag === "LoopTerminator") {
                 // error if initiator doesn't exist
                 if (!(profile.name in initiators)) {
-                    throw Error(`Reference to nonexistant LoopInitiator ${profile.name} in LoopTerminator`);
+                    throw Error(`Reference to nonexistent LoopInitiator ${profile.name} in LoopTerminator`);
                 }
                 // recreate
                 initiators[profile.name].addTerminator();
@@ -220,7 +220,7 @@ export class Flow {
             } else if (elementNode.nodeName === "LoopTerminator") {
                 // error if initiator doesn't exist
                 if (!(name in initiators)) {
-                    console.error(`Reference to nonexistant LoopInitiator ${name} in LoopTerminator`);
+                    console.error(`Reference to nonexistent LoopInitiator ${name} in LoopTerminator`);
                     continue
                 }
                 // recreate
@@ -237,7 +237,7 @@ export class Flow {
                     continue;
                 } else {
                     // if profile is a ref to a non-existent object, error
-                    console.error(`Reference to nonexistant Routine ${name} in flow`);
+                    console.error(`Reference to nonexistent Routine ${name} in flow`);
                     continue
                 }
             }

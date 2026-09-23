@@ -112,7 +112,7 @@ export class Param {
         for (let key of this.saveAttrs) {
             // take a snapshot
             let val = $state.snapshot(this[key]);
-            // make Python compatable
+            // make Python compatible
             val = js2py(val);
             // set value
             node.setAttribute(key, val);

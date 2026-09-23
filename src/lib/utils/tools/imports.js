@@ -4,7 +4,7 @@
 
 
 /**
- * Make sure an import string is in a useable state. Namely:
+ * Make sure an import string is in a usable state. Namely:
  * - In entry points format (module.submodule:Class.method) rather than flat import format (module.submodule.Class.method)
  * 
  * @param {string} value Import string to sanitize

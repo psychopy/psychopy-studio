@@ -60,7 +60,7 @@ export class Experiment {
             )
         },
         redo: () => {
-            // do nothin if we have no future
+            // do nothing if we have no future
             if (!this.history.future) {
                 return
             }

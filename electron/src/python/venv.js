@@ -308,7 +308,7 @@ export async function getVenv(version) {
                 )
             }
         }
-        // if none exist, await one's existance
+        // if none exist, await one's existence
         if (!(version in awaiting)) {
             awaiting[version] = Promise.withResolvers()
         }

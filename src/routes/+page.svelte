@@ -53,7 +53,7 @@
         {/if}
     </nav>
 
-    <!-- this will setup themeing -->
+    <!-- this will setup theming -->
     <Theme />
 </div>
 

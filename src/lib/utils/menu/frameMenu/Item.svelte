@@ -45,7 +45,7 @@
         if (role) {
             profile.role = $state.snapshot(role)
         }
-        // assign an accellerator matching the shortcut
+        // assign an accelerator matching the shortcut
         if (shortcut && shortcut in prefs.shortcuts) {
             profile.accelerator = prefs.shortcuts[shortcut].val.join("+")
         }
