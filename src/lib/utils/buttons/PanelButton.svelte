@@ -4,7 +4,7 @@
     import { asset } from '$app/paths';
 
     let {
-        /** @prop @type {string} Label for this button */
+        /** @prop @type {string|import('svelte').Snippet} Label for this button */
         label,
         /** @prop @type {string|undefined} Hover text for this button, if any */
         tooltip=undefined,
@@ -25,7 +25,11 @@
         {tooltip}
     </Tooltip>
     {/if}
-    {label}
+    {#if typeof label === "function"}
+        {@render label()}
+    {:else}
+        {label}
+    {/if}
     <svg 
         class=panel-indicator
         class:open={open}
