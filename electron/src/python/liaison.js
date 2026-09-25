@@ -2,7 +2,6 @@ import { app } from 'electron';
 import { getVenv } from "./venv.js";
 import logging from "../logging.js";
 import { output, decoder, getSafeAddress } from "./utils.js";
-import { appVersion } from "../version.js";
 import path from "path";
 
 
@@ -262,10 +261,6 @@ export class Liaison {
  * @returns {Liaison}
  */
 export async function getLiaison(version) {
-    // substitute "app" for app version
-    if (version === "app") {
-        version = appVersion
-    }
     // get venv for this version
     let venv = await getVenv(version)
     // get/make liaison for it

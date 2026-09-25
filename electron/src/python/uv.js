@@ -2,9 +2,7 @@ import { app } from 'electron';
 import { platform , arch } from "process";
 import path from "path";
 import fs from "fs";
-import { extract as unzip } from "@electron-internal/extract-zip";
-import { extract as untar } from "tar";
-import { execSync, execTracked, output } from "./utils.js";
+import { execSync, execTracked, output, downloadFolder, resolvePackageVersion } from "./utils.js";
 import { appVersion } from "../version.js";
 
 
@@ -199,37 +197,11 @@ export class UV {
         // get relevant executable 
         this.output(`Downloading UV for ${platform} (${arch})...`)
         try {
-            await fetch(
-                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installers[platform][arch]}`
-            ).then(
-                resp => resp.blob()
-            ).then(
-                async blob => {
-                    this.output(`Finished downloading ${installers[platform][arch]}, extracting executable...`)
-                    // write to a zipped file
-                    let zipfile = path.join(this.uvFolder, installers[platform][arch]);
-                    fs.writeFileSync(zipfile, await blob.bytes());
-                    // extract file
-                    if (path.extname(zipfile) === ".zip") {
-                        // extract zip file...
-                        await unzip(zipfile, {
-                            dir: this.uvFolder
-                        })
-                    }
-                    if (path.extname(zipfile) === ".gz") {
-                        // extract tar.gz file...
-                        untar({
-                            file: zipfile,
-                            cwd: this.uvFolder,
-                            strip: 1,
-                            sync: true
-                        })
-                    }
-                    // delete zip file
-                    fs.unlink(zipfile, err => {if (err) throw err})
-                    this.output(`Finished installing UV.`)
-                }
+            await downloadFolder(
+                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installers[platform][arch]}`,
+                this.uvFolder
             )
+            this.output(`Finished installing UV.`)
         } catch (err) {
             this.output(err?.error || err)
         }
@@ -276,17 +248,11 @@ export class UV {
      * Find the Python executable for the given PsychoPy version
      * 
      * @param {string} psychopyVersion PsychoPy version to look for
-     * @returns {string|undefined} Path to the found executable, or undefined if there is none
+     * @returns {Promise<string|undefined>} Path to the found executable, or undefined if there is none
      */
-    findPython(psychopyVersion=appVersion) {
-        // substitute "app" for app version
-        if (psychopyVersion === "app") {
-            psychopyVersion = appVersion
-        }
-        // strip * if present
-        if (psychopyVersion.match(/\d+\.\d+\.\*/)) {
-            psychopyVersion = psychopyVersion.match(/\d+\.\d+/)[0]
-        }
+    async findPython(psychopyVersion=appVersion) {
+        // resolve asterisks
+        psychopyVersion = await resolvePackageVersion(psychopyVersion, "psychopy")
         // get specific folder for this version
         let folder = path.join(
             this.pyFolder, psychopyVersion
@@ -324,6 +290,7 @@ export class UV {
                 recursive: true
             })
         }
+        // create venv
         try {
             await this.execTracked([
                 "venv", folder, "--python", pythonVersion, "--clear"
@@ -371,9 +338,10 @@ export class UV {
      * @param {array<string>} args Arguments to execute
      * @param {int} timeout Time (ms) after which to give up
      * @param {string} tag Tag to send output to (use undefined to not emit an event)
+     * @param {object} env Extra environment variables to set for the child process
      */
-    async execTracked(args, timeout=undefined, tag="uv") {
-        return execTracked(tag, this.executable, args, timeout)
+    async execTracked(args, timeout=undefined, tag="uv", env={}) {
+        return execTracked(tag, this.executable, args, timeout, env)
     }
 
     /**

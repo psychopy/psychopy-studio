@@ -2,8 +2,110 @@ import proc from "child_process";
 import logging from "../logging.js";
 import { BrowserWindow } from "electron";
 import tcp from "tcp-port-used";
+import { extract as unzip } from "@electron-internal/extract-zip";
+import { extract as untar } from "tar";
+import fs from "fs";
+import path from "path";
+import semver from "semver";
+import { appVersion } from "../version.js";
+
 
 export const decoder = new TextDecoder();
+
+
+/**
+ * Download and extract a folder from a zip/tar file online
+ * 
+ * @param {string} url URL to zip/tar file to download
+ * @param {string} target Folder path to extract folder to
+ */
+export async function downloadFolder(
+    url,
+    target
+) {
+    // get filename from url
+    let filename = URL.parse(url).pathname.split("/").at(-1)
+    // get file content as a blob
+    let data = await fetch(url).then(resp => resp.blob()).then(blob => blob.bytes())
+    // write to a zipped file
+    let zipfile = path.join(target, filename);
+    fs.writeFileSync(zipfile, data);
+    // extract file
+    if (path.extname(zipfile) === ".zip") {
+        // extract zip file...
+        await unzip(zipfile, {
+            dir: target
+        })
+    }
+    if (path.extname(zipfile) === ".gz") {
+        // extract tar.gz file...
+        await untar({
+            file: zipfile,
+            cwd: target,
+            strip: 1,
+            sync: true
+        })
+    }
+    // delete zip file
+    fs.unlink(zipfile, err => {if (err) throw err})
+}
+
+
+/**
+ * Use PyPi to resolve an asterisk in a version number (e.g. psychopy 2022.2.* => 2022.2.5)
+ * 
+ * @param {string} version Version number to resolve
+ * @param {string} pipname Package this version number pertains to
+ */
+export async function resolvePackageVersion(version, pipname) {
+    // substitute "app" for app version
+    if (pipname === "psychopy" && version === "app") {
+        version = appVersion
+    }
+    // return as is if no asterisk
+    if (!version.includes("*")) {
+        return version
+    }
+    // get versions of the given package on PyPi (use cache if present)
+    let candidates 
+    if (!(pipname in resolvePackageVersion.cache)) {
+        resolvePackageVersion.cache[pipname] = await fetch(
+            `https://pypi.org/pypi/${pipname}/json`
+        ).then(
+            resp => {
+                // error if getting versions fails
+                if (resp.ok) {
+                    return resp.json()
+                } else {
+                    throw new Error(resp.status)
+                }
+            }
+        ).then(
+            // get array of versions
+            resp => Object.keys(resp.releases)
+        )
+    }
+    candidates = resolvePackageVersion.cache[pipname]
+    // parse as if given a .0 release to get an object for the release series
+    let series = semver.parse(version.replaceAll(".*", ".0"))
+    // filter for just versions in this series
+    candidates = candidates.filter(
+        v => (
+            series
+            && semver.valid(v)
+            && semver.major(v) === series.major
+            && semver.minor(v) === series.minor
+        )
+    )
+    // error if there are no matching versions
+    if (!candidates.length) {
+        throw new Error(`Could not find a version of ${pipname} matching ${version}`)
+    }
+    // get highest version from those left
+    return candidates.sort(semver.compare).at(-1)
+}
+// cache versions by package so we only have to query pypi once per session
+resolvePackageVersion.cache = {}
 
 
 /**
@@ -123,12 +225,16 @@ export function execSync(tag, command, args, timeout=undefined, silent=false) {
  * @param {string} command Command to run
  * @param {array<string>} args Arguments to pass to child process
  * @param {int} timeout Time (ms) after which to give up, leave undefined to not timeout
+ * @param {object} env Extra environment variables to set for the child process
  */
-export async function execTracked(tag, command, args, timeout=undefined) {
+export async function execTracked(tag, command, args, timeout=undefined, env={}) {
     // log input in front end
     input(tag, `${command} ${(args || []).join(" ")}`, timeout)
     // execute asynchronously
-    let process = proc.spawn(command, args, {timeout: timeout})
+    let process = proc.spawn(command, args, {
+        timeout: timeout,
+        env: {...globalThis.process.env, ...env}
+    })
     // pass output to front end
     process.stdout.on("data", evt => output(tag, evt))
     process.stderr.on("data", evt => output(tag, evt))

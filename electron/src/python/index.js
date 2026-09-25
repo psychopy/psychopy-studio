@@ -1,6 +1,7 @@
 import { app, ipcMain } from "electron";
 import { uv } from "./uv.js";
 import { venvs, getVenv } from "./venv.js";
+import { resolvePackageVersion } from "./utils.js";
 import { Liaison, getLiaison } from "./liaison.js";
 import { PythonShell } from "./shell.js";
 import { PythonScript } from "./script.js";
@@ -39,6 +40,7 @@ export const handlers = {
         setDirectory: ipcMain.handle("python.uv.setDirectory", (evt, option) => uv.setDirectory(option)),
         exists: ipcMain.handle("python.uv.exists", (evt) => uv.exists()),
         needsUpdate: ipcMain.handle("python.uv.needsUpdate", (evt) => uv.needsUpdate()),
+        resolvePackageVersion: ipcMain.handle("python.uv.resolvePackageVersion", (evt, version, pipname) => resolvePackageVersion(version, pipname)),
         install: ipcMain.handle("python.uv.install", (evt) => uv.install()),
         makeExecutable: ipcMain.handle("python.uv.makeExecutable", (evt, psychopyVersion, pythonVersion) => uv.makeExecutable(psychopyVersion, pythonVersion)),
         findPython: ipcMain.handle("python.uv.findPython", (evt, version) => uv.findPython(version)),

@@ -1,32 +1,62 @@
 import { uv } from "./uv.js";
-import { execSync, execTracked, output } from "./utils.js";
+import { execSync, output, downloadFolder, resolvePackageVersion } from "./utils.js";
 import { appVersion } from "../version.js";
 import semver from "semver";
 import logging from "../logging.js";
 import proc from "child_process";
 import process from "process";
+import path from "path";
+import fs from "fs";
 
 
 export class PythonVenv {
+    /**
+     * Use `PythonVenv.create` rather than calling this directly, as some setup needs to be async.
+     */
     constructor(pythonVersion="3.10", psychopyVersion=appVersion) {
         this.pythonVersion = pythonVersion
         this.psychopyVersion = psychopyVersion
-        // populated when `setup` is called
+        // populated by `create` or `setup`
         this.executable = undefined
         // stores refs to running liaison, scripts and shells
         this.liaison = undefined
         this.scripts = {}
         this.shells = {}
         this.psychojs = {}
-        // store in venvs object
-        venvs[this.psychopyVersion] = this
+    }
+
+    /**
+     * Create a PythonVenv, resolving its PsychoPy version and looking for an existing executable
+     *
+     * @param {string} pythonVersion Python version to use
+     * @param {string} psychopyVersion Target PsychoPy version
+     * @returns {Promise<PythonVenv>}
+     */
+    static async create(pythonVersion="3.10", psychopyVersion=appVersion) {
+        // resolve asterisks
+        psychopyVersion = await resolvePackageVersion(psychopyVersion, "psychopy")
+        // make venv object
+        let venv = new PythonVenv(pythonVersion, psychopyVersion)
         // try to get Python executable
-        this.executable = uv.findPython(this.psychopyVersion)
+        venv.executable = await uv.findPython(psychopyVersion)
+        // store in venvs object
+        venvs[psychopyVersion] = venv
         // if we were waiting for this venv, resolve now
         if (psychopyVersion in awaiting) {
-            awaiting[psychopyVersion].resolve(this)
+            awaiting[psychopyVersion].resolve(venv)
             delete awaiting[psychopyVersion]
         }
+
+        return venv
+    }
+
+    /**
+     * Folder for the psychopy module
+     */
+    get ppyFolder() {
+        return path.join(
+            uv.folder, ".psychopy", this.psychopyVersion
+        )
     }
 
     /**
@@ -69,11 +99,11 @@ export class PythonVenv {
      * @param {boolean} prerelease Whether to allow unreleased versions of psychopy-lib
      */
     async setup(prerelease=false) {
-        // make one if there isn't one
+        // make an executable if there isn't one
         if (!this.executable) {
             this.executable = await uv.makeExecutable(
-                psychopyVersion,
-                pythonVersion
+                this.psychopyVersion,
+                this.pythonVersion
             )
         }
         // get installed packages so we know what needs installing
@@ -93,22 +123,80 @@ export class PythonVenv {
         }
         // install psychopy library
         if (!("psychopy" in installed || "psychopy-lib" in installed)) {
+            // get zip file to install
+            let source
             if (this.psychopyVersion === "dev" || prerelease === "dev") {
                 // for dev environment, install from dev branch
-                await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/dev.zip")
+                source = "https://github.com/psychopy/psychopy/archive/refs/heads/dev.zip"
             } else if (prerelease === "release") {
                 // for prerelease, install from release branch
-                await this.installPackage("https://github.com/psychopy/psychopy/archive/refs/heads/release.zip")
+                source = "https://github.com/psychopy/psychopy/archive/refs/heads/release.zip"
             } else {
-                // for released version, install from pypi
+                // for released version, install from tag
                 let pkg = "psychopy"
                 if (semver.parse(this.psychopyVersion) < "2026.2.0") {
                     // older versions need to use psychopy-lib rather than psychopy to avoid installing wx
                     pkg += "-lib"
                 }
-                await this.installPackage(`${pkg}==${this.psychopyVersion}`)
+                source = `https://github.com/psychopy/${pkg}/archive/refs/tags/${this.psychopyVersion}.zip`
             }
+            // make sure there's a folder to download psychopy to
+            if (!fs.existsSync(this.ppyFolder)) {
+                fs.mkdirSync(this.ppyFolder, {
+                    recursive: true
+                })
+            }
+            // download zipfile
+            uv.output(
+                "Downloading PsychoPy library..."
+            )
+            await downloadFolder(
+                source,
+                this.ppyFolder
+            )
+            uv.output(
+                "Finished downloading PsychoPy library."
+            )
+            // get name of module folder within extracted folder
+            let moduleFolder = fs.readdirSync(this.ppyFolder, { withFileTypes: true }).find(
+                entry => entry.isDirectory()
+            ).name
+            // try to sync with psychopy
+            try {
+                await this.syncProject(
+                    path.join(this.ppyFolder, moduleFolder)
+                )
+            } catch {
+                // if this fails (as it will with older versions) do pip install instead
+                await this.installPackage(
+                    path.join(this.ppyFolder, moduleFolder)
+                )
+            }
+
         }
+    }
+
+    /**
+     * Sync a local project with this venv
+     * 
+     * @param {string} folder Directory containing the project to sync
+     */
+    async syncProject(folder) {
+        // log start
+        uv.output(
+            `Syncing ${folder}...\n`
+        )
+        // run uv command to install, pointing it at the venv containing our executable (Scripts/python.exe or bin/python)
+        // --inexact stops uv from removing packages which aren't in the project (e.g. liaison-py)
+        await uv.execTracked([
+            "sync", "--directory", folder, "--python", this.executable, "--inexact"
+        ], undefined, `uv`, {
+            UV_PROJECT_ENVIRONMENT: path.dirname(path.dirname(this.executable))
+        })
+        // log done
+        uv.output(
+            `Finished syncing ${folder}.\n`
+        )
     }
 
     /**
@@ -286,10 +374,8 @@ export class PythonVenv {
  * @returns {PythonVenv}
  */
 export async function getVenv(version) {
-    // substitute "app" for app version
-    if (version === "app") {
-        version = appVersion
-    }
+    // resolve any asterisk in the version number
+    version = await resolvePackageVersion(version, "psychopy")
     // strip extras from version
     if (version.match(/\d+\.\d+\.\d+/)) {
         version = version.match(/\d+\.\d+\.\d+/)[0]
@@ -302,7 +388,7 @@ export async function getVenv(version) {
         // if environment exists but no object, make one
         for (let env of await uv.getEnvironments()) {
             if (env.psychopyVersion === version) {
-                return new PythonVenv(
+                return PythonVenv.create(
                     env.pythonVersion, 
                     env.psychopyVersion
                 )

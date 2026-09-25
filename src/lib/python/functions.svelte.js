@@ -29,8 +29,13 @@ function handleError(err) {
  * @param {string} version 
  */
 async function sanitizeVersion(version) {
+    // use app version if version is just "app"
     if (!version || version === "app") {
         version = await electron.version()
+    }
+    // resolve any asterisks
+    if (version.includes("*")) {
+        version = await python.uv.resolvePackageVersion(version, "psychopy")
     }
 
     return version

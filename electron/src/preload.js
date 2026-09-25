@@ -77,6 +77,7 @@ const python = {
     systemInfo: () => ipcRenderer.invoke("python.uv.systemInfo").then(resp => resp),
     exists: () => ipcRenderer.invoke("python.uv.exists").then(resp => resp),
     needsUpdate: () => ipcRenderer.invoke("python.uv.needsUpdate").then(resp => resp),
+    resolvePackageVersion: (version, pipname) => ipcRenderer.invoke("python.uv.resolvePackageVersion", version, pipname).then(resp => resp),
     findDirectory: (option) => ipcRenderer.invoke("python.uv.findDirectory", option).then(resp => resp),
     setDirectory: (option) => ipcRenderer.invoke("python.uv.setDirectory", option).then(resp => resp),
     install: () => ipcRenderer.invoke("python.uv.install").then(resp => resp),
