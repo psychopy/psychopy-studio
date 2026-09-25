@@ -140,7 +140,7 @@
 		"electron": "^43.7.0",
 		"electron-builder": "*",
 		"estree-walker": "^3.0.3",
-		"i18next-cli": "^1.73.3",
+		"i18next-cli": "^1.74.1",
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.6",
 		"vite": "^8.1.5",
