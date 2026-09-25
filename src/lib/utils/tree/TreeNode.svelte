@@ -1,9 +1,11 @@
 <script>
     import { Icon } from "$lib/utils/icons";
+    import { Tooltip } from "$lib/utils/tooltip"
     import { getContext } from "svelte";
 
     let {
         label,
+        tooltip=undefined,
         data=undefined,
         icon=undefined,
         onselect=(evt, data) => {},
@@ -15,6 +17,7 @@
     } = $props()
 
     let handle = $state.raw();
+    let hovered = $state.raw(false);
 
     let siblings = getContext("siblings")
 </script>
@@ -37,6 +40,10 @@
         }
     }}
     oncontextmenu={evt => oncontextmenu(evt, data)}
+    onmouseenter={evt => hovered = true}
+    onmouseleave={evt => hovered = false}
+    onfocusin={evt => hovered = true}
+    onfocusout={evt => hovered = false}
     class:selected={siblings.selected === handle}
     disabled={disabled}
 >
@@ -49,6 +56,15 @@
             size=1.25rem
         />
     {/if}
+    <!-- optional tooltip -->
+    {#if tooltip}
+        <Tooltip 
+            position="bottom-right"
+            bind:shown={hovered}
+        >
+            {tooltip}
+        </Tooltip>
+    {/if}
     <!-- label -->
     <span class=node-label>
         {label}
@@ -57,6 +73,7 @@
 
 <style>
     .tree-node {
+        position: relative;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -64,7 +81,6 @@
         gap: .5rem;
         background-color: transparent;
         border: none;
-        overflow: hidden;
         border-left: 1px solid transparent;
         padding: .5rem 1rem;
     }

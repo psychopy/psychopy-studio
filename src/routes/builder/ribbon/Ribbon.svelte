@@ -26,6 +26,7 @@
     import { FindDialog } from "$lib/dialogs/find/index.js";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js"
     import ParamsDialog from "$lib/paramCtrls/ParamsDialog.svelte";
+    import NewProjectDlg from '../../../lib/dialogs/newProject/NewProjectDlg.svelte';
     import { IconButton, SwitchButton } from '$lib/utils/buttons';
     import { UserCtrl, ProjectCtrl } from '$lib/pavlovia';
     import MonitorCenterDlg from '$lib/dialogs/monitorCenter/MonitorCenterDlg.svelte';
@@ -35,6 +36,7 @@
     let current = getContext("current");
 
     let show = $state({
+        newProjectDlg: false,
         settingsDlg: false,
         findDlg: false,
         deviceMgrDlg: false,
@@ -71,6 +73,15 @@
     <Menu />
     
     <RibbonSection label={translate("File")} icon="/icons/rbn-file.svg">
+        <IconButton 
+            icon="/icons/btn-new.svg"
+            label={translate("New project")}
+            onclick={evt => show.newProjectDlg = true}
+            borderless
+        />
+        <NewProjectDlg
+            bind:shown={show.newProjectDlg}
+        />
         <IconButton 
             icon="/icons/btn-new.svg" 
             label={translate("New file")} 
