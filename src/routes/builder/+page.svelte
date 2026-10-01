@@ -14,11 +14,12 @@
     import { electron } from "$lib/globals.svelte";
     import { SetupPython, PythonErrors } from '$lib/python';
     import ReadMe from '$lib/dialogs/readme/ReadMe.svelte';
+    import KeyboardAccessPrompt from '$lib/dialogs/keyboardAccess/KeyboardAccessPrompt.svelte';
     import {
         openFile
     } from "./callbacks.svelte";
     import { python } from "$lib/globals.svelte";
-    import TipsDialog from '../../lib/dialogs/tips/TipsDialog.svelte';
+    import TipsDialog from '$lib/dialogs/tips/TipsDialog.svelte';
     import { translate } from "$lib/translation";
 
     // parse url params
@@ -107,6 +108,10 @@
     <TipsDialog 
         categories={["general", "builder", "silly"]}
         bind:shown={current.tip.shown}
+    />
+    <!-- this will prompt to user to give keyboard permission, if needed -->
+    <KeyboardAccessPrompt 
+        experiment={current.experiment}
     />
     <!-- this will setup themeing -->
     <Theme />

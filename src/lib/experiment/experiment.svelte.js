@@ -17,6 +17,11 @@ export class Experiment {
     file = $state(undefined)
     running = $state.raw(undefined)
 
+    /** keep track of any prompts which have already been prompted for this experiment */
+    prompts = {
+        keyboardAccess: false
+    }
+
     /** store past and future states for this experiment */
     history = $state({
         past: [],
@@ -262,6 +267,10 @@ export class Experiment {
             stem: "untitled",
             ext: ".psyexp"
         }
+        // mark all prompts as unasked
+        for (let key in this.prompts) {
+            this.prompts[key] = false
+        }
         // set to current version
         this.version = "2026.1.0"
         // clear history
@@ -314,6 +323,36 @@ export class Experiment {
         return results
     }
 
+    async needsKeyboardAccess() {
+        // we always need this for ioHub or ptb
+        if (
+            this.settings.params['useLegacyKeyboard']?.val 
+            && ["ioHub", "PsychToolbox"].includes(this.settings.params['keyboardBackend']?.val)
+        ) {
+            return true
+        }
+        // get all Components
+        let comps = Object.values(this.routines).reduce(
+            (acc, rt) => {
+                acc.push(...rt.components)
+                return acc
+            },
+            []
+        )
+        // do any keyboards need keypresses outside PsychoPy
+        if (comps.some(
+            comp => comp.tag === "KeyboardComponent" && !comp.params['muteOutsidePsychopy']?.val
+        )) {
+            return true
+        }
+        // if the gil is enabled, we always need keyboard permission
+        if (await python.venv.hasGIL(this.useVersion)) {
+            return true
+        }
+
+        return false
+    }
+
     pilotMode = $derived(![true, "true", "True", 1, "1"].includes(this.settings.params['runMode']?.val))
 
     getPilotMode() {
@@ -328,6 +367,10 @@ export class Experiment {
         // set param val
         this.settings.params['runMode'].val = value
     }
+
+    useVersion = $derived(
+        this.settings.params['Use version'].val || "app"
+    )
 
     /**
      * List of all Static Components in this Experiment
@@ -534,13 +577,11 @@ export class Experiment {
             this.file.stem + (target === "PsychoJS" ? ".js" : ".py")
         )
         // make sure relevant Python version is setup
-        let version = $state.snapshot(this.settings.params['Use version'].val)
-        if (version) {
-            await setupPython(version)
+        if (this.useVersion !== "app") {
+            await setupPython(this.useVersion)
         }
-        version = version || "app"
         // reload devices.json if necessary
-        await python.liaison.send(version, {
+        await python.liaison.send(this.useVersion, {
             command: "try",
             args: ["prefs.setDevicesFile", path.join(
                 await electron.paths.user(), "devices.json"
@@ -550,7 +591,7 @@ export class Experiment {
         )
 
         // create experiment object via Liaison
-        await python.liaison.send(version, {
+        await python.liaison.send(this.useVersion, {
             command: "init",
             args: [
                 "currentExperiment",
@@ -560,7 +601,7 @@ export class Experiment {
             reason => console.error(reason)
         )
         // load from file
-        await python.liaison.send(version, {
+        await python.liaison.send(this.useVersion, {
             command: "run",
             args: [
                 "currentExperiment.loadFromXML",
@@ -570,7 +611,7 @@ export class Experiment {
             reason => console.error(reason)
         )
         // clear use version param (as version is handled by studio)
-        await python.liaison.send(version, {
+        await python.liaison.send(this.useVersion, {
             command: "init",
             args: [
                 "useVersion",
@@ -580,7 +621,7 @@ export class Experiment {
         }).catch(
             reason => console.error(reason)
         )
-        await python.liaison.send(version, {
+        await python.liaison.send(this.useVersion, {
             command: "run",
             args: [
                 "useVersion.__setattr__",
@@ -591,7 +632,7 @@ export class Experiment {
             reason => console.error(reason)
         )
         // write script
-        let script = await python.liaison.send(version, {
+        let script = await python.liaison.send(this.useVersion, {
             command: "run",
             args: [
                 "currentExperiment.writeScript",
@@ -637,9 +678,8 @@ export class Experiment {
             )
         }
         // make sure relevant Python version is setup
-        let version = $state.snapshot(this.settings.params['Use version'].val) || "app"
-        if (version) {
-            await setupPython(version)
+        if (this.useVersion) {
+            await setupPython(this.useVersion)
         }
         // mark started
         await python.output.stdout.send(
@@ -647,7 +687,7 @@ export class Experiment {
         )
         // run script
         this.running = await python.scripts.run(
-            version,
+            this.useVersion,
             target, 
             ...(this.pilotMode ? ["--pilot"] : []),
             "--prefs-json",
@@ -670,10 +710,8 @@ export class Experiment {
             console.error("Script running is not available in browser.")
             return
         }
-        // figure out version
-        let version = $state.snapshot(this.settings.params['Use version'].val) || "app"
         // request stop from electron
-        await python.scripts.stop(version, this.running)
+        await python.scripts.stop(this.useVersion, this.running)
         // mark finished
         this.running = undefined
         await python.output.stdout.send(

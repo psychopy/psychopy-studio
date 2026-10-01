@@ -170,7 +170,8 @@
 	},
 	"optionalDependencies": {
 		"@rollup/rollup-linux-x64-gnu": "*",
-		"dmg-builder": "^0.5.1"
+		"dmg-builder": "^0.5.1",
+		"node-mac-permissions": "^2.5.0"
 	},
 	"os": [
 		"darwin",

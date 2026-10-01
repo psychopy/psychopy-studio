@@ -19,7 +19,8 @@
     import Shortcuts from '$lib/utils/Shortcuts.svelte';
     import { shortcuts } from "./callbacks.svelte";
     import TipsDialog from '$lib/dialogs/tips/TipsDialog.svelte';
-    import { translate } from "$lib/translation"
+    import KeyboardAccessPrompt from '$lib/dialogs/keyboardAccess/KeyboardAccessPrompt.svelte';
+    import { translate } from "$lib/translation";
     
 
     setContext("current", current)
@@ -174,7 +175,10 @@
         categories={["general", "runner", "silly"]}
         bind:shown={current.tip.shown}
     />
-
+    <!-- this will prompt to user to give keyboard permission, if needed -->
+    <KeyboardAccessPrompt 
+        experiment={current.runlist[current.selection]}
+    />
     <!-- this will setup themeing -->
     <Theme />
     <!-- this will setup keyboard shortcuts -->

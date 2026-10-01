@@ -318,6 +318,24 @@ export class PythonVenv {
     }
 
     /**
+     * Check whether this environment's Python has the GIL enabled
+     *
+     * @returns {boolean} Whether or not the GIL is enabled
+     */
+    hasGIL() {
+        // run Python directly (not via a shell) so quoting is the same on every platform
+        let resp = proc.execFileSync(this.executable, ["-c", [
+            "try:",
+            "    import json, sysconfig",
+            "    print(sysconfig.get_config_var('Py_GIL_DISABLED'))",
+            "except:",
+            "    print(0)"
+        ].join("\n")], { encoding: "utf8" })
+
+        return resp.trim() !== "1"
+    }
+
+    /**
      * Execute a Python command synchronously
      * 
      * @param {array<string>} args Arguments to execute

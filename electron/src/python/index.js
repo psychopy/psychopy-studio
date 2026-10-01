@@ -30,7 +30,8 @@ export const handlers = {
         installPackage: ipcMain.handle("python.venv.installPackage", async (evt, venv, name, version=undefined) => (await getVenv(venv)).installPackage(name, version)),
         uninstallPackage: ipcMain.handle("python.venv.uninstallPackage", async (evt, venv, name) => (await getVenv(venv)).uninstallPackage(name)),
         getPackages: ipcMain.handle("python.venv.getPackages", async (evt, venv) => (await getVenv(venv)).getPackages()),
-        getPackageDetails: ipcMain.handle("python.venv.getPackageDetails", async (evt, venv, name) => (await getVenv(venv)).getPackageDetails(name))
+        getPackageDetails: ipcMain.handle("python.venv.getPackageDetails", async (evt, venv, name) => (await getVenv(venv)).getPackageDetails(name)),
+        hasGIL: ipcMain.handle("python.venv.hasGIL", async (evt, venv) => (await getVenv(venv)).hasGIL())
     },
     uv: {
         folder: ipcMain.handle("python.uv.folder", (evt) => uv.folder),
