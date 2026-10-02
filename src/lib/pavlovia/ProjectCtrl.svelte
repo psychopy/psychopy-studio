@@ -6,15 +6,18 @@
     import ManageProjectsDlg from "$lib/dialogs/projects/manage/ManageProjectsDlg.svelte";
     import NewProjectDlg from "./NewProjectDlg.svelte";
     import { translate } from "$lib/translation";
+    import BrowseDemosDlg from "$lib/pavlovia/browseProjects/BrowseDemosDlg.svelte";
 
     let current = getContext("current")
 
     let show = $state({
         newProjectDlg: false,
         manageProjectsDlg: false,
+        browseProjectsDlg: false
     })
     let awaiting = $state({
-        newProjectDlg: Promise.withResolvers()
+        newProjectDlg: Promise.withResolvers(),
+        browseProjectsDlg: Promise.withResolvers()
     })
 
     // refresh project when experiment or user changes
@@ -70,7 +73,7 @@
     <MenuItem 
         label={translate("Browse demos")}
         icon="/icons/btn-demos.svg" 
-        onclick={evt => window.open("https://pavlovia.org/explore/demos", "_blank")}
+        onclick={evt => show.browseProjectsDlg = true}
         borderless
     />
     <MenuItem
@@ -86,4 +89,8 @@
 <NewProjectDlg 
     bind:shown={show.newProjectDlg}
     bind:awaiting={awaiting.newProjectDlg}
+/>
+<BrowseDemosDlg
+    bind:shown={show.browseProjectsDlg}
+    bind:awaiting={awaiting.browseProjectsDlg}
 />

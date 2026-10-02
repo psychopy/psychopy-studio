@@ -38,7 +38,8 @@ const electron = {
     scandir: (root) => ipcRenderer.invoke("electron.files.scandir", root).then(resp => resp),
     showItemInFolder: (folder) => ipcRenderer.invoke("electron.files.showItemInFolder", folder),
     openPath: (path) => ipcRenderer.invoke("electron.files.openPath", path),
-    openExternal: (url) => ipcRenderer.invoke("electron.files.openExternal", url)
+    openExternal: (url) => ipcRenderer.invoke("electron.files.openExternal", url),
+    downloadFolder: (url, target) => ipcRenderer.invoke("electron.files.downloadFolder", url, target)
   },
   clipboard: {
     get: () => ipcRenderer.invoke("electron.clipboard.get").then(resp => resp),
@@ -128,9 +129,12 @@ const git = {
   listGroups: (username) => ipcRenderer.invoke("git.listGroups", username).then(resp => resp),
   listSurveys: (username) => ipcRenderer.invoke("git.listSurveys", username).then(resp => resp),
   getUserInfo: (username) => ipcRenderer.invoke("git.getUserInfo", username).then(resp => resp),
+  authenticateURL: (url, username) => ipcRenderer.invoke("git.authenticateURL", url, username).then(resp => resp),
   getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user).then(resp => resp),
   getProjectInfo: (details, username) => ipcRenderer.invoke("git.getProjectInfo", details, username).then(resp => resp),
   clone: (details, username) => ipcRenderer.invoke("git.clone", details, username).then(resp => resp),
+  fork: (details, username) => ipcRenderer.invoke("git.fork", details, username).then(resp => resp),
+  listProjectForks: (project, username) => ipcRenderer.invoke("git.listProjectForks", project, username).then(resp => resp),
   pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force).then(resp => resp),
   stage: (folder) => ipcRenderer.invoke("git.stage", folder).then(resp => resp),
   commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user).then(resp => resp),

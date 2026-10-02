@@ -2,7 +2,8 @@ import { app } from 'electron';
 import { platform , arch } from "process";
 import path from "path";
 import fs from "fs";
-import { execSync, execTracked, output, downloadFolder, resolvePackageVersion } from "./utils.js";
+import { execSync, execTracked, output, resolvePackageVersion } from "./utils.js";
+import { downloadFolder } from "../files.js";
 import { appVersion } from "../version.js";
 
 

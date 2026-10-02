@@ -2,53 +2,11 @@ import proc from "child_process";
 import logging from "../logging.js";
 import { BrowserWindow } from "electron";
 import tcp from "tcp-port-used";
-import { extract as unzip } from "@electron-internal/extract-zip";
-import { extract as untar } from "tar";
-import fs from "fs";
-import path from "path";
 import semver from "semver";
 import { appVersion } from "../version.js";
 
 
 export const decoder = new TextDecoder();
-
-
-/**
- * Download and extract a folder from a zip/tar file online
- * 
- * @param {string} url URL to zip/tar file to download
- * @param {string} target Folder path to extract folder to
- */
-export async function downloadFolder(
-    url,
-    target
-) {
-    // get filename from url
-    let filename = URL.parse(url).pathname.split("/").at(-1)
-    // get file content as a blob
-    let data = await fetch(url).then(resp => resp.blob()).then(blob => blob.bytes())
-    // write to a zipped file
-    let zipfile = path.join(target, filename);
-    fs.writeFileSync(zipfile, data);
-    // extract file
-    if (path.extname(zipfile) === ".zip") {
-        // extract zip file...
-        await unzip(zipfile, {
-            dir: target
-        })
-    }
-    if (path.extname(zipfile) === ".gz") {
-        // extract tar.gz file...
-        await untar({
-            file: zipfile,
-            cwd: target,
-            strip: 1,
-            sync: true
-        })
-    }
-    // delete zip file
-    fs.unlink(zipfile, err => {if (err) throw err})
-}
 
 
 /**

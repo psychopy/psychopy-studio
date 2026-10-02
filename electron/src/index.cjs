@@ -11,7 +11,8 @@ if (!fs.existsSync(path.join(app.getPath("appData"), "psychopy4"))) {
 }
 
 const { handlers: pythonHandlers } = require("./python");
-const { handlers: gitHandlers } = require("./git.js")
+const { handlers: gitHandlers } = require("./git.js");
+const { handlers: filesHandlers } = require("./files.js");
 const logging = require("./logging.js");
 const { UsageReport } = require("./usage.js");
 const { favicon } = require("./resources.js");
@@ -259,27 +260,7 @@ const handlers = {
         projects: ipcMain.handle("electron.paths.pavlovia.projects", (evt) => path.join(app.getPath("appData"), "psychopy4", "pavlovia", "projects.json")),
       }
     },
-    files: {
-      load: ipcMain.handle("electron.files.load", (evt, file) => fs.readFileSync(file, { encoding: 'utf8' })),
-      save: ipcMain.handle("electron.files.save", (evt, file, content) => fs.writeFileSync(file, content, { encoding: 'utf8', mode: 0o777 })),
-      exists: ipcMain.handle("electron.files.exists", (evt, file) => fs.existsSync(file)),
-      stat: ipcMain.handle("electron.files.stat", (evt, file) => {
-        let stat = fs.statSync(file)
-        return Object.assign({
-          isDirectory: stat.isDirectory(),
-          isFile: stat.isFile()
-        }, stat)
-      }),
-      mkdir: ipcMain.handle("electron.files.mkdir", (evt, path, recursive = true) => fs.mkdirSync(path, { recursive: recursive })),
-      openDialog: ipcMain.handle("electron.files.openDialog", (evt, options) => dialog.showOpenDialogSync(windows[evt.sender.id], options)),
-      saveDialog: ipcMain.handle("electron.files.saveDialog", (evt, options) => dialog.showSaveDialogSync(windows[evt.sender.id], options)),
-      scandir: ipcMain.handle("electron.files.scandir", (evt, root, recursive) => fs.readdirSync(root, { recursive: recursive }).sort(
-        (a, b) => fs.statSync(path.join(root, b)).isDirectory() - fs.statSync(path.join(root, a)).isDirectory()
-      )),
-      showItemInFolder: ipcMain.handle("electron.files.showItemInFolder", (evt, folder) => shell.showItemInFolder(folder)),
-      openPath: ipcMain.handle("electron.files.openPath", (evt, path) => shell.openPath(path)),
-      openExternal: ipcMain.handle("electron.files.openExternal", (evt, url) => shell.openExternal(url))
-    },
+    files: filesHandlers,
     clipboard: {
       get: ipcMain.handle("electron.clipboard.get", (evt) => clipboard),
       set: ipcMain.handle("electron.clipboard.set", (evt, value) => clipboard = value)
