@@ -5,6 +5,7 @@
 
     let {
         label,
+        tooltip=undefined,
         icon=undefined,
         onselect=(evt, data) => {},
         onactivate=(evt, data) => {},
@@ -20,6 +21,7 @@
 >
     <TreeNode
         label={label}
+        tooltip={tooltip}
         icon={icon}
         onselect={(evt, data) => {
             open = !open;
