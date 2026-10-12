@@ -16,6 +16,8 @@
          * @param evt {MouseEvent} Event triggered on click
          * @param data {any} Arbitrary data associated with this menu item 
          */
+        /** @prop @type {String} Role of the button (e.g. copy, paste, etc.), mostly used for accelerators on Mac */
+        role=undefined,
         onclick=(evt, data) => {},
         /** @prop @type {any} Arbitrary data associated with this menu item  */
         data={},
@@ -34,7 +36,8 @@
     template.push({
         label: label,
         enabled: !disabled,
-        click: id
+        click: id,
+        ...role ? { role: role } : {}
     })
     let index = template.length - 1
     // listen for calls from backend

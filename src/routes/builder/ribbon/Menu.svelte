@@ -154,6 +154,22 @@
         />
         <MenuSeparator />
         <MenuItem 
+            label={translate("Cut text")}
+            icon="/icons/btn-cut.svg"
+            role="cut"
+        />
+        <MenuItem 
+            label={translate("Copy text")}
+            icon="/icons/btn-copy.svg"
+            role="copy"
+        />
+        <MenuItem 
+            label={translate("Paste text")}
+            icon="/icons/btn-paste.svg"
+            role="paste"
+        />
+        <MenuSeparator />
+        <MenuItem 
             label={translate("Find in experiment")}
             icon="/icons/btn-find.svg"
             onclick={evt => show.findDlg = true}
