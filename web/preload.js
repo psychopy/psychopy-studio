@@ -1,3 +1,11 @@
+import { createClipboard } from "./clipboard";
+import { createSystem } from "./system";
+import { createFiles } from "./files";
+import { getPlatform } from "./platform";
+import { createWindows } from "./windows";
+
+const files = createFiles();
+const windows = createWindows();
 
 /**
  * Treat this file as a hitlist for functions which the web-only version of PsychoPy Studio should expose to the front-end. 
@@ -12,8 +20,8 @@ export const electron = {
     new: (target) => {},
     get: (target) => {},
     send: (id, tag, data) => {},
-    emit: (tag, data) => {},
-    listen: (tag, lsnr) => {},
+    emit: (tag, data) => windows.emit,
+    listen: (tag, lsnr) => windows.listen,
     focus: (id) => {},
     devtools: (id) => {},
     close: (id) => {},
@@ -43,22 +51,16 @@ export const electron = {
     scandir: (root) => {},
     showItemInFolder: (folder) => {},
     openPath: (path) => {},
-    openExternal: (url) => {},
+    openExternal: (url) => files.openExternal,
     downloadFolder: (url, target, name) => {}
   },
-  clipboard: {
-    get: () => {},
-    set: (value) => {}
-  },
+  clipboard: createClipboard(),
   state: {
     updateFrame: (details) => {}
   },
-  system: {
-    requestKeyboardAccess: () => {},
-    hasKeyboardAccess: () => {}
-  },
+  system: createSystem(),
   version: () => {},
-  platform: () => {},
+  platform: getPlatform,
   quit: () => {}
 };
 
