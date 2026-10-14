@@ -129,6 +129,7 @@
 		"dev": "npm run electron:start",
 		"test": "playwright test",
 		"test:ui": "playwright test --ui"
+		"test:web": "node --test"
 	},
 	"devDependencies": {
 		"@electron/fuses": "^2.1.3",
