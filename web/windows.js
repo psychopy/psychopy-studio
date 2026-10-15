@@ -1,6 +1,13 @@
-export function createWindows() {
+export function createWindows(
+    windowObject = globalThis.window,
+    documentObject = globalThis.document
+) {
     const listeners = new Map();
     return {
+        new: async (target) => {
+            const url = new URL(target.replace(/^\//, ""), documentObject.baseURI);
+            return windowObject.open(url, "_blank");
+        },
         listen: (tag, listener) => {
             if (!listeners.has(tag)) {
                 listeners.set(tag, new Set());

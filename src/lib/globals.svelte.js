@@ -1,5 +1,5 @@
-// if running from electron, these will be set by preload.js, otherwise will be undefined
-export var electron = $state(window.electron) 
+// if running from electron or web, these will be set by the corresponding runtime, otherwise will be undefined
+export var electron = $state(window.electron | window.web) 
 export var git = $state(window.git)
 export var python = $state(window.python)
 // global stores for pavlovia and hardware stuff
