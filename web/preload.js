@@ -1,10 +1,13 @@
-import { createClipboard } from "./clipboard";
-import { createSystem } from "./system";
-import { createFiles } from "./files";
-import { getPlatform } from "./platform";
-import { createWindows } from "./windows";
+import { createClipboard } from "./clipboard.js";
+import { createSystem } from "./system.js";
+import { createFiles } from "./files.js";
+import { getPlatform } from "./platform.js";
+import { createWindows } from "./windows.js";
+import { createState } from "./state.js";
+import { createPaths } from "./paths.js";
 
 const files = createFiles();
+const paths = createPaths();
 const windows = createWindows();
 
 /**
@@ -17,7 +20,7 @@ const windows = createWindows();
 
 export const electron = {
   windows: {
-    new: (target) => {},
+    new: (target) => windows.new,
     get: (target) => {},
     send: (id, tag, data) => {},
     emit: (tag, data) => windows.emit,
@@ -33,7 +36,7 @@ export const electron = {
     documents: () => {},
     user: () => {},
     devices: () => {},
-    prefs: () => {},
+    prefs: paths.prefs,
     pavlovia: {
       dir: () => {},
       users: () => {},
@@ -41,9 +44,9 @@ export const electron = {
     }
   },
   files: {
-    load: (file) => {},
-    save: (file, content) => {},
-    exists: (file) => {},
+    load: files.load,
+    save: files.save,
+    exists: files.exists,
     stat: (file) => {},
     mkdir: (path, recursive=true) => {},
     openDialog: (options) => {},
@@ -55,9 +58,7 @@ export const electron = {
     downloadFolder: (url, target, name) => {}
   },
   clipboard: createClipboard(),
-  state: {
-    updateFrame: (details) => {}
-  },
+  state: createState,
   system: createSystem(),
   version: () => {},
   platform: getPlatform,
