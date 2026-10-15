@@ -5,5 +5,5 @@ export const trailingSlash = 'always';
 import { installWebRuntime } from '$web/runtime.js';
 
 if (typeof window !== 'undefined' && !window.electron) {
-  installWebRuntime(window);
+    installWebRuntime(window);
 }
