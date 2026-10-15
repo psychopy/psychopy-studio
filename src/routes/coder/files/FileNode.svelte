@@ -1,7 +1,7 @@
 <script>
     import { Menu, MenuItem } from "$lib/utils/menu";
     import { TreeNode } from "$lib/utils/tree";
-    import { parsePath } from "$lib/utils/files";
+    import { parsePath, fileIcons } from "$lib/utils/files";
     import path from "path-browserify";
     import { electron } from "$lib/globals.svelte";
     import { getContext } from "svelte";
@@ -10,67 +10,6 @@
     let {
         value
     } = $props()
-
-    let fileIcons = {
-        ".txt": "text",
-        ".md": "text",
-        ".log": "text",
-        ".json": "json",
-        ".yaml": "json",
-        ".yml": "json",
-        ".toml": "json",
-        ".tml": "json",
-        ".xml": "json",
-        ".psydat": "json",
-        ".csv": "table",
-        ".xlsx": "table",
-        ".xls": "table",
-        ".tsv": "table",
-        ".png": "image",
-        ".jpeg": "image",
-        ".jpg": "image",
-        ".bmp": "image",
-        ".tiff": "image",
-        ".tif": "image",
-        ".ppm": "image",
-        ".gif": "image",
-        ".svg": "design",
-        ".psd": "design",
-        ".ai": "design",
-        ".afdesign": "design",
-        ".afphoto": "design",
-        ".xcf": "design",
-        ".vsd": "design",
-        ".cdr": "design",
-        ".cdx": "design",
-        ".drawio": "design",
-        ".mp4": "video",
-        ".mov": "video",
-        ".avi": "video",
-        ".wmv": "video",
-        ".webm": "video",
-        ".mpeg": "video",
-        ".mp3": "audio",
-        ".wav": "audio",
-        ".aac": "audio",
-        ".wma": "audio",
-        ".flac": "audio",
-        ".m4a": "audio",
-        ".psyexp": "psyexp",
-        ".psyrun": "psyrun",
-        ".py": "python",
-        "pyproject.toml": "packaging",
-        ".whl": "packaging",
-        ".wheel": "packaging",
-        ".js": "js",
-        ".html": "html",
-        ".css": "css",
-        ".git": "git",
-        ".gitignore": "git",
-        ".gitattributes": "git",
-        "README.md": "info",
-        "readme.md": "info",
-    }
 
     let current = getContext("current")
 
