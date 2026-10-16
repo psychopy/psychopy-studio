@@ -1,7 +1,7 @@
 <script>
     import { StandaloneRoutine, Routine, Component } from '$lib/experiment';
     import { Button } from '$lib/utils/buttons';
-    import { getContext } from "svelte";
+    import { getContext, untrack } from "svelte";
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
     import { ParamsNotebook } from "$lib/paramCtrls";
     import { translate } from "$lib/translation";
@@ -12,8 +12,8 @@
         component
     } = $props()
     
-    let dlgComponent = $state(
-        new Component(component['__name__'])
+    let dlgComponent = $state.raw(
+        untrack(() => new Component(component['__name__']))
     );
     let showDialog = $state()
 

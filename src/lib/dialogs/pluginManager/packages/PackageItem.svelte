@@ -1,6 +1,6 @@
 <script>
     import { marked } from "marked";
-    import { getContext } from "svelte";
+    import { getContext, untrack } from "svelte";
     import VersionCtrl from "../VersionCtrl.svelte";
     import ProgressDlg from "../ProgressDlg.svelte";
     import { translate } from "$lib/translation";
@@ -12,7 +12,7 @@
     } = $props()
 
     let siblings = getContext("siblings");
-    siblings.all.push($state.snapshot(name))
+    siblings.all.push(untrack(() => $state.snapshot(name)))
 
     $effect(() => {
         if (siblings.selected === undefined) {

@@ -1,6 +1,6 @@
 <script>
     import { electron } from "$lib/globals.svelte";
-    import { getContext, setContext } from "svelte";
+    import { getContext, setContext, untrack } from "svelte";
     import { SubMenu } from "..";
 
     let {
@@ -18,7 +18,7 @@
     // add self to template
     let template = getContext("template");
     template.push({
-        label: label,
+        label: untrack(() => label),
         submenu: []
     })
     // set own submenu as new template
