@@ -201,8 +201,8 @@ export async function downloadFolder(
         path.join(target, filename.split(".")[0])
     )
     // extract file
-    if (path.extname(zipfile) === ".zip") {
-        // extract zip file...
+    if ([".zip", ".nupkg"].includes(path.extname(zipfile))) {
+        // extract zip file (NuGet packages are zip files too)...
         await unzip(zipfile, {
             dir: tmp
         })

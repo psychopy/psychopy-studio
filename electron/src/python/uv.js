@@ -2,6 +2,7 @@ import { app } from 'electron';
 import { platform , arch } from "process";
 import path from "path";
 import fs from "fs";
+import semver from "semver";
 import { execSync, execTracked, output, resolvePackageVersion } from "./utils.js";
 import { downloadFolder } from "../files.js";
 import { appVersion } from "../tools/version.js";
@@ -82,6 +83,15 @@ export class UV {
     get pyFolder() {
         return path.join(
             this.folder, ".python"
+        )
+    }
+
+    /**
+     * Subfolder for standalone Python executables (always in the user folder)
+     */
+    get executablesFolder() {
+        return path.join(
+            this.findDirectory("user"), ".python", ".executables"
         )
     }
 
@@ -223,6 +233,10 @@ export class UV {
         }
         // iterate through subfolders in the python folder
         for (let subfolder of fs.readdirSync(this.pyFolder)) {
+            // skip hidden folders (e.g. .executables), as these aren't environments
+            if (subfolder.startsWith(".")) {
+                continue
+            }
             // reinstate .* syntax
             if (subfolder.match(/^\d+\.\d+$/)) {
                 subfolder += ".*"
@@ -270,6 +284,85 @@ export class UV {
     }
 
     /**
+     * Get a signed Python executable from python.org's NuGet packages (Windows only). Python builds
+     * installed by uv are unsigned, so can be blocked by Windows Smart App Control.
+     *
+     * @param {string} pythonVersion Python version to get, either X.Y (for the latest patch) or X.Y.Z
+     * @returns {Promise<string>} Path to the Python executable
+     */
+    async getSignedPython(pythonVersion) {
+        // get specific folder for this version
+        let folder = path.join(
+            this.executablesFolder, pythonVersion
+        )
+        let executable = path.join(folder, "python.exe")
+        // use existing executable if there is one
+        if (fs.existsSync(executable)) {
+            return executable
+        }
+        // python.org publishes a different NuGet package for each architecture
+        let pkg = {
+            x64: "python",
+            ia32: "pythonx86",
+            arm64: "pythonarm64"
+        }[arch]
+        if (!pkg) {
+            throw new Error(`No Python NuGet package for architecture ${arch}`)
+        }
+        // get versions of the package on NuGet
+        let candidates = await fetch(
+            `https://api.nuget.org/v3-flatcontainer/${pkg}/index.json`
+        ).then(
+            resp => {
+                // error if getting versions fails
+                if (resp.ok) {
+                    return resp.json()
+                } else {
+                    throw new Error(resp.status)
+                }
+            }
+        ).then(
+            resp => resp.versions
+        )
+        // get highest full release matching the requested version
+        let version = candidates.filter(
+            v => (
+                semver.valid(v)
+                && !semver.prerelease(v)
+                && v.split(".").slice(0, pythonVersion.split(".").length).join(".") === pythonVersion
+            )
+        ).sort(semver.compare).at(-1)
+        if (!version) {
+            throw new Error(`Could not find a NuGet release of Python matching ${pythonVersion}`)
+        }
+        // clear any leftovers from a previous failed download
+        let download = path.join(
+            this.executablesFolder, `.${pythonVersion}.download`
+        )
+        for (let target of [folder, download]) {
+            fs.rmSync(target, { recursive: true, force: true })
+        }
+        fs.mkdirSync(this.executablesFolder, {
+            recursive: true
+        })
+        // download and extract package
+        this.output(`Downloading Python ${version} from python.org...`)
+        await downloadFolder(
+            `https://api.nuget.org/v3-flatcontainer/${pkg}/${version}/${pkg}.${version}.nupkg`,
+            this.executablesFolder,
+            path.basename(download)
+        )
+        // Python itself is in the package's tools folder, so move that into place
+        fs.renameSync(
+            path.join(download, "tools"), folder
+        )
+        fs.rmSync(download, { recursive: true, force: true })
+        this.output(`Finished installing Python ${version}.`)
+
+        return executable
+    }
+
+    /**
      * Create a Python executable for the given PsychoPy version (without any packages yet)
      * 
      * @param {string} pythonVersion Python version to use for the executable
@@ -293,10 +386,20 @@ export class UV {
                 recursive: true
             })
         }
+        // on Windows, use a signed Python from python.org so it isn't blocked by Smart App Control
+        let python = pythonVersion
+        if (platform === "win32") {
+            try {
+                python = await this.getSignedPython(pythonVersion)
+            } catch (err) {
+                // if this fails, let uv get Python itself
+                this.output(`Could not get Python ${pythonVersion} from python.org, falling back to uv: ${err?.message || err}`)
+            }
+        }
         // create venv
         try {
             await this.execTracked([
-                "venv", folder, "--python", pythonVersion, "--clear"
+                "venv", folder, "--python", python, "--clear"
             ])
         } catch (err) {
             // on Mac, we might need to install Rosetta first
@@ -313,7 +416,7 @@ export class UV {
                 )
                 // make venv again - this time with Rosetta
                 await this.execTracked([
-                    "venv", folder, "--python", pythonVersion, "--clear", "--no-config"
+                    "venv", folder, "--python", python, "--clear", "--no-config"
                 ])
             } else {
                 throw err
