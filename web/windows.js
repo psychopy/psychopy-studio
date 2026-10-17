@@ -6,6 +6,10 @@ export function createWindows(
     return {
         new: async (target) => {
             const url = new URL(target.replace(/^\//, ""), documentObject.baseURI);
+            if (windowObject.self !== windowObject.top) {
+                windowObject.location.assign(url);
+                return windowObject;
+            }
             return windowObject.open(url, "_blank");
         },
         listen: (tag, listener) => {

@@ -10,6 +10,7 @@ test("installs the web adapter when Electron is unavailable", () => {
     assert.equal(installWebRuntime(windowObject), electron);
     assert.equal(windowObject.web, electron);
     assert.equal(windowObject.electron, undefined);
+    assert.equal(typeof windowObject.git.loadProjects, "function");
 });
 
 test("does not replace an existing web adapter", () => {
@@ -22,9 +23,11 @@ test("does not replace an existing web adapter", () => {
 
 test("does not overwrite Electron's adapter", () => {
     const existing = {};
-    const windowObject = { electron: existing };
+    const existingGit = {};
+    const windowObject = { electron: existing, git: existingGit };
 
     assert.equal(installWebRuntime(windowObject), existing);
     assert.equal(windowObject.electron, existing);
+    assert.equal(windowObject.git, existingGit);
     assert.equal(windowObject.web, undefined);
 });
