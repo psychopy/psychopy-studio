@@ -5,6 +5,7 @@ import { getPlatform } from "./platform.js";
 import { createWindows } from "./windows.js";
 import { createState } from "./state.js";
 import { createPaths } from "./paths.js";
+import { getVersion } from "./version.js";
 
 const files = createFiles();
 const paths = createPaths();
@@ -49,8 +50,8 @@ export const electron = {
     exists: files.exists,
     stat: (file) => {},
     mkdir: (path, recursive=true) => {},
-    openDialog: (options) => {},
-    saveDialog: (options) => {},
+    openDialog: files.openDialog,
+    saveDialog: files.saveDialog,
     scandir: (root) => {},
     showItemInFolder: (folder) => {},
     openPath: (path) => {},
@@ -60,7 +61,7 @@ export const electron = {
   clipboard: createClipboard(),
   state: createState,
   system: createSystem(),
-  version: () => {},
+  version: getVersion,
   platform: getPlatform,
   quit: () => {}
 };
