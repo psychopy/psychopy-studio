@@ -6,19 +6,45 @@ import { createWindows } from "./windows.js";
 test("opens a target relative to the document base URL", async () => {
     const calls = [];
     const windowHandle = {};
+    const windowObject = {
+        open: (...args) => {
+            calls.push(args);
+            return windowHandle;
+        }
+    };
+
+    windowObject.self = windowObject;
+    windowObject.top = windowObject;
     const windows = createWindows(
-        {
-            open: (...args) => {
-                calls.push(args);
-                return windowHandle;
-            }
-        },
+        windowObject,
         { baseURI: "https://example.com/psychopy-studio/" }
     );
 
     assert.equal(await windows.new("builder/"), windowHandle);
     assert.deepEqual(calls, [
         [new URL("https://example.com/psychopy-studio/builder/"), "_blank"]
+    ]);
+});
+
+test("opens a target inside the current iframe", async () => {
+    const calls = [];
+    const parentWindow = {};
+    const windowObject = {
+        location: {
+            assign: (url) => calls.push(url)
+        }
+    };
+
+    windowObject.self = windowObject;
+    windowObject.top = parentWindow;
+    const windows = createWindows(
+        windowObject,
+        { baseURI: "https://example.com/psychopy-studio/" }
+    );
+
+    assert.equal(await windows.new("builder/"), windowObject);
+    assert.deepEqual(calls, [
+        new URL("https://example.com/psychopy-studio/builder/")
     ]);
 });
 
