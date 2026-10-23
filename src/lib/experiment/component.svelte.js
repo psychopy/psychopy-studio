@@ -22,7 +22,7 @@ export class Component extends HasParams {
         // get frame rate if possible
         let fr
         if (this.exp && !this.exp.settings?.params?.['measureFrameRate']?.val) {
-            fr = parseInt(this.exp.settings.params['frameRate']?.val || 60)
+            fr = parseInt(this.exp.settings?.params['frameRate']?.val || 60)
         } else {
             // if measured on the fly, assume 60 for display purposes
             fr = 60;
@@ -61,7 +61,7 @@ export class Component extends HasParams {
         // get frame rate if possible
         let fr
         if (this.exp && !this.exp.settings?.params?.['measureFrameRate']?.val) {
-            fr = parseInt(this.exp.settings.params['frameRate']?.val || 60)
+            fr = parseInt(this.exp.settings?.params['frameRate']?.val || 60)
         } else {
             // if measured on the fly, assume 60 for display purposes
             fr = 60;

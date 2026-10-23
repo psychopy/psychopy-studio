@@ -5,7 +5,7 @@
     import { Button } from '$lib/utils/buttons';
     import { getContext } from "svelte";
     import Dialog from "$lib/utils/dialog/Dialog.svelte";
-    import { profiles, pending } from "$lib/experiment/profiles.svelte";
+    import { profiles } from "$lib/experiment/profiles.svelte";
     import { translate } from "$lib/translation";
     
     let current = getContext("current");
@@ -47,12 +47,12 @@
     <Menu 
         bind:shown={showMenu}
     >
-        {#await pending.loops.promise}
+        {#await profiles.loops.pending.promise}
             <MenuItem 
                 label={translate("Loading loops...")}
             />
-        {:then loops}
-            {#each Object.entries(loops) as [loopType, loopProfile]}
+        {:then}
+            {#each Object.entries(profiles.loops.value) as [loopType, loopProfile]}
                 {#if !loopProfile.hidden}
                     <MenuItem 
                         label={translate("New {}...").replace("{}", loopProfile.label?.toLowerCase?.() || loopType)}
@@ -66,6 +66,10 @@
                     />
                 {/if}
             {/each}
+        {:catch}
+            <MenuItem 
+                label={translate("Failed to load loops")}
+            />
         {/await}
     </Menu>
 

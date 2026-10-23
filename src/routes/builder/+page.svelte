@@ -44,14 +44,17 @@
         $effect(() => {
             electron.state.updateFrame(
                 {
-                    files: [current.experiment?.file?.file]
+                    // if still loading a file, store that file rather than the blank experiment
+                    files: [(current.experiment?.loading || current.experiment?.file)?.file]
                 }
             )
         })
     }
 </script>
 
-{#if current.experiment.file}
+{#if current.experiment.loading}
+    <title>{translate("PsychoPy Builder")}: {translate("Loading {}...").replace("{}", current.experiment.loading.name)}</title>
+{:else if current.experiment.file}
     <title>{translate("PsychoPy Builder")}: {current.experiment.file?.name}</title>
 {:else}
     <title>{translate("PsychoPy Builder")}</title>

@@ -10,6 +10,10 @@
         if (!experiment?.needsKeyboardAccess) {
             return
         }
+        // skip until any file has finished loading
+        if (experiment?.loading || !experiment?.file) {
+            return
+        }
         // skip if already asked
         if (experiment?.prompts?.keyboardAccess) {
             return

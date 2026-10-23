@@ -7,6 +7,7 @@ import { Routine, StandaloneRoutine } from "./routine.svelte";
 import { Component } from "./component.svelte";
 import { Flow, LoopInitiator } from "./flow.svelte";
 import { setupPython } from "$lib/python";
+import { ready as profilesReady } from "./profiles.svelte";
 
 
 export class Experiment {
@@ -20,7 +21,11 @@ export class Experiment {
             routine => routine.valid
         )
     )
+    /** experiment settings, undefined until profiles are available (see `ready`) */
+    settings = $state.raw(undefined)
     file = $state(undefined)
+    /** file currently being loaded into this experiment (if any) */
+    loading = $state.raw(undefined)
     running = $state.raw(undefined)
 
     /** keep track of any prompts which have already been prompted for this experiment */
@@ -166,8 +171,6 @@ export class Experiment {
      */
     constructor(filename) {
         // create attributes
-        this.settings = new Component("SettingsComponent")
-        this.settings.exp = this
         this.flow = new Flow(this);
         // starting defaults
         this.reset()
@@ -175,6 +178,28 @@ export class Experiment {
         if (filename) {
             this.file = parsePath(filename);
         }
+        // resolves once profiles are available and settings have been created
+        this.ready = profilesReady.then(() => {
+            this.settings = new Component("SettingsComponent")
+            this.settings.exp = this
+            // add a default Routine, if nothing has been added in the meantime
+            if (!Object.keys(this.routines).length) {
+                this.addDefaultRoutine()
+            }
+        })
+        // failure to get profiles is already logged, so just mark as handled here
+        this.ready.catch(err => {})
+    }
+
+    /**
+     * Add a blank Routine called "trial" to this Experiment and its flow (requires profiles to 
+     * be available)
+     */
+    addDefaultRoutine() {
+        this.routines['trial'] = new Routine();
+        this.routines['trial'].exp = this;
+        this.routines['trial'].settings.params['name'].val = "trial";
+        this.flow.flat.push(this.routines['trial'])
     }
 
     /**
@@ -283,18 +308,15 @@ export class Experiment {
         if (!keepHistory) {
             this.history.clear()
         }
-        // reset settings
-        this.settings.reset()
+        // reset settings (if they've been created yet)
+        this.settings?.reset()
         // remove all routines
         Object.keys(this.routines).forEach((key) => delete this.routines[key])
         // clear the flow
         this.flow.clear()
-        // add a default routine
-        if (defaultRoutine) {
-            this.routines['trial'] = new Routine();
-            this.routines['trial'].exp = this;
-            this.routines['trial'].settings.params['name'].val = "trial";
-            this.flow.flat.push(this.routines['trial'])
+        // add a default routine (if profiles are available, otherwise it's added once they are)
+        if (defaultRoutine && this.settings) {
+            this.addDefaultRoutine()
         }
     }
 
@@ -323,13 +345,15 @@ export class Experiment {
         }
         // search settings
         results.push(
-            ...this.settings.search()
+            ...(this.settings?.search() || [])
         )
 
         return results
     }
 
     async needsKeyboardAccess() {
+        // wait for settings
+        await this.ready
         // we always need this for ioHub or ptb
         if (
             this.settings.params['useLegacyKeyboard']?.val 
@@ -361,7 +385,7 @@ export class Experiment {
         return false
     }
 
-    pilotMode = $derived(![true, "true", "True", 1, "1"].includes(this.settings.params['runMode']?.val))
+    pilotMode = $derived(![true, "true", "True", 1, "1"].includes(this.settings?.params['runMode']?.val))
 
     getPilotMode() {
         return this.settings.params['runMode'].val
@@ -377,7 +401,7 @@ export class Experiment {
     }
 
     useVersion = $derived(
-        this.settings.params['Use version'].val || "app"
+        this.settings?.params['Use version'].val || "app"
     )
 
     /**
@@ -403,7 +427,7 @@ export class Experiment {
         let node = {
             filename: this.file.file,
             version: this.version,
-            settings: this.settings.toJSON(),
+            settings: this.settings?.toJSON(),
             routines: {},
             flow: this.flow.toJSON(),
         };
@@ -532,21 +556,32 @@ export class Experiment {
         if (typeof file === "string") {
             file = parsePath(file)
         }
-        // read text content from file
-        let content
-        if (electron) {
-            content = await electron.files.load(file.file)
-        } else {
-            // without electron, file needs to have a handle (from a UI interaction)
-            content = await file.handle.text()
+        // mark as loading
+        this.loading = file
+        try {
+            // read text content from file
+            let content
+            if (electron) {
+                content = await electron.files.load(file.file)
+            } else {
+                // without electron, file needs to have a handle (from a UI interaction)
+                content = await file.handle.text()
+            }
+            // wait for settings
+            await this.ready
+            // load from content
+            this.fromXML(content)
+            // store file
+            this.file = file
+        } finally {
+            // mark as no longer loading
+            this.loading = undefined
         }
-        // load from content
-        this.fromXML(content)
-        // store file
-        this.file = file
     }
 
     async toFile(file) {
+        // wait for settings
+        await this.ready
         // get experiment as xml
         let node = this.toXML()
         // convert to an xml string
@@ -749,6 +784,8 @@ export class Experiment {
      * @param {boolean} compile If true, compile the experiment to JS before running
      */
     async runJS(compile=true) {
+        // wait for settings
+        await this.ready
         // compile first if requested
         let target
         if (compile) {

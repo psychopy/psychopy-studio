@@ -141,15 +141,16 @@
             icon="/icons/btn-settings.svg" 
             label={translate("Experiment settings")} 
             onclick={(evt) => show.settingsDlg = true}
-            disabled={current.experiment === null}
+            disabled={!current.experiment.settings}
             borderless
         />
-        {#if current.experiment !== null }
+        {#await current.experiment.ready then}
             <ParamsDialog
                 element={current.experiment.settings}
                 bind:shown={show.settingsDlg}
             />
-        {/if}
+        {:catch}
+        {/await}
         <SwitchButton 
             labels={[translate("Pilot"), translate("Run")]} 
             tooltip={current.experiment?.pilotMode ? "Experiment will run in pilot mode" : "Experiment will run in run mode"}

@@ -8,7 +8,7 @@
     import { Device, Param } from "$lib/experiment"
     import { setContext } from "svelte";
     import { devices, python } from "$lib/globals.svelte";
-    import { pending as profilesPending, profiles } from "$lib/experiment/profiles.svelte";
+    import { profiles, refresh } from "$lib/experiment/profiles.svelte";
     import { translate } from "$lib/translation";
 
     let {
@@ -24,19 +24,6 @@
     let panelsOpen = $state({})
 
     let timeout = $state.raw(60000)
-
-    function refresh(evt) {
-        profilesPending.devices.resolve(
-            python.liaison.send("app", {
-                command: "run",
-                args: [
-                    "psychopy.experiment:getDeviceProfiles"
-                ]
-            }).then(
-                resp => Object.assign(profiles.devices, resp)
-            )
-        )
-    }
 
     let disableBtns = $derived({
         OK: !param.valid.value || !selection
@@ -81,17 +68,17 @@
             <CompactButton
                 icon="/icons/btn-refresh.svg"
                 tooltip={translate("Refresh")}
-                onclick={refresh}
+                onclick={evt => refresh("devices")}
             />
         </div>
         <div class=devices-list>
-            {#await profilesPending.devices.promise}
+            {#await profiles.devices.pending.promise}
                 <div class=loading-msg>
                     {translate("Getting device backends...")}
                 </div>
             {:then}
-                {#if profiles.devices}
-                    {#each Object.values(profiles.devices).filter(profile => profile.device) as backend}
+                {#if profiles.devices.value}
+                    {#each Object.values(profiles.devices.value).filter(profile => profile.device) as backend}
                         {#await python.liaison.send("app", {
                             command: "run",
                             args: ["psychopy.hardware.manager:DeviceManager.getAvailableDevices", sanitizeImportString(backend.device)]
@@ -134,7 +121,7 @@
                                     <CompactButton
                                         icon="/icons/btn-refresh.svg"
                                         tooltip={translate("Retry")}
-                                        onclick={refresh}
+                                        onclick={evt => refresh("devices")}
                                     />
                                 </div>
                             </div>

@@ -33,15 +33,26 @@
     <Menu 
         bind:shown={showMenu}
     >
-        <MenuItem 
-            label={translate("New Routine...")}
-            onclick={() => {
-                // create blank Routine
-                current.inserting = new Routine()
-                // show dialog
-                showNewRoutineDialog = true
-            }}
-        />
+        <!-- creating a Routine needs profiles, so wait for them -->
+        {#await current.experiment.ready}
+            <MenuItem 
+                label={translate("Loading Routines...")}
+            />
+        {:then}
+            <MenuItem 
+                label={translate("New Routine...")}
+                onclick={() => {
+                    // create blank Routine
+                    current.inserting = new Routine()
+                    // show dialog
+                    showNewRoutineDialog = true
+                }}
+            />
+        {:catch}
+            <MenuItem 
+                label={translate("Failed to load Routines")}
+            />
+        {/await}
         {#each Object.entries(current.experiment.routines) as [name, routine]}
         <MenuItem 
             label={name}

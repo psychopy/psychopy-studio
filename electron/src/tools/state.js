@@ -10,7 +10,8 @@ const lastStateFile = path.join(
 
 // object storing details of current app state
 export var state = {
-  frames: {}
+  frames: {},
+  profiles: {}
 }
 
 /**
@@ -51,6 +52,26 @@ export function updateFrame(id, details) {
 }
 
 /**
+ * Store the last received value for a set of element profiles, and save to file
+ * 
+ * @param {string} key Which set of profiles these are (e.g. "components", "loops", "devices")
+ * @param {object} value Profiles as received from Python
+ */
+export function setProfiles(key, value) {
+    state.profiles[key] = value
+    saveState()
+}
+
+/**
+ * Get the last received values for each set of element profiles
+ * 
+ * @returns {object} Object of profiles keyed by set (e.g. "components", "loops", "devices")
+ */
+export function getProfiles() {
+    return state.profiles
+}
+
+/**
  * Save current app state to JSON file
  */
 export function saveState() {
@@ -67,7 +88,8 @@ if (!fs.existsSync(lastStateFile)) {
 
 // load last state from file
 export var lastState = {
-    frames: {}
+    frames: {},
+    profiles: {}
 };
 try {
     Object.assign(
@@ -79,10 +101,15 @@ try {
 } catch (err) {
     console.error("Failed to load previous app state.", err)
 }
+// carry over last received profiles, so they're preserved even if not received again this session
+Object.assign(state.profiles, lastState.profiles)
 
 
 export const handlers = {
     updateFrame: ipcMain.handle("electron.state.updateFrame", (evt, details) => updateFrame(evt.sender.id, details)),
+    setProfiles: ipcMain.handle("electron.state.setProfiles", (evt, key, value) => setProfiles(key, value)),
+    // synchronous so that profiles are available as soon as a window loads
+    getProfiles: ipcMain.on("electron.state.getProfiles", (evt) => { evt.returnValue = getProfiles() }),
 }
 
 
@@ -91,5 +118,7 @@ export default {
     newFrame: newFrame,
     updateFrame: updateFrame,
     closeFrame: closeFrame,
+    setProfiles: setProfiles,
+    getProfiles: getProfiles,
     saveState: saveState
 }

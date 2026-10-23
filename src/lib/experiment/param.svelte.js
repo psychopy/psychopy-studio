@@ -370,19 +370,19 @@ export class HasParams {
     reset() {
         // get template
         let template;
-        if (this.tag in profiles.components) {
-            template = profiles.components[this.tag];
-        } else if (this.tag in profiles.loops) {
-            template = profiles.loops[this.tag];
-        } else if (this.tag in profiles.devices) {
-            template = profiles.devices[this.tag];
+        if (this.tag in profiles.components.value) {
+            template = profiles.components.value[this.tag];
+        } else if (this.tag in profiles.loops.value) {
+            template = profiles.loops.value[this.tag];
+        } else if (this.tag in profiles.devices.value) {
+            template = profiles.devices.value[this.tag];
         } else if (this.tag === "Preferences") {
-            template = profiles.preferences;
+            template = profiles.preferences.value;
         } else {
             console.warn(
                 `Failed to find template for ${this.tag}, reverting to UnknownComponent`
             );
-            template = profiles.components["UnknownComponent"];
+            template = profiles.components.value["UnknownComponent"];
         }
         // set class
         this.__class__ = template?.__class__;

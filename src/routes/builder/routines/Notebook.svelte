@@ -23,6 +23,13 @@
 </script>
 
 <Notebook>
+    {#snippet placeholder()}
+        {#if current.experiment.loading}
+            <div class=loading-msg>
+                {translate("Loading {}...").replace("{}", current.experiment.loading.name)}
+            </div>
+        {/if}
+    {/snippet}
     {#if current.experiment !== null}
         {#each Object.entries(current.experiment.routines) as [name, routine]}
             <NotebookPage 
@@ -49,15 +56,19 @@
             </NotebookPage>
         {/each}
     {/if}
-    <ButtonTab
-        callback={(evt) => {
-            // create blank Routine
-            current.inserting = new Routine()
-            // show dialog
-            showNewRoutineDialog = true
-        }}
-        tooltip={translate("New Routine...")}
-    ></ButtonTab>
+    <!-- creating a Routine needs profiles, so wait for them -->
+    {#await current.experiment.ready then}
+        <ButtonTab
+            callback={(evt) => {
+                // create blank Routine
+                current.inserting = new Routine()
+                // show dialog
+                showNewRoutineDialog = true
+            }}
+            tooltip={translate("New Routine...")}
+        ></ButtonTab>
+    {:catch}
+    {/await}
 </Notebook>
 
 <!-- dialog for creating a new Routine -->
@@ -88,3 +99,8 @@
         ></ParamsNotebook>
     </Dialog>
 {/if}
+<style>
+    .loading-msg {
+        color: var(--outline);
+    }
+</style>

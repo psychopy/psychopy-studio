@@ -5,7 +5,7 @@
     import { Device } from "$lib/experiment";
     import { devices, electron } from "$lib/globals.svelte";
     import AddDeviceDialog from "./addDevice/AddDeviceDialog.svelte";
-    import { pending } from "$lib/experiment/profiles.svelte";
+    import { profiles } from "$lib/experiment/profiles.svelte";
     import { onMount } from "svelte";
     import { translate } from "$lib/translation";
 
@@ -51,7 +51,12 @@
             return
         }
         // wait for Python to have started so we have necessary class defs
-        await pending.devices.promise
+        try {
+            await profiles.devices.pending.promise
+        } catch (err) {
+            console.error("Can't load devices as device profiles failed to load.", err)
+            return
+        }
         // get devices file path
         let file = await electron.paths.devices();
         // make sure devices.json exists

@@ -22,7 +22,7 @@
             let deviceTypes = []
             for (let target of param.allowedVals) {
                 deviceTypes.push(
-                    ...Object.values(profiles.devices).filter(
+                    ...Object.values(profiles.devices.value).filter(
                         profile => target.endsWith(profile.__class__)
                     ).map(
                         profile => profile.label || profile.__name__

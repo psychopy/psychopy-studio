@@ -17,10 +17,12 @@
 
 
 {#if shown}
-    {#await python.uv.python({
-        python: "3.10",
-        psychopy: current.experiment.settings.params['Use version']?.val
-    })}
+    {#await current.experiment.ready.then(
+        () => python.uv.python({
+            python: "3.10",
+            psychopy: current.experiment.settings.params['Use version']?.val
+        })
+    )}
         <MessageDialog
             id=install-prompt
             bind:shown={shown}
@@ -28,7 +30,7 @@
                 CANCEL: (evt) => {},
             }}
         >
-            {translate("Installing PsychoPy {}...").replace("{}", current.experiment.settings.params['Use version']?.val)}
+            {translate("Installing PsychoPy {}...").replace("{}", current.experiment.settings?.params['Use version']?.val)}
         </MessageDialog>
     {:then executable}
         {#await action(executable)}

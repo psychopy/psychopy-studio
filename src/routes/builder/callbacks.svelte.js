@@ -64,7 +64,11 @@ async function revealFolder() {
 }
 
 
-async function file_save() {
+export async function file_save() {
+    // can't save while a file is still loading
+    if (current.experiment.loading) {
+        return
+    }
     // diverge here based on whether there is a current file...
     if (current.experiment.file.file) {
         current.experiment.toFile(
@@ -77,7 +81,11 @@ async function file_save() {
     }
 }
 
-async function file_save_as() {
+export async function file_save_as() {
+    // can't save while a file is still loading
+    if (current.experiment.loading) {
+        return
+    }
     // open file browser
     let file = await browseFileSave(
         [
@@ -233,7 +241,9 @@ async function pasteComponent(routine, index) {
 /* Run */
 
 
-function togglePiloting() {
+export async function togglePiloting() {
+    // wait for settings
+    await current.experiment.ready
     // update history
     current.experiment.history.update(`toggle pilot mode`)
     // toggle pilot mode
@@ -355,12 +365,12 @@ export default {
     ),
     save: new Callback(
         file_save,
-        () => !current.experiment.valid || (!current.experiment.history.past.length && current.experiment.file.file),
+        () => current.experiment.loading || !current.experiment.valid || (!current.experiment.history.past.length && current.experiment.file.file),
         "save"
     ),
     saveAs: new Callback(
         file_save_as,
-        () => !current.experiment.valid,
+        () => current.experiment.loading || !current.experiment.valid,
         "saveAs"
     ),
     close: new Callback(close, undefined, "close"),
@@ -377,7 +387,7 @@ export default {
     ),
     togglePiloting: new Callback(
         togglePiloting,
-        () => current.experiment === null,
+        () => !current.experiment?.settings,
         "togglePiloting"
     ),
     sendToRunner: new Callback(

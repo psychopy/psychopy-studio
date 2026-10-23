@@ -46,7 +46,9 @@ const electron = {
     set: (value) => ipcRenderer.invoke("electron.clipboard.set", value).then(resp => resp)
   },
   state: {
-    updateFrame: (details) => ipcRenderer.invoke("electron.state.updateFrame", details).then(resp => resp)
+    updateFrame: (details) => ipcRenderer.invoke("electron.state.updateFrame", details).then(resp => resp),
+    setProfiles: (key, value) => ipcRenderer.invoke("electron.state.setProfiles", key, value).then(resp => resp),
+    getProfiles: () => ipcRenderer.sendSync("electron.state.getProfiles")
   },
   system: {
     requestKeyboardAccess: () => ipcRenderer.invoke("electron.system.requestKeyboardAccess").then(resp => resp),
