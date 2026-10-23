@@ -15,7 +15,7 @@ export class UV {
     folderSpecified = Promise.withResolvers();
 
     // defines the version of UV to install
-    version = "0.12.5"
+    version = "0.12.12"
 
     /**
      * Choose a folder for the given directory option according to the current OS.
@@ -99,7 +99,7 @@ export class UV {
      */
     get executable() {
         return path.join(
-            this.uvFolder, "uv"
+            this.uvFolder, "uv" + (platform === "win32" ? ".exe" : "")
         )
     }
 
@@ -264,7 +264,23 @@ export class UV {
         try {
             return this.execSync(["python", "find", `"${folder}"`])
         } catch (err) {
-            // if this fails, return undefined (as there is none)
+            // a block from Windows Smart App Control can be dealt with
+            if (platform === "win32" && err.stderr?.toString().match(/\(os error (4551|4556)\)/)) {
+                // log that Python was blocked
+                this.output(
+                    "Launching Python was blocked by Windows Smart App Control. Reinstalling Python and trying again."
+                )
+                // reinstall Python
+                await this.execTracked(["python", "install", "--force", "--reinstall"])
+                // try finding again
+                try {
+                    return this.execSync(["python", "find", `"${folder}"`])
+                } catch {
+                    // if we still can't find anything, it's probably genuinely not there
+                    return
+                }
+            }
+            // anything else, assume it means Python isn't there
             return
         }
     }

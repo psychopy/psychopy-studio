@@ -14,9 +14,11 @@ export class PythonVenv {
     /**
      * Use `PythonVenv.create` rather than calling this directly, as some setup needs to be async.
      */
-    constructor(pythonVersion="3.10", psychopyVersion=appVersion) {
+    constructor(pythonVersion="3.10", psychopyVersion=appVersion, prerelease=false) {
         this.pythonVersion = pythonVersion
         this.psychopyVersion = psychopyVersion
+        // which dogfood build we're running, if any ("release", "dev" or false)
+        this.prerelease = prerelease
         // populated by `create` or `setup`
         this.executable = undefined
         // stores refs to running liaison, scripts and shells
@@ -31,13 +33,14 @@ export class PythonVenv {
      *
      * @param {string} pythonVersion Python version to use
      * @param {string} psychopyVersion Target PsychoPy version
+     * @param {"release"|"dev"|undefined} prerelease Branch to install unreleased psychopy-lib from, or undefined for a released version
      * @returns {Promise<PythonVenv>}
      */
-    static async create(pythonVersion="3.10", psychopyVersion=appVersion) {
+    static async create(pythonVersion="3.10", psychopyVersion=appVersion, prerelease=false) {
         // resolve asterisks
         psychopyVersion = await resolvePackageVersion(psychopyVersion, "psychopy")
         // make venv object
-        let venv = new PythonVenv(pythonVersion, psychopyVersion)
+        let venv = new PythonVenv(pythonVersion, psychopyVersion, prerelease)
         // try to get Python executable
         venv.executable = await uv.findPython(psychopyVersion)
         // if another venv object was stored while we awaited, use that so refs to it aren't orphaned
@@ -101,9 +104,11 @@ export class PythonVenv {
     /**
      * Setup this virtual environment; make sure it exists and install necessary packages.
      * 
-     * @param {boolean} prerelease Whether to allow unreleased versions of psychopy-lib
+     * @param {"release"|"dev"|false} prerelease Branch to install unreleased psychopy-lib from, or undefined for a released version
      */
     async setup(prerelease=false) {
+        // remember prerelease setting so the venv can be recreated the same way
+        this.prerelease = prerelease
         // make an executable if there isn't one
         if (!this.executable) {
             this.executable = await uv.makeExecutable(
@@ -351,6 +356,35 @@ export class PythonVenv {
         ].join("\n")], { encoding: "utf8" })
 
         return resp.trim() !== "1"
+    }
+
+    /**
+     * Check whether Windows Smart App Control (or another application control policy) is stopping this
+     * environment's Python from launching at all
+     *
+     * @returns {boolean} `true` if Python couldn't be launched on Windows, `false` otherwise
+     */
+    isBlocked() {
+        if (process.platform !== "win32" || !this.executable || !fs.existsSync(this.executable)) {
+            return false
+        }
+        // run without a shell, so a launch failure shows up as a spawn error rather than a nonzero exit code
+        let resp = proc.spawnSync(this.executable, ["--version"], { timeout: 10000 })
+        // if Python ran (even if it then failed), it wasn't blocked
+        return Boolean(resp.error) && resp.error.code !== "ETIMEDOUT"
+    }
+
+    /**
+     * Delete and recreate this environment, then reinstall its packages
+     */
+    async recreate() {
+        // remake the venv (uses --clear)
+        this.executable = await uv.makeExecutable(
+            this.psychopyVersion,
+            this.pythonVersion
+        )
+        // reinstall packages
+        await this.setup(this.prerelease)
     }
 
     /**

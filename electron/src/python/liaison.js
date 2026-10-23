@@ -42,11 +42,29 @@ export class Liaison {
         // mark started
         this.started = true
         // get liaison constants
-        this.constants = JSON.parse(
-            this.venv.execSync([
+        let constants
+        try {
+            constants = this.venv.execSync([
                 "-m", "liaison.constants"
             ], 10000)
-        )
+        } catch (err) {
+            // a block from Windows Smart App Control can be dealt with
+            if (this.venv.isBlocked()) {
+                // log that Python was blocked
+                logging.log(
+                    "Launching Python was blocked by Windows Smart App Control. Recreating Python environment and trying again."
+                )
+                // recreate the environment
+                await this.venv.recreate()
+                // try again (if this fails, let it error)
+                constants = this.venv.execSync([
+                    "-m", "liaison.constants"
+                ], 10000)
+            } else {
+                throw err
+            }
+        }
+        this.constants = JSON.parse(constants)
         // get a safe address
         this.address = await getSafeAddress()
         // log start
