@@ -354,7 +354,7 @@ export class Experiment {
             return true
         }
         // if the gil is enabled, we always need keyboard permission
-        if (await python.venv.hasGIL(this.useVersion)) {
+        if (python && await python.venv.hasGIL(this.useVersion)) {
             return true
         }
 

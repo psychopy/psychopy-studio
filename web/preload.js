@@ -1,3 +1,15 @@
+import { createClipboard } from "./clipboard.js";
+import { createSystem } from "./system.js";
+import { createFiles } from "./files.js";
+import { getPlatform } from "./platform.js";
+import { createWindows } from "./windows.js";
+import { createState } from "./state.js";
+import { createPaths } from "./paths.js";
+import { getVersion } from "./version.js";
+
+const files = createFiles();
+const paths = createPaths();
+const windows = createWindows();
 
 /**
  * Treat this file as a hitlist for functions which the web-only version of PsychoPy Studio should expose to the front-end. 
@@ -9,11 +21,11 @@
 
 export const electron = {
   windows: {
-    new: (target) => {},
+    new: (target) => windows.new,
     get: (target) => {},
     send: (id, tag, data) => {},
-    emit: (tag, data) => {},
-    listen: (tag, lsnr) => {},
+    emit: (tag, data) => windows.emit,
+    listen: (tag, lsnr) => windows.listen,
     focus: (id) => {},
     devtools: (id) => {},
     close: (id) => {},
@@ -25,7 +37,7 @@ export const electron = {
     documents: () => {},
     user: () => {},
     devices: () => {},
-    prefs: () => {},
+    prefs: paths.prefs,
     pavlovia: {
       dir: () => {},
       users: () => {},
@@ -33,32 +45,24 @@ export const electron = {
     }
   },
   files: {
-    load: (file) => {},
-    save: (file, content) => {},
-    exists: (file) => {},
+    load: files.load,
+    save: files.save,
+    exists: files.exists,
     stat: (file) => {},
     mkdir: (path, recursive=true) => {},
-    openDialog: (options) => {},
-    saveDialog: (options) => {},
+    openDialog: files.openDialog,
+    saveDialog: files.saveDialog,
     scandir: (root) => {},
     showItemInFolder: (folder) => {},
     openPath: (path) => {},
-    openExternal: (url) => {},
+    openExternal: (url) => files.openExternal,
     downloadFolder: (url, target, name) => {}
   },
-  clipboard: {
-    get: () => {},
-    set: (value) => {}
-  },
-  state: {
-    updateFrame: (details) => {}
-  },
-  system: {
-    requestKeyboardAccess: () => {},
-    hasKeyboardAccess: () => {}
-  },
-  version: () => {},
-  platform: () => {},
+  clipboard: createClipboard(),
+  state: createState,
+  system: createSystem(),
+  version: getVersion,
+  platform: getPlatform,
   quit: () => {}
 };
 
