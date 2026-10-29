@@ -32,6 +32,8 @@
         affirmative=false,
         /** @prop @type {boolean} Is this button a negative response? */
         negative=false,
+        /** @prop @type {boolean} Stretch button to fit its container? */
+        stretch=false,
         /** @prop @type {boolean} Reduce padding around this button's contents? */
         tight=false,
         /** @prop @type {boolean} No background and only show border when hovered (looks better in the ribbon) */
@@ -81,6 +83,7 @@
         class:horizontal={layout === "horizontal"}
         class:small={size === "small"}
         class:large={size === "large"}
+        class:stretch
         class:tight
         class:ghost
         class:depressed
@@ -232,6 +235,11 @@
     /* Tight */
     button.tight {
         padding: .25rem;
+    }
+
+    /* Stretch */
+    button.stretch {
+        width: auto;
     }
 
     /* Ghost */

@@ -6,18 +6,21 @@
     import ManageProjectsDlg from "$lib/dialogs/projects/manage/ManageProjectsDlg.svelte";
     import NewProjectDlg from "./NewProjectDlg.svelte";
     import { translate } from "$lib/translation";
-    import BrowseDemosDlg from "$lib/pavlovia/browseProjects/BrowseDemosDlg.svelte";
+    import { BrowseDemosDlg } from "$lib/pavlovia/demos";
+    import { SearchProjectsDlg } from "$lib/pavlovia/search";
 
     let current = getContext("current")
 
     let show = $state({
         newProjectDlg: false,
         manageProjectsDlg: false,
-        browseProjectsDlg: false
+        browseDemosDlg: false,
+        searchProjectsDlg: false,
     })
     let awaiting = $state({
         newProjectDlg: Promise.withResolvers(),
-        browseProjectsDlg: Promise.withResolvers()
+        browseDemosDlg: Promise.withResolvers(),
+        searchProjectsDlg: Promise.withResolvers(),
     })
 
     // refresh project when experiment or user changes
@@ -73,13 +76,13 @@
     <MenuItem 
         label={translate("Browse demos")}
         icon="/icons/btn-demos.svg" 
-        onclick={evt => show.browseProjectsDlg = true}
+        onclick={evt => show.browseDemosDlg = true}
         borderless
     />
     <MenuItem
         label={translate("Search projects")}
         icon="/icons/btn-find.svg"
-        onclick={(evt) => window.open("https://pavlovia.org/explore", "_blank")}
+        onclick={(evt) => show.searchProjectsDlg = true}
     />
 </DropdownButton>
 
@@ -91,6 +94,10 @@
     bind:awaiting={awaiting.newProjectDlg}
 />
 <BrowseDemosDlg
-    bind:shown={show.browseProjectsDlg}
-    bind:awaiting={awaiting.browseProjectsDlg}
+    bind:shown={show.browseDemosDlg}
+    bind:awaiting={awaiting.browseDemosDlg}
+/>
+<SearchProjectsDlg
+    bind:shown={show.searchProjectsDlg}
+    bind:awaiting={awaiting.searchProjectsDlg}
 />

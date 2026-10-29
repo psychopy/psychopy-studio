@@ -9,7 +9,7 @@
     import { electron, python, git } from "$lib/globals.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
-    import BrowseDemosDlg from "$lib/pavlovia/browseProjects/BrowseDemosDlg.svelte";
+    import { BrowseDemosDlg } from "$lib/pavlovia/demos";
     import { projectsLoaded, openProject } from "$lib/pavlovia/utils.svelte";
     import semver from "semver";
     import { translate } from "$lib/translation";

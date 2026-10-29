@@ -1,13 +1,14 @@
 <script>
     import { setContext } from "svelte";
     import { PanelButton } from "$lib/ui/button";
-    import { translate } from "$lib/translation";
 
     let {
-        /** @prop @type {((term: string, data: object) => boolean)|undefined} If items are searchable, a function which takes the search query and an item's data and returns whether the item matches */
-        search=undefined,
-        /** @prop @type {string} Search term (ignored if not searchable) */
-        searchTerm=$bindable(),
+        /** @prop @type {object|undefined} Parameters to use for filtering; bind to this to read/set them from outside */
+        params=$bindable(),
+        /** @prop @type {((params: object, data: object) => boolean)|undefined} Function which takes an item's data along with an object of optional parameters, then returns whether it should be shown */
+        filter=(params, data) => true,
+        /** @prop @type {Snippet|undefined} Snippet for optional other controls; it receives a parameters object so can bind to it */
+        ctrls=undefined,
         /** @prop @type {Snippet} */
         children
     } = $props()
@@ -19,14 +20,17 @@
         items: []
     })
     setContext("siblings", items)
-
+    // assign defaults if not given any params
+    if (params === undefined) {
+        params = { 
+            searchTerm: "" 
+        }
+    }
     // if we have a search function, update shown items according to it
     $effect(() => {
-        if (search) {
-            // set each item's shown state according to results of search function
-            for (let i in items.items) {
-                items.items[i].shown = search(searchTerm || "", items.items[i].data)
-            }
+        // set each item's shown state according to results of search function
+        for (let i in items.items) {
+            items.items[i].shown = filter(params, items.items[i].data)
         }
     })
 
@@ -68,15 +72,8 @@
 
 <div class=list-detail-ctrl>
     <div class=list-panel>
-        {#if search}
-            <input 
-                type="search"
-                class=search-ctrl
-                placeholder={translate("Search...")}
-                aria-label={translate("Search")}
-                bind:value={searchTerm}
-            />
-        {/if}
+        {@render ctrls?.(params)}
+
         <div class=items-list>
             {#each sortByCateg(
                 items.items.filter(item => item.shown)
@@ -124,6 +121,8 @@
         flex-direction: column;
         overflow-y: auto;
         gap: .5rem;
+    }
+    .items-list .items-list {
         padding: .5rem;
     }
     .details-panel {

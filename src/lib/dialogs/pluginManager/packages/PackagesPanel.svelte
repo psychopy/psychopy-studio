@@ -1,6 +1,7 @@
 <script>
     import PackageItem from "./PackageItem.svelte";
     import { ListDetail, ListDetailCategory, ListDetailItem } from "$lib/ui/listdetail";
+    import { SearchCtrl } from "$lib/ui/input";
     import { python } from "$lib/globals.svelte";
     import { translate } from "$lib/translation"
 
@@ -33,9 +34,16 @@
 </script>
 
 <ListDetail
-    search={(term, data) => data.name.toLowerCase().includes(term.toLowerCase()) || term === ""}
-    bind:searchTerm={searchTerm}
+    filter={(params, data) => data.name.toLowerCase().includes(params.searchTerm.toLowerCase()) || params.searchTerm === ""}
 >
+    {#snippet ctrls(params)}
+        <SearchCtrl 
+            bind:value={params.searchTerm}
+            placeholder={translate("Search packages...")}
+            debounce=500
+        />
+    {/snippet}
+
     <ListDetailCategory
         label={translate("Installed")}
         open

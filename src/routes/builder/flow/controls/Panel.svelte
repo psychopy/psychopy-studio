@@ -17,6 +17,7 @@
         align-items: start;
         align-content: start;
         z-index: 1;
+        width: max-content;
     }
     
 </style>

@@ -1,6 +1,7 @@
 <script>
     import PluginItem from "./PluginItem.svelte";
     import { ListDetail, ListDetailCategory, ListDetailItem } from "$lib/ui/listdetail";
+    import { SearchCtrl } from "$lib/ui/input";
     import { python } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
 
@@ -22,15 +23,26 @@
 
 
 <ListDetail
-    search={(term, data) => (
-        data.name.toLowerCase().includes(term.toLowerCase()) ||
-        data.pipname.toLowerCase().includes(term.toLowerCase()) ||
-        data.description?.toLowerCase().includes(term.toLowerCase()) ||
-        data.keywords?.includes(term) ||
-        term === ""
+    filter={(params, data) => (
+        data.name.toLowerCase().includes(params.searchTerm.toLowerCase()) ||
+        data.pipname.toLowerCase().includes(params.searchTerm.toLowerCase()) ||
+        data.description?.toLowerCase().includes(params.searchTerm.toLowerCase()) ||
+        data.keywords?.includes(params.searchTerm) ||
+        params.searchTerm === ""
     )}
 >
-    {#await fetch("/api/plugins").then(resp => resp.json())}
+    {#snippet ctrls(params)}
+        <SearchCtrl 
+            bind:value={params.searchTerm}
+            placeholder={translate("Search plugins...")}
+        />
+    {/snippet}
+
+    {#await fetch(
+        "/api/plugins"
+    ).then(
+        resp => resp.json()
+    )}
         {translate("Getting plugins...")}
     {:then allPlugins}
         {#each [

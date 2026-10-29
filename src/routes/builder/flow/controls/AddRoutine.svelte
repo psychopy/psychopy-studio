@@ -27,6 +27,7 @@
         }}
         disabled={current.inserting}
         horizontal
+        stretch
     />
     
     <!-- menu for adding a Routine -->

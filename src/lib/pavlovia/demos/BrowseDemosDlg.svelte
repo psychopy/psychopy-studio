@@ -7,7 +7,7 @@
         shown=$bindable(),
         awaiting=$bindable(),
         selection=$bindable(),
-        searchTerm=$bindable()
+        params=$bindable()
     } = $props()
 
 </script>
@@ -22,6 +22,6 @@
 >
     <BrowseDemos 
         bind:selection={selection}
-        bind:searchTerm={searchTerm}
+        bind:params={params}
     />
 </Dialog>

@@ -1,11 +1,12 @@
 <script>
     import ProjectPanel from "../ProjectPanel.svelte";
     import { ListDetail, ListDetailItem, ListDetailCategory } from "$lib/ui/listdetail";
+    import { SearchCtrl } from "$lib/ui/input";
     import { translate } from "$lib/translation";
 
     let {
         selection=$bindable(),
-        searchTerm=$bindable()
+        params=$bindable()
     } = $props()
 
     let requestDemos = fetch("https://pavlovia.org/api/v2/experiments?search=demos&designer=demos").then(
@@ -33,9 +34,16 @@
 </script>
 
 <ListDetail
-    search={(term, data) => data.name.includes(term || "")}
-    bind:searchTerm={searchTerm}
+    filter={(params, data) => data.name.includes(params.searchTerm || "")}
+    bind:params={params}
 >
+    {#snippet ctrls(params)}
+        <SearchCtrl 
+            bind:value={params.searchTerm}
+            placeholder={translate("Search demos...")}
+        />
+    {/snippet}
+
     {#await requestDemos}
         {translate(
             "Loading demos..."

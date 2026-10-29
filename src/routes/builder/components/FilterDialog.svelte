@@ -1,11 +1,32 @@
 <script>
     import { Dialog } from "$lib/ui/dialog";
+    import { Field } from "$lib/ui/input";
+    import { RadioButton } from "$lib/ui/button";
     import { translate } from "$lib/translation";
 
     let {
         filter=$bindable(),
         shown=$bindable()
     } = $props();
+
+    /**
+     * Get the key for a filter: its items sorted and joined by commas, so filters with the same items always have the same key
+     *
+     * @param {string[]|undefined} value Filter to get the key for
+     * @returns {string} Key for this filter ("" if there is no filter)
+     */
+    function keyFor(value) {
+        return value?.toSorted().join(",") ?? ""
+    }
+
+    /**
+     * Set the filter from a key made by `keyFor`
+     *
+     * @param {string} key Key to set the filter from
+     */
+    function setKey(key) {
+        filter = key ? key.split(",") : undefined
+    }
 
 </script>
 
@@ -16,50 +37,34 @@
     shrink
 >
     <div class=container>
-        {translate("Show only Components which work with...")}
-        <div class=radio-ctrl>  
-            <input 
-                type=radio 
-                id=component-filter-any 
-                name=component-filter
-                onclick={(evt) => filter = undefined}
-                checked={filter === undefined}
+        <Field
+            label={translate("Show only Components which work with...")}
+        >
+            <RadioButton 
+                bind:selection={() => keyFor(filter), setKey}
+                label={translate("Any")}
+                value=""
+                stretch
             />
-            <label for=component-filter-any>Any</label>
-
-            <input 
-                type=radio 
-                id=component-filter-py 
-                name=component-filter
-                onclick={(evt) => filter = ["PsychoPy"]}
-                checked={filter && filter.includes("PsychoPy") && !filter.includes("PsychoJS")}
+            <RadioButton 
+                bind:selection={() => keyFor(filter), setKey}
+                label={translate("PsychoPy (local)")}
+                value=PsychoPy
+                stretch
             />
-            <label for=component-filter-py>
-                {translate("PsychoPy (local)")}
-            </label>
-                
-            <input 
-                type=radio 
-                id=component-filter-js 
-                name=component-filter
-                onclick={(evt) => filter = ["PsychoJS"]}
-                checked={filter && !filter.includes("PsychoPy") && filter.includes("PsychoJS")}
+            <RadioButton 
+                bind:selection={() => keyFor(filter), setKey}
+                label={translate("PsychoJS (online)")}
+                value=PsychoJS
+                stretch
             />
-            <label for=component-filter-js>
-                {translate("PsychoJS (online)")}
-            </label>
-
-            <input 
-                type=radio 
-                id=component-filter-both 
-                name=component-filter
-                onclick={(evt) => filter = ["PsychoPy", "PsychoJS"]}
-                checked={filter && filter.includes("PsychoPy") && filter.includes("PsychoJS")}
+            <RadioButton 
+                bind:selection={() => keyFor(filter), setKey}
+                label={translate("Both")}
+                value=PsychoJS,PsychoPy
+                stretch
             />
-            <label for=component-filter-both>
-                {translate("Both")}
-            </label>
-        </div>
+        </Field>
     </div>
 </Dialog>
 
@@ -69,11 +74,5 @@
         flex-direction: column;
         gap: 1rem;
         padding: 1rem;
-    }
-    .radio-ctrl {
-        display: grid;
-        grid-template-columns: min-content auto;
-        gap: .5rem;
-        align-items: center;
     }
 </style>

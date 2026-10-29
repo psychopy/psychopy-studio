@@ -22,6 +22,8 @@
                     label="{item.file.name.length > 40 ? "..." : ""}{item.file.name.slice(-40)}"
                     tooltip={item.file.file}
                     icon="/icons/btn-{item instanceof Experiment ? "builder" : "coder"}.svg"
+                    stretch
+                    small
                 />
                 <Button
                     icon="/icons/btn-delete.svg"

@@ -1,14 +1,14 @@
 <script>
-    import ComponentButton from './ComponentButton.svelte';
+    import ElementButton from './ElementButton.svelte';
     import ComponentSection from './Section.svelte';
 
     import { profiles as allProfiles, refresh } from '$lib/experiment/profiles.svelte';
-    import RoutineButton from './RoutineButton.svelte';
     import FilterDialog from './FilterDialog.svelte';
     import { Button } from "$lib/ui/button";
     import { PluginManagerDlg } from "$lib/dialogs/pluginManager"
     import { electron, python } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
+    import { Component, StandaloneRoutine } from "$lib/experiment";
 
     /**
      * Sort Components into ordered categories
@@ -70,6 +70,21 @@
     }
 
     /**
+     * Create an element from a profile, to be used as the template for an ElementButton
+     * 
+     * @param profile { object } Component or Routine profile
+     * 
+     * @returns { Component|StandaloneRoutine } Element created from the profile
+     */
+    function elementFor(profile) {
+        if (profile['__class__'].startsWith("psychopy.experiment.components") || profile['__class__'].endsWith("omponent")) {
+            return new Component(profile['__name__'])
+        } else {
+            return new StandaloneRoutine(profile['__name__'])
+        }
+    }
+
+    /**
      * Get Components again from PsychoPy
      */
     async function refreshProfiles() {
@@ -124,15 +139,9 @@
                     {#if filterProfiles(categProfiles).length}
                         <ComponentSection label={categ}>
                             {#each filterProfiles(categProfiles) as profile}
-                                {#if profile['__class__'].startsWith("psychopy.experiment.components") || profile['__class__'].endsWith("omponent")}
-                                    <ComponentButton 
-                                        component={profile}
-                                    />
-                                {:else}
-                                    <RoutineButton 
-                                        component={profile}
-                                    />
-                                {/if}
+                                <ElementButton 
+                                    element={elementFor(profile)}
+                                />
                             {/each}
                         </ComponentSection>
                     {/if}
