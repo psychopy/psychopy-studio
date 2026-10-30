@@ -112,5 +112,10 @@
         overflow: hidden;
         max-width: 35rem;
         position-try-fallbacks: flip-block, flip-inline;
+        /* popovers still inherit from their DOM parent, so reset text styling */
+        line-height: normal;
+        font-weight: normal;
+        font-style: normal;
+        text-align: left;
     }
 </style>

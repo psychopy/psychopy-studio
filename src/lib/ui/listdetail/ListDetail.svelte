@@ -121,9 +121,10 @@
         flex-direction: column;
         overflow-y: auto;
         gap: .5rem;
+        padding: .5rem;
     }
     .items-list .items-list {
-        padding: .5rem;
+        padding: .5rem 0;
     }
     .details-panel {
         padding: 2rem;

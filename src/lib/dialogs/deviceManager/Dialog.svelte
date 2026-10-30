@@ -1,7 +1,8 @@
 <script>
     import { Dialog, DialogButton } from "$lib/ui/dialog";
     import DeviceDetails from "./DeviceDetails.svelte";
-    import { ButtonTab, Listbook, NotebookPage } from "$lib/ui/notebook";
+    import { ListDetail, ListDetailItem } from "$lib/ui/listdetail";
+    import { Button } from "$lib/ui/button";
     import { Device } from "$lib/experiment";
     import { devices, electron } from "$lib/globals.svelte";
     import AddDeviceDialog from "./addDevice/AddDeviceDialog.svelte";
@@ -32,12 +33,27 @@
     )
 
     let restore = {
-        set: () => Object.values(devices).forEach(
-            (value) => value.restore.set()
-        ),
-        apply: () => Object.values(devices).forEach(
-            (value) => value.restore.apply()
-        ),
+        devices: {},
+        set: () => {
+            // remember which devices exist, so removed ones can be put back
+            restore.devices = {...devices}
+            Object.values(devices).forEach(
+                (value) => value.restore.set()
+            )
+        },
+        apply: () => {
+            // remove any devices added since the restore point
+            for (let key of Object.keys(devices)) {
+                if (!(key in restore.devices)) {
+                    delete devices[key]
+                }
+            }
+            // put back any devices removed since the restore point
+            Object.assign(devices, restore.devices)
+            Object.values(devices).forEach(
+                (value) => value.restore.apply()
+            )
+        },
     }
 
     let btnsDisabled = $derived({
@@ -179,57 +195,62 @@
     onopen={restore.set}
     bind:shown={shown}
 >
-    <div class=container>
-        <Listbook>
-            {#each Object.entries(devices) as [key, device]}
-                <NotebookPage
-                    bind:selected={
-                        () => {return currentDevice === device},
-                        (value) => {currentDevice = device}
+    <ListDetail>
+        {#each Object.entries(devices) as [key, device] (key)}
+            <ListDetailItem
+                bind:selected={
+                    () => currentDevice === device,
+                    (value) => {
+                        if (value) {
+                            currentDevice = device
+                        }
                     }
-                    label={device.name} 
-                    data={device}
-                    close={(evt) => delete devices[key]}
-                >
-                    <DeviceDetails
-                        device={device}
-                    ></DeviceDetails>
-                </NotebookPage>
-            {/each}
-            <!-- placeholder page -->
-            {#if Object.keys(devices).length === 0}
-            <NotebookPage
-                label=""
-                selected
+                }
+                data={device}
+                onremove={(evt) => delete devices[key]}
+                removeTooltip={translate("Remove device")}
             >
-                <div class=placeholder-page>
-                    <p>{translate("No devices have been setup.")}</p>
-                    <p>{translate("Click \"Add device\" to add a new device, or import devices from a .json file.")}</p>
-                </div>
-            </NotebookPage>
-            {/if}
+                {#snippet label()}
+                    <h4>{device.name}</h4>
+                    {profiles.devices.value[device.tag]?.label || device.tag}
+                {/snippet}
 
-            {#if electron}
-                <ButtonTab
-                    callback={(evt) => showAddDeviceDialog = true}
-                    label={translate("+ Add device")}
-                    tooltip={electron
-                        ? translate("Setup a currently connected device")
-                        : translate("Device setup not available in web-only")
-                    }
-                    disabled={!electron}
-                />
-                <AddDeviceDialog
-                    bind:shown={showAddDeviceDialog}
-                />
-            {/if}
-            <ButtonTab
-                callback={openDevicesFile}
-                label={translate("⭱ Import devices")}
-                tooltip={translate("Import devices from a .json file")}
+                <DeviceDetails
+                    device={device}
+                ></DeviceDetails>
+            </ListDetailItem>
+        {/each}
+        <!-- placeholder message -->
+        {#if Object.keys(devices).length === 0}
+            <div class=placeholder>
+                <p>{translate("No devices have been setup.")}</p>
+                <p>{translate("Click \"Add device\" to add a new device, or import devices from a .json file.")}</p>
+            </div>
+        {/if}
+        {#if electron}
+            <Button
+                onclick={(evt) => showAddDeviceDialog = true}
+                label={translate("Add device")}
+                icon="/icons/btn-add.svg"
+                tooltip={translate("Setup a currently connected device")}
+                small
+                horizontal
             />
-        </Listbook>
-    </div>
+            <AddDeviceDialog
+                bind:shown={showAddDeviceDialog}
+            />
+        {:else}
+            <Button
+                onclick={openDevicesFile}
+                label={translate("Import devices")}
+                icon="/icons/btn-open.svg"
+                tooltip={translate("Import devices from a .json file")}
+                small
+                horizontal
+            />
+        {/if}
+    </ListDetail>
+
     {#snippet buttons()}
         <DialogButton
             role=OK
@@ -253,16 +274,7 @@
 </Dialog>
 
 <style>
-    .container {
-        display: flex;
-        flex-direction: column;
-        padding: 1rem;
-        height: 100%;
-        box-sizing: border-box;
-    }
-    .placeholder-page {
-        padding: 0 1rem;
-        width: 30rem;
-        color: var(--outline)
+    .placeholder {
+        color: var(--outline);
     }
 </style>
