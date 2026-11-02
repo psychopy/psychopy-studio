@@ -6,7 +6,7 @@
     import { translate } from "$lib/translation";
 
     let {
-        /** @prop @type {string} Label for this button */
+        /** @prop @type {string|import("svelte").Snippet|undefined} Label for this button, or a snippet to render in its place */
         label=undefined,
         /** @prop @type {string|import("svelte").Snippet|undefined} Path to icon for this button, or a snippet to render in its place, if any */
         icon=undefined,
@@ -38,6 +38,8 @@
         tight=false,
         /** @prop @type {boolean} No background and only show border when hovered (looks better in the ribbon) */
         ghost=false,
+        /** @prop @type {boolean} Gives the button an opaque background (--base) */
+        opaque=false,
         /** @prop @type {boolean} Style this button as though it's pressed in (mostly just for ToggleButton) */
         depressed=false,
         /** @prop @type {"left"|"right"|"top"|"bottom"|undefined} Side(s) of this button which are flush against another element, to remove the rounded corners on that side */
@@ -47,7 +49,9 @@
         /** @prop @type {function|undefined} If action is cancellable, supply a function to cancel it */
         cancel=undefined,
         /** @prop @type {boolean} Disable this button */
-        disabled = false
+        disabled = false,
+        /** @interface @type {import("svelte/elements").HTMLButtonAttributes} Any other attributes (e.g. role, id, aria-*) are passed through to the underlying <button> */
+        ...attrs
     } = $props()
 
     let show = $state({
@@ -72,6 +76,7 @@
 
 {#snippet button(status)}
     <button
+        {...attrs}
         disabled={disabled} 
         onclick={{
             // if completed/not started, execute method
@@ -88,6 +93,7 @@
         class:stretch
         class:tight
         class:ghost
+        class:opaque
         class:depressed
         class:primary
         class:affirmative
@@ -100,7 +106,7 @@
         onmouseleave={() => {if (tooltip) {show.tooltip = false}}}
         onfocusin={() => {if (tooltip) {show.tooltip = true}}}
         onfocusout={() => {if (tooltip) {show.tooltip = false}}}
-        aria-label={name}
+        aria-label={attrs["aria-label"] ?? name}
     >
         {#if tooltip}
             <Tooltip
@@ -268,7 +274,6 @@
         text-align: left;
     }
 
-
     /* Ghost */
     button.ghost {
         box-shadow: none;
@@ -283,6 +288,11 @@
     }
     button.ghost:enabled:focus {
         border-color: var(--blue);
+    }
+
+    /* Opaque */
+    button.opaque {
+        background-color: var(--base);
     }
 
     /* Depressed */
