@@ -8,16 +8,25 @@
         awaiting=$bindable()
     } = $props()
 
+    // memoise source, so the URL is only recreated when the source actually changes (not just when the parent re-reads it)
+    let source = $derived(String(src))
     // transform source to a URL
     let url = $derived.by(() => {
-        if (String(src).match(/.*\.(svg|png|jpg|jpeg)/g)) {
+        if (source.match(/.*\.(svg|png|jpg|jpeg)/g)) {
             // if already looks like a url, return as is
-            return asset(src)
+            return asset(source)
         } else {
             // blobbify data to get around cross-origin security nonsense
-            let blob = new Blob([src], {type: 'image/svg+xml'})
-            
-            return URL.createObjectURL(blob);  
+            let blob = new Blob([source], {type: 'image/svg+xml'})
+
+            return URL.createObjectURL(blob);
+        }
+    })
+    // release blob URLs when replaced or unmounted
+    $effect(() => {
+        let current = url
+        if (current.startsWith("blob:")) {
+            return () => URL.revokeObjectURL(current)
         }
     })
 </script>
