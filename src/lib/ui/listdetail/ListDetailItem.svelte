@@ -1,8 +1,7 @@
 <script>
     import { marked } from "marked";
     import { getContext, onMount } from "svelte";
-    import { Icon } from "$lib/ui/icon";
-    import { Tooltip } from "$lib/ui/tooltip";
+    import { AttachedButton } from "$lib/ui/button";
     import { translate } from "$lib/translation";
 
     let {
@@ -64,32 +63,25 @@
     $effect(() => {
         selected = siblings.selected === index
     })
-
-    let removeHovered = $state.raw(false)
 </script>
 
 {#snippet itemButton()}
-    <!-- remove button can't be nested in the item button, so they sit side by side in a wrapper -->
-    <div 
-        class=item
-        role=presentation
+    <AttachedButton
+        icon="/icons/sym-close.svg"
+        onclick={onremove}
+        tooltip={removeTooltip || translate("Remove")}
+        shortcut="Delete"
+        negative
     >
         <button 
             id="{index}-tab"
             class=item-button
             class:selected={siblings.selected === index}
-            class:removable={onremove !== undefined}
             role="tab"
             aria-selected={siblings.selected === index}
             aria-controls={siblings.selected === index ? `${index}-panel` : undefined}
             focusgroupstart={siblings.selected === index ? "" : undefined}
             onclick={evt => siblings.selected = index}
-            onkeydown={evt => {
-                // delete key removes the item, as remove button is out of the tab order
-                if (onremove !== undefined && evt.key === "Delete") {
-                    onremove(evt)
-                }
-            }}
         >
             {#if typeof label === "function"}
                 {@render label()}
@@ -101,30 +93,7 @@
                 {label}
             {/if}
         </button>
-        {#if onremove !== undefined}
-            <button
-                class=remove-btn
-                aria-label={removeTooltip || translate("Remove")}
-                tabindex=-1
-                onclick={onremove}
-                onmouseenter={() => removeHovered = true}
-                onmouseleave={() => removeHovered = false}
-            >
-                <Icon
-                    src="/icons/sym-close.svg"
-                    size=.75rem
-                />
-                {#if removeTooltip}
-                    <Tooltip
-                        bind:shown={removeHovered}
-                        position="bottom"
-                    >
-                        {removeTooltip}
-                    </Tooltip>
-                {/if}
-            </button>
-        {/if}
-    </div>
+    </AttachedButton>
 {/snippet}
 
 {#snippet itemDetails()}
@@ -142,10 +111,6 @@
 {/snippet}
 
 <style>
-    .item {
-        position: relative;
-        display: grid;
-    }
     .item-button {
         display: flex;
         flex-direction: column;
@@ -175,26 +140,5 @@
         box-shadow: 
             inset 1px 1px 10px rgba(0, 0, 0, 0.05)
         ;
-    }
-    .item-button.removable {
-        /* leave room for the remove button */
-        padding-right: 2.5rem;
-    }
-    .remove-btn {
-        position: absolute;
-        top: .5rem;
-        right: .5rem;
-        display: flex;
-        margin: 0;
-        padding: .5rem;
-        border: none;
-        background: none;
-        color: var(--outline);
-        opacity: 0.5;
-        transition: opacity .2s, color .2s;
-    }
-    .remove-btn:hover {
-        opacity: 1;
-        color: var(--red);
     }
 </style>
