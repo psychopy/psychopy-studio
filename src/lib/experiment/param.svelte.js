@@ -499,22 +499,9 @@ export class HasParams {
                         }
                     };
                     // add breadcrumbs
-                    if (this.constructor.name === "Component") {
-                        match.breadcrumbs = {
-                            param: param,
-                            component: this,
-                            routine: this.routine
-                        };
-                    } else if (this.constructor.name === "StandaloneRoutine") {
-                        match.breadcrumbs = {
-                            param: param,
-                            routine: this
-                        };
-                    } else if (this.constructor.name === "LoopInitiator") {
-                        match.breadcrumbs = {
-                            param: param,
-                            loop: this
-                        };
+                    match.breadcrumbs = {
+                        param: param,
+                        ...this.breadcrumbs
                     }
                     // add to results
                     results.push(match);
@@ -523,6 +510,15 @@ export class HasParams {
         }
 
         return results;
+    }
+    
+    /**
+     * Get search breadcrumbs for this element. Subclasses of HasParams should overload this.
+     * 
+     * @returns {object|undefined} Parameters for this object's breadcrumbs
+     */
+    get breadcrumbs() {
+        return {}
     }
 
     /**

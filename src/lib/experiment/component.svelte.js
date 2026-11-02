@@ -130,4 +130,11 @@ export class Component extends HasParams {
 
         return force_end;
     });
+
+    get breadcrumbs() {
+        return {
+            component: this,
+            routine: this.routine
+        }
+    }
 }
