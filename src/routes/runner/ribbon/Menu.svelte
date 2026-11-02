@@ -41,7 +41,7 @@
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
-            label={translate("Open file")} 
+            label={translate("Open file...")} 
             shortcut="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
@@ -55,7 +55,7 @@
         />
         <MenuItem 
             icon="/icons/btn-saveas.svg" 
-            label={translate("Save file as")}
+            label={translate("Save file as...")}
             shortcut="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
@@ -65,7 +65,7 @@
 
         <MenuItem
             icon="/icons/btn-settings.svg"
-            label={translate("Preferences")}
+            label={translate("Preferences...")}
             onclick={(evt) => {show.prefsDlg = true}}
         />
         <MenuItem
@@ -168,7 +168,7 @@
 
     <SubMenu label={translate("Tools")} icon="/icons/btn-hamburger.svg">
         <MenuItem 
-            label={translate("Open device manager")}
+            label={translate("Open device manager...")}
             icon="/icons/btn-devices.svg"
             onclick={evt => show.deviceMgrDlg = true}
         />
@@ -180,7 +180,7 @@
                 disabled={!python?.ready}
             />
             <MenuItem
-                label="Install PsychoPy from Git"
+                label="Install PsychoPy from Git..."
                 onclick={evt => show.psychopyBranchDlg = true}
             />
         {/if}
@@ -229,7 +229,7 @@
                     <MenuSeparator />
                     
                     <MenuItem
-                        label={translate("Report bug")}
+                        label={translate("Report bug...")}
                         onclick={evt => show.bugReport = true}
                     />
                 {/if}
