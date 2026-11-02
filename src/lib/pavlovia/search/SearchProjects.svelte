@@ -7,7 +7,7 @@
     import { ToggleButton, Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
     import { getContext } from "svelte";
-    import { demosPromise } from "../demos/globals.svelte";
+    import { getDemos } from "../demos/functions.svelte";
 
     let {
         selection=$bindable(),
@@ -75,7 +75,7 @@
             )
         } else {
             // show demos otherwise
-            return demosPromise.then(
+            return getDemos().then(
                 resp => resp.experiments
             )
         }
