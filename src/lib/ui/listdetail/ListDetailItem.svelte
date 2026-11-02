@@ -1,11 +1,10 @@
 <script>
-    import { marked } from "marked";
     import { getContext, onMount } from "svelte";
-    import { AttachedButton } from "$lib/ui/button";
+    import { AttachedButton, RadioButton } from "$lib/ui/button";
     import { translate } from "$lib/translation";
 
     let {
-        /** @prop @type {Snippet|string} Either a snippet containing the inner contents of this item's button in the list panel, or a string (Markdown) to use for its label */
+        /** @prop @type {Snippet|string} Either a snippet containing the inner contents of this item's button in the list panel, or a string to use for its label */
         label,
         /** @prop @type {*} Arbitrary data associated with this item, used for searching */
         data={},
@@ -73,26 +72,18 @@
         shortcut="Delete"
         negative
     >
-        <button 
+        <RadioButton
+            bind:selection={siblings.selected}
+            value={index}
+            label={label}
             id="{index}-tab"
-            class=item-button
-            class:selected={siblings.selected === index}
             role="tab"
             aria-selected={siblings.selected === index}
             aria-controls={siblings.selected === index ? `${index}-panel` : undefined}
             focusgroupstart={siblings.selected === index ? "" : undefined}
-            onclick={evt => siblings.selected = index}
-        >
-            {#if typeof label === "function"}
-                {@render label()}
-            {:else if typeof label === "string" && label.includes("\n")}
-                {@html marked(label)}
-            {:else if typeof label === "string"}
-                {@html marked.parseInline(label)}
-            {:else}
-                {label}
-            {/if}
-        </button>
+            large
+            opaque
+        />
     </AttachedButton>
 {/snippet}
 
@@ -110,35 +101,3 @@
     {/if}
 {/snippet}
 
-<style>
-    .item-button {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
-        background-color: var(--base);
-        border: 1px solid var(--overlay);
-        border-radius: .5rem;
-        padding: 1rem;
-        transition: border-color .2s, box-shadow .2s, background-color .2s, color .2s;
-        box-shadow: 
-            inset -1px -1px 2px rgba(0, 0, 0, 0.025)
-        ;
-    }
-    .item-button:disabled {
-        opacity: 50%;
-    }
-    .item-button:hover,
-    .item-button:focus {
-        outline: none;
-        border-color: var(--blue);
-        box-shadow: 
-            inset 1px 1px 10px rgba(0, 0, 0, 0.05)
-        ;
-    }
-    .item-button.selected {
-        border-color: var(--blue);
-        box-shadow: 
-            inset 1px 1px 10px rgba(0, 0, 0, 0.05)
-        ;
-    }
-</style>
