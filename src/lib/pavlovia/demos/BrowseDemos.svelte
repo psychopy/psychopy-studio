@@ -6,7 +6,7 @@
 
     let {
         selection=$bindable(),
-        searchTerm=$bindable()
+        params=$bindable()
     } = $props()
 
     let requestDemos = fetch("https://pavlovia.org/api/v2/experiments?search=demos&designer=demos").then(
@@ -34,11 +34,12 @@
 </script>
 
 <ListDetail
-    filter={(params, data) => data.name.includes(searchTerm || "")}
+    filter={(params, data) => data.name.includes(params.searchTerm || "")}
+    bind:params={params}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 
-            bind:value={searchTerm}
+            bind:value={params.searchTerm}
             placeholder={translate("Search demos...")}
         />
     {/snippet}

@@ -9,7 +9,8 @@
     import { electron, python, git } from "$lib/globals.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
-    import BrowseDemosDlg from "$lib/pavlovia/browseProjects/BrowseDemosDlg.svelte";
+    import { BrowseDemosDlg } from "$lib/pavlovia/demos";
+    import { SearchProjectsDlg } from "$lib/pavlovia/search";
     import { projectsLoaded, openProject } from "$lib/pavlovia/utils.svelte";
     import semver from "semver";
     import { translate } from "$lib/translation";
@@ -29,7 +30,8 @@
         pluginMgr: false,
         psychopyBranchDlg: false,
         bugReport: false,
-        browseDemosDlg: false
+        browseDemosDlg: false,
+        searchProjectsDlg: false
     })
 </script>
 
@@ -278,6 +280,36 @@
         </SubMenu>
     {/if}
 
+
+    <SubMenu label={translate("Pavlovia")}>
+        {#if !current.project}
+            <MenuItem
+                label={translate("New project")}
+                icon="/icons/btn-add.svg"
+                onclick={evt => show.newProjectDlg = true}
+                disabled={!current.user || !current.experiment?.file?.file}
+            />
+        {/if}
+        <MenuItem
+            label={translate("Edit project")}
+            icon="/icons/btn-edit.svg"
+            onclick={evt => window.open(`${current.project.web_url}/edit`, "_blank")}
+            disabled={!current.project}
+        />
+        <MenuSeparator/>
+        <MenuItem 
+            label={translate("Browse demos")}
+            icon="/icons/btn-demos.svg" 
+            onclick={evt => show.browseDemosDlg = true}
+            borderless
+        />
+        <MenuItem
+            label={translate("Search projects")}
+            icon="/icons/btn-find.svg"
+            onclick={(evt) => show.searchProjectsDlg = true}
+        />
+    </SubMenu>
+
     <SubMenu label={translate("Demos")}>
         {#await projectsLoaded.promise then projects}
             {#each Object.keys(projects).filter(project => project.startsWith("demos/")) as project}
@@ -401,4 +433,7 @@
 {/if}
 <BrowseDemosDlg
     bind:shown={show.browseDemosDlg}
+/>
+<SearchProjectsDlg
+    bind:shown={show.searchProjectsDlg}
 />
