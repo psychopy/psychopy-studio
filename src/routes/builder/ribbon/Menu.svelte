@@ -52,7 +52,7 @@
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
-            label={translate("Open file")} 
+            label={translate("Open file...")} 
             shortcut="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
@@ -66,7 +66,7 @@
         />
         <MenuItem
             icon="/icons/btn-saveas.svg"
-            label={translate("Save file as")}
+            label={translate("Save file as...")}
             shortcut="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
@@ -82,7 +82,7 @@
 
         <MenuItem
             icon="/icons/btn-settings.svg"
-            label={translate("Preferences")}
+            label={translate("Preferences...")}
             onclick={(evt) => {show.prefsDlg = true}}
         />
         <MenuItem
@@ -145,7 +145,7 @@
         <MenuSeparator />
 
         <MenuItem 
-            label={translate("Find in experiment")}
+            label={translate("Find in experiment...")}
             icon="/icons/btn-find.svg"
             onclick={evt => show.findDlg = true}
             shortcut="find"
@@ -201,7 +201,7 @@
 
     <SubMenu label={translate("Experiment")} icon="/icons/rbn-experiment.svg">
         <MenuItem 
-            label={translate("Experiment settings")}
+            label={translate("Experiment settings...")}
             icon="/icons/btn-settings.svg"
             onclick={evt => show.settingsDlg = true}
             disabled={!current.experiment.settings}
@@ -328,7 +328,7 @@
 
     <SubMenu label={translate("Tools")} icon="/icons/btn-hamburger.svg">
         <MenuItem 
-            label={translate("Open device manager")}
+            label={translate("Open device manager...")}
             icon="/icons/btn-devices.svg"
             onclick={evt => show.deviceMgrDlg = true}
         />
@@ -355,7 +355,7 @@
                 onclick={callbacks.reinstallPython.fcn}
             />
             <MenuItem
-                label="Install PsychoPy from Git"
+                label="Install PsychoPy from Git..."
                 onclick={evt => show.psychopyBranchDlg = true}
             />
         {/if}
@@ -390,7 +390,7 @@
                     <MenuSeparator />
 
                     <MenuItem
-                        label={translate("Report bug")}
+                        label={translate("Report bug...")}
                         onclick={evt => show.bugReport = true}
                     />
                 {/if}
