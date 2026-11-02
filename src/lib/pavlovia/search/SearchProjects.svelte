@@ -99,6 +99,7 @@
             <ToggleButton 
                 label={translate("Mine")}
                 tooltip={current.user ? translate("Only show projects belonging to you") : translate("Log in to show only projects belonging to you")}
+                icon="/icons/btn-memode.svg"
                 bind:value={params.meMode}
                 disabled={!current.user}
                 small
