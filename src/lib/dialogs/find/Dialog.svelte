@@ -1,6 +1,8 @@
 <script>
-    import { ToggleButton } from "$lib/ui/button";
-    import { Dialog } from "$lib/ui/dialog"
+    import { Button, ToggleButton } from "$lib/ui/button";
+    import { Icon } from "$lib/ui/icon";
+    import { SearchCtrl } from "$lib/ui/input";
+    import { Dialog } from "$lib/ui/dialog";
     import { ParamsDialog } from "$lib/ui/paramCtrls";
     import { current } from "../../../routes/builder/globals.svelte";
     import { translate } from "$lib/translation";
@@ -38,12 +40,9 @@
         <div
             class=find-ctrls
         >
-            <input 
-                type=text 
-                placeholder={translate("Search...")}
-                class=search-bar
+            <SearchCtrl 
                 bind:value={searchTerm}
-            >
+            />
             <ToggleButton 
                 bind:value={useRegex} 
                 icon="/icons/btn-regex.svg"
@@ -64,8 +63,8 @@
             >
                 <div class=item-breadcrumbs>
                     {#if result.breadcrumbs.loop}
-                        <button 
-                            class=breadcrumb
+                        <Button 
+                            label={result.breadcrumbs.loop.name}
                             onclick={(evt) => {
                                 // open loop dialog
                                 dialog.element = result.breadcrumbs.loop
@@ -73,23 +72,32 @@
                                 // close this dialog
                                 shown = false;
                             }}
-                        >{result.breadcrumbs.loop.name}</button>
+                            tight
+                        />
                     {/if}
                     {#if result.breadcrumbs.routine}
-                        <button 
-                            class=breadcrumb
+                        <Button 
+                            label={result.breadcrumbs.routine.name}
                             onclick={(evt) => {
                                 // navigate to routine
                                 current.routine = result.breadcrumbs.routine
                                 // close this dialog
                                 shown = false;
                             }}
-                        >{result.breadcrumbs.routine.name}</button>
+                            tight
+                        />
                     {/if}
                     {#if result.breadcrumbs.component}
-                        >
-                        <button 
-                            class=breadcrumb
+                        <Icon 
+                            src="/icons/sym-arrow-right.svg"
+                            size=".5rem"
+                        />
+                        <Button 
+                            label={
+                                ["RoutineSettingsComponent", "SettingsComponent"].includes(result.breadcrumbs.component.tag)
+                                ? "settings"
+                                : result.breadcrumbs.component.name
+                            }
                             onclick={(evt) => {
                                 // navigate to routine
                                 current.routine = result.breadcrumbs.component.routine
@@ -99,14 +107,15 @@
                                 // close this dialog
                                 shown = false;
                             }}
-                        >{
-                            ["RoutineSettingsComponent", "SettingsComponent"].includes(result.breadcrumbs.component.tag)
-                            ? "settings"
-                            : result.breadcrumbs.component.name
-                        }</button>
+                            tight
+                        />
                     {/if}
                     {#if result.breadcrumbs.param}
-                        > {result.breadcrumbs.param.name}
+                        <Icon 
+                            src="/icons/sym-arrow-right.svg"
+                            size=".5rem"
+                        />
+                        {result.breadcrumbs.param.name}
                     {/if}
                 </div>
                 <div class=item-content>{result.text.before}<b>{result.text.text}</b>{result.text.after}</div>
@@ -127,39 +136,6 @@
 {/if}
 
 <style>
-    button {
-        position: relative;
-        background-color: transparent;
-        border: 1px solid var(--overlay);
-        border-radius: .5rem;
-        transition: border-color .2s, box-shadow .2s, background-color .2s, color .2s;
-        box-shadow: 
-            inset -1px -1px 2px rgba(0, 0, 0, 0.025)
-        ;
-    }
-
-    button:disabled {
-        opacity: 50%;
-    }
-    button:enabled:hover,
-    button:enabled:focus {
-        outline: none;
-        border-color: var(--blue);
-        box-shadow: 
-            inset 1px 1px 10px rgba(0, 0, 0, 0.05)
-        ;
-    }
-    button:disabled {
-        opacity: 50%;
-    }
-    button:enabled:hover,
-    button:enabled:focus {
-        outline: none;
-        border-color: var(--blue);
-        box-shadow: 
-            inset 1px 1px 10px rgba(0, 0, 0, 0.05)
-        ;
-    }
 
     .container {
         display: grid;
@@ -174,10 +150,6 @@
         display: flex;
         flex-wrap: nowrap;
         gap: .5rem;
-    }
-    .search-bar {
-        flex-grow: 1;
-        min-width: 30rem;
     }
     .results-list {
         display: flex;
@@ -212,9 +184,5 @@
     }
     .result-item .item-content b {
         font-family: var(--mono);
-    }
-
-    .breadcrumb {
-        padding: .25rem .5rem;
     }
 </style>
