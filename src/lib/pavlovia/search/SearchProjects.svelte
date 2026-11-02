@@ -7,6 +7,7 @@
     import { ToggleButton, Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
     import { getContext } from "svelte";
+    import { demosPromise } from "../demos/globals.svelte";
 
     let {
         selection=$bindable(),
@@ -62,6 +63,24 @@
         return url
     })
 
+    let projectsPromise = $derived.by(() => {
+        if (params.searchTerm || params.meMode || hasFilters) {
+            // do a search if we have any search term or params
+            return git.authenticateURL(query.toString(), current.user).then(
+                url => fetch(url)
+            ).then(
+                resp => resp.json()
+            ).then(
+                resp => resp.experiments
+            )
+        } else {
+            // show demos otherwise
+            return demosPromise.then(
+                resp => resp.experiments
+            )
+        }
+    })
+
     let show = $state({
         filterDlg: false
     })
@@ -94,36 +113,29 @@
             />
         </div>
     {/snippet}
-    {#if params.searchTerm || params.meMode || hasFilters}
-        {#await git.authenticateURL(query.toString(), current.user).then(
-            url => fetch(url)
-        ).then(
-            resp => resp.json()
-        ).then(
-            resp => resp.experiments
-        )}
-            {translate("Searching...")}
-        {:then projects}
-            {#each projects as project}
-                <ListDetailItem 
-                    data={project}
-                    bind:selected={
-                        () => selection === project.pathWithNamespace,
-                        (value) => selection = value && project.pathWithNamespace
-                    }
-                >
-                    {#snippet label()}
-                        <h4>{project.name}</h4>
-                        {project.pathWithNamespace.replaceAll("/", " / ")}
-                    {/snippet}
+    {#await projectsPromise}
+        {translate("Searching...")}
+    {:then projects}
+        {#each projects as project}
+            <ListDetailItem 
+                data={project}
+                bind:selected={
+                    () => selection === project.pathWithNamespace,
+                    (value) => selection = value && project.pathWithNamespace
+                }
+            >
+                {#snippet label()}
+                    <h4>{project.name}</h4>
+                    {project.pathWithNamespace.replaceAll("/", " / ")}
+                {/snippet}
 
-                    <ProjectPanel 
-                        project={project.pathWithNamespace}
-                    />
-                </ListDetailItem>
-            {/each}
-        {/await}
-    {/if}
+                <ProjectPanel 
+                    project={project.pathWithNamespace}
+                />
+            </ListDetailItem>
+        {/each}
+    {/await}
+
 </ListDetail>
 
 <FilterDlg

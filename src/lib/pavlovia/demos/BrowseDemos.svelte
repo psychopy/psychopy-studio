@@ -3,15 +3,14 @@
     import { ListDetail, ListDetailItem, ListDetailCategory } from "$lib/ui/listdetail";
     import { SearchCtrl } from "$lib/ui/input";
     import { translate } from "$lib/translation";
+    import { demosPromise } from "./globals.svelte";
 
     let {
         selection=$bindable(),
         params=$bindable()
     } = $props()
 
-    let requestDemos = fetch("https://pavlovia.org/api/v2/experiments?search=demos&designer=demos").then(
-        resp => resp.json()
-    ).then(
+    let requestDemos = demosPromise.then(
         resp => resp.experiments.reduce((acc, demo) => {
             // for each keyword...
             for (let keyword of demo.keywords || []) {
