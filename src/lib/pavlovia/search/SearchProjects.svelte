@@ -93,7 +93,7 @@
         <SearchCtrl 
             bind:value={params.searchTerm}
             placeholder={translate("Search projects...")}
-            debounce=500
+            debounce=1000
         />
         <div class=ctrl-buttons>
             <ToggleButton 

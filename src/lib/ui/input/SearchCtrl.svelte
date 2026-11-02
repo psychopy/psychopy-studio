@@ -9,7 +9,11 @@
         /** @prop @type {Snippet} Options to show while searching (supplied as <option> elements, like in a data list), will be provided with the search term */
         options=undefined,
         /** @prop @type {number} Debounce period (ms) to prevent excessive searching */
-        debounce=0
+        debounce=0,
+        /** @prop @type {number} Minimum number of characters needed to perform a search (pressing search key will still search) */
+        minchars=4,
+        /** @prop @type {string} Key which, when pressed, will force a search */
+        searchKey="Enter"
     } = $props()
 
     // get unique ID from Svelte
@@ -24,7 +28,11 @@
         if (debounce) {
             // start a timer updating the term after debounce period has elapsed
             let timeout = setTimeout(
-                () => value = before, 
+                () => {
+                    if (before.length >= minchars) {
+                        value = before
+                    }
+                }, 
                 debounce
             )
             // cancel the timeout on subsequent changes
@@ -47,6 +55,11 @@
     list="{id}-options"
     placeholder={placeholder}
     aria-label={placeholder || translate("Search")}
+    onkeydown={evt => {
+        if (evt.key === searchKey) {
+            value = $state.snapshot(current)
+        }
+    }}
     bind:value={current}
 />
 <datalist id="{id}-options">
