@@ -162,6 +162,7 @@
             message={translate("Error, click to show")}
             icon="/icons/sym-error.svg"
             onclick={evt => show.error = true}
+            ondismiss={evt => awaiting = Promise.resolve(false)}
         />
     </MessageArray>
     <!-- error dialog -->

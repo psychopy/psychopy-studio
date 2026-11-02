@@ -35,6 +35,7 @@
                 message={translate("Python error, click to show")}
                 icon="/icons/sym-error.svg"
                 onclick={evt => errors[i].showDlg = true}
+                ondismiss={evt => errors[i].dismissed = true}
             />
             <MessageDialog
                 title={translate("Python error")}

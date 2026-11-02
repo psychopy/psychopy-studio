@@ -1,27 +1,42 @@
 <script>
     import { Icon } from "$lib/ui/icon";
+    import AttachedButton from "$lib/ui/button/AttachedButton.svelte";
+    import { translate } from "$lib/translation";
     import { fly } from "svelte/transition";
     let {
         message,
         icon=undefined,
-        onclick=evt => {}
+        onclick=evt => {},
+        /** @prop @type {function|undefined} Function to dismiss this message (setting this will show the dismiss button) */
+        ondismiss=undefined
     } = $props()
 </script>
 
 
-<button 
-    class=message
-    onclick={onclick}
+<div
+    class=message-ctrl
     transition:fly
 >
-    {#if icon}
-        <Icon 
-            src={icon}
-            size=1.5em
-        />
-    {/if}
-    {message}
-</button>
+    <AttachedButton
+        icon="/icons/sym-close.svg"
+        onclick={ondismiss}
+        tooltip={translate("Dismiss")}
+        position="right"
+    >
+        <button
+            class=message
+            onclick={onclick}
+        >
+            {#if icon}
+                <Icon
+                    src={icon}
+                    size=1.5em
+                />
+            {/if}
+            {message}
+        </button>
+    </AttachedButton>
+</div>
 
 <style>
     .message {
@@ -33,5 +48,6 @@
         color: var(--base);
         border-radius: .5rem;
         padding: .5rem 1rem;
+        padding-right: 2.5rem;
     }
 </style>
