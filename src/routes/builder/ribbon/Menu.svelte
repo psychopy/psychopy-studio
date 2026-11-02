@@ -284,7 +284,7 @@
     <SubMenu label={translate("Pavlovia")}>
         {#if !current.project}
             <MenuItem
-                label={translate("New project")}
+                label={translate("New project...")}
                 icon="/icons/btn-add.svg"
                 onclick={evt => show.newProjectDlg = true}
                 disabled={!current.user || !current.experiment?.file?.file}
@@ -298,13 +298,13 @@
         />
         <MenuSeparator/>
         <MenuItem 
-            label={translate("Browse demos")}
+            label={translate("Browse demos...")}
             icon="/icons/btn-demos.svg" 
             onclick={evt => show.browseDemosDlg = true}
             borderless
         />
         <MenuItem
-            label={translate("Search projects")}
+            label={translate("Search projects...")}
             icon="/icons/btn-find.svg"
             onclick={(evt) => show.searchProjectsDlg = true}
         />
