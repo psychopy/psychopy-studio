@@ -337,6 +337,12 @@ export class LoopInitiator extends HasParams {
 
         return newNode;
     }
+
+    get breadcrumbs() {
+        return {
+            loop: this
+        }
+    }
 }
 
 export class LoopTerminator {

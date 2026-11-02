@@ -280,5 +280,11 @@ export class StandaloneRoutine extends HasParams {
 
         return targets;
     });
+
+    get breadcrumbs() {
+        return {
+            routine: this
+        }
+    }
 }
 
