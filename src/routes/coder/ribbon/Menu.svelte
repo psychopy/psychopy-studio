@@ -39,14 +39,14 @@
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
-            label={translate("Open file")} 
+            label={translate("Open file...")} 
             shortcut="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
-            label={translate("Open folder")} 
+            label={translate("Open folder...")} 
             onclick={callbacks.folderOpen.fcn} 
         />
         <MenuItem 
@@ -58,7 +58,7 @@
         />
         <MenuItem 
             icon="/icons/btn-saveas.svg" 
-            label={translate("Save file as")}
+            label={translate("Save file as...")}
             shortcut="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
@@ -79,7 +79,7 @@
 
         <MenuItem
             icon="/icons/btn-settings.svg"
-            label={translate("Preferences")}
+            label={translate("Preferences...")}
             onclick={(evt) => {show.prefsDlg = true}}
         />
         <MenuItem
@@ -145,7 +145,7 @@
         <MenuSeparator />
 
         <MenuItem 
-            label={translate("Find")}
+            label={translate("Find...")}
             icon="/icons/btn-find.svg"
             onclick={callbacks.find.fcn}
             disabled={callbacks.find.disabled}
@@ -254,7 +254,7 @@
                 onclick={callbacks.reinstallPython.fcn}
             />
             <MenuItem
-                label="Install PsychoPy from Git"
+                label="Install PsychoPy from Git..."
                 onclick={evt => show.psychopyBranchDlg = true}
             />
         {/if}
@@ -288,7 +288,7 @@
                     <MenuSeparator />
                     
                     <MenuItem
-                        label={translate("Report bug")}
+                        label={translate("Report bug...")}
                         onclick={evt => show.bugReport = true}
                     />
                 {/if}
