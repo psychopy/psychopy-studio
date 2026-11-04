@@ -22,6 +22,7 @@ export var menus = {
 export async function newWindow(target = null, show = true, fullscreen = false) {
   // create window
   let win = new BrowserWindow({
+    title: "PsychoPy",
     icon: favicon,
     width: 1600,
     height: 900,
