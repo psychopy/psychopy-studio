@@ -14,18 +14,21 @@
         children=undefined
     } = $props();
 
-    let useRegex = $state(false)
-    let caseSensitive = $state(false)
     let searchTerm = $state("");
 
     let results = $derived(
-        current.experiment.search(searchTerm, useRegex, caseSensitive)
+        current.experiment.search(searchTerm, params.useRegex, params.caseSensitive)
     )
 
     let dialog = $state({
         shown: false,
         element: undefined
     });
+
+    let params = $state({
+        useRegex: false,
+        caseSensitive: false
+    })
 
 </script>
 
@@ -36,26 +39,27 @@
     bind:shown={shown}
     buttons={["OK"]}
 >
-    <div class=container>
-        <div
-            class=find-ctrls
+    <div class=container>  
+        <SearchCtrl 
+            bind:value={searchTerm}
+            bind:params={params}
         >
-            <SearchCtrl 
-                bind:value={searchTerm}
-            />
-            <ToggleButton 
-                bind:value={useRegex} 
-                icon="/icons/btn-regex.svg"
-                tooltip={translate("Use RegEx syntax")}
-                small
-            />
-            <ToggleButton 
-                bind:value={caseSensitive} 
-                icon="/icons/btn-case.svg"
-                tooltip={translate("Use case-sensitive searching")}
-                small
-            />
-        </div>
+            {#snippet ctrls(params)}
+                <ToggleButton 
+                    bind:value={params.useRegex} 
+                    icon="/icons/btn-regex.svg"
+                    tooltip={translate("Use RegEx syntax")}
+                    small
+                />
+                <ToggleButton 
+                    bind:value={params.caseSensitive} 
+                    icon="/icons/btn-case.svg"
+                    tooltip={translate("Use case-sensitive searching")}
+                    small
+                />
+            {/snippet}
+        </SearchCtrl>
+
         <div class=results-list>
             {#each results as result}
             <div
@@ -138,18 +142,14 @@
 <style>
 
     .container {
-        display: grid;
+        display: flex;
+        flex-direction: column;
         position: relative;
         grid-template-rows: min-content 1fr;
         padding: 1rem;
-        height: 100%;
+        min-width: 35rem;
         box-sizing: border-box;
         gap: 1rem;
-    }
-    .find-ctrls {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: .5rem;
     }
     .results-list {
         display: flex;

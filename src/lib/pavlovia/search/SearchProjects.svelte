@@ -92,27 +92,27 @@
     {#snippet ctrls(params)}
         <SearchCtrl 
             bind:value={params.searchTerm}
+            params={params}
             placeholder={translate("Search projects...")}
             debounce=1000
-        />
-        <div class=ctrl-buttons>
-            <ToggleButton 
-                label={translate("Mine")}
-                tooltip={current.user ? translate("Only show projects belonging to you") : translate("Log in to show only projects belonging to you")}
-                icon="/icons/btn-memode.svg"
-                bind:value={params.meMode}
-                disabled={!current.user}
-                small
-            />
-            <div class=gap></div>
-            <Button 
-                tooltip={translate("Filter...")}
-                icon="/icons/btn-filter.svg"
-                onclick={evt => show.filterDlg = true}
-                depressed={hasFilters}
-                small
-            />
-        </div>
+        >
+            {#snippet ctrls(params)}
+                <ToggleButton 
+                    tooltip={current.user ? translate("Only show projects belonging to you") : translate("Log in to show only projects belonging to you")}
+                    icon="/icons/btn-memode.svg"
+                    bind:value={params.meMode}
+                    disabled={!current.user}
+                    small
+                />
+                <Button 
+                    tooltip={translate("Filter...")}
+                    icon="/icons/btn-filter.svg"
+                    onclick={evt => show.filterDlg = true}
+                    depressed={hasFilters}
+                    small
+                />
+            {/snippet}
+        </SearchCtrl>
     {/snippet}
     {#await projectsPromise}
         {translate("Searching...")}
