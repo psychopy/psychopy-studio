@@ -3,15 +3,14 @@
     import { ListDetail, ListDetailItem, ListDetailCategory } from "$lib/ui/listdetail";
     import { SearchCtrl } from "$lib/ui/input";
     import { translate } from "$lib/translation";
+    import { getDemos } from "./functions.svelte";
 
     let {
         selection=$bindable(),
-        searchTerm=$bindable()
+        params=$bindable()
     } = $props()
 
-    let requestDemos = fetch("https://pavlovia.org/api/v2/experiments?search=demos&designer=demos").then(
-        resp => resp.json()
-    ).then(
+    let requestDemos = getDemos().then(
         resp => resp.experiments.reduce((acc, demo) => {
             // for each keyword...
             for (let keyword of demo.keywords || []) {
@@ -34,11 +33,12 @@
 </script>
 
 <ListDetail
-    filter={(params, data) => data.name.includes(searchTerm || "")}
+    filter={(params, data) => data.name.includes(params.searchTerm || "")}
+    bind:params={params}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 
-            bind:value={searchTerm}
+            bind:value={params.searchTerm}
             placeholder={translate("Search demos...")}
         />
     {/snippet}
