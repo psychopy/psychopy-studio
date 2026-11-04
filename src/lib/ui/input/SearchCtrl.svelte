@@ -1,6 +1,7 @@
 <script>
-    import { translate } from "$lib/translation"
-    import { untrack } from "svelte"
+    import InputTextCtrl from "./InputTextCtrl.svelte";
+    import { translate } from "$lib/translation";
+    import { untrack } from "svelte";
 
     let {
         value=$bindable(),
@@ -9,7 +10,7 @@
         /** @prop @type {string|undefined} Placeholder text to display before typing */
         placeholder=translate("Search..."),
         /** @prop @type {Snippet} Options to show while searching (supplied as <option> elements, like in a data list), will be provided with the search term */
-        options=undefined,
+        options:_options=undefined,
         /** @prop @type {Snippet} Additional controls, receives the param bindable */
         ctrls=undefined,
         /** @prop @type {number} Debounce period (ms) to prevent excessive searching */
@@ -17,11 +18,11 @@
         /** @prop @type {number} Minimum number of characters needed to perform a search (pressing search key will still search) */
         minchars=4,
         /** @prop @type {string} Key which, when pressed, will force a search */
-        searchKey="Enter"
+        searchKey="Enter",
+        /** @prop @interface object Other props will be passed to InputTextCtrl */
+        ...attrs
     } = $props()
 
-    // get unique ID from Svelte
-    let id = $props.id()
     // this stores the current value of the text control
     let current = $state.raw(untrack(() => value) ?? "")
     // apply debounce period
@@ -52,35 +53,21 @@
     })
 </script>
 
-<div class=search-container>
-    <input 
-        type="search"
-        class=search-ctrl
-        list="{id}-options"
-        placeholder={placeholder}
-        aria-label={placeholder || translate("Search")}
-        onkeydown={evt => {
-            if (evt.key === searchKey) {
-                value = $state.snapshot(current)
-            }
-        }}
-        bind:value={current}
-    />
-    <datalist id="{id}-options">
-        {@render options?.(value)}
-    </datalist>
-    {@render ctrls?.(params)}
-</div>
-
-
-<style>
-    .search-container {
-        display: flex;
-        flex-direction: row;
-        gap: .5rem;
-    }
-    .search-ctrl{
-        flex-grow: 1;
-    }
-</style>
-
+<InputTextCtrl
+    type=search
+    placeholder={placeholder}
+    bind:value={current}
+    onkeydown={evt => {
+        if (evt.key === searchKey) {
+            value = $state.snapshot(current)
+        }
+    }}
+    {...attrs}
+>
+    {#snippet options()}
+        {@render _options?.(value)}
+    {/snippet}
+    {#snippet buttons()}
+        {@render ctrls?.(params)}
+    {/snippet}
+</InputTextCtrl>
