@@ -39,6 +39,7 @@
     {#snippet ctrls(params)}
         <SearchCtrl 
             bind:value={params.searchTerm}
+            params={params}
             placeholder={translate("Search demos...")}
         />
     {/snippet}
