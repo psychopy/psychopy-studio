@@ -263,9 +263,14 @@ export class Liaison {
         // define listener to find reply then remove itself
         let lsnr = evt => {
             // parse reply
-            let data = JSON.parse(evt.data)
-            // check ID
-            if (data.evt.id !== msgid) {
+            let data
+            try {
+                data = JSON.parse(evt.data)
+            } catch {
+                return
+            }
+            // ignore messages which aren't replies to this one
+            if (data?.evt?.id !== msgid) {
                 return
             }
             // if ID matches, store and stop listening
