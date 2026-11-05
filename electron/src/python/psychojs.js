@@ -45,7 +45,7 @@ export class PsychoJSServer {
         this.pending = []
     }
 
-    static async run(cwd, params={}) {
+    static async run(cwd, params={}, width=undefined, height=undefined, fullscreen=false) {
         // parse params
         params = new URLSearchParams(params)
         // create new server
@@ -54,9 +54,13 @@ export class PsychoJSServer {
         server.win = new BrowserWindow({
             icon: favicon,
             title: "PsychoJS Experiment",
+            width: width,
+            height: height,
             show: false,
         });
-        server.win.maximize();
+        if (fullscreen) {
+            server.win.maximize();
+        }
         // setup window menu
         let menu = Menu.buildFromTemplate(menuTemplate)
         server.win.setMenu(menu)
