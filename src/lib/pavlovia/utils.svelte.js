@@ -33,6 +33,8 @@ export async function openProject(folder) {
     } else {
         openIn(file.file, "coder")
     }
+
+    return file
 }
 
 /**

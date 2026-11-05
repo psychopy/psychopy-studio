@@ -15,6 +15,7 @@
     } = $props();
 
     let current = getContext("current");
+    let dialog = getContext("dialog");
 
     let show = $state({
         forkPrompt: false
@@ -94,7 +95,14 @@
         <Button 
             label={translate("Open file")}
             icon="/icons/btn-open.svg"
-            onclick={evt => openProject(folder)}
+            onclick={evt => openProject(folder).then(
+                complete => {
+                    // if we're in a dialog, close it after opening
+                    if (complete && dialog) {
+                        dialog.shown = false
+                    }
+                }
+            )}
             horizontal
         />
         {#await electron.files.scandir(folder, true) then files}
