@@ -39,6 +39,7 @@
     <div class=notebook-container>
         <ParamsNotebook 
             bind:element={routine}
+            wide
         />
     </div>
 </div>

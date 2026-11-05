@@ -96,6 +96,7 @@
             cancel(evt);
         }
     }}
+    class:shrink
 >
     {#if shown}
         <div class="title">
@@ -118,7 +119,6 @@
         </div>
         <div 
             class="content"
-            style:height={shrink ? "fit-content" : "80vh"}
         >
             {@render children?.()}
         </div>
@@ -154,19 +154,29 @@
     }
     dialog {
         grid-template-rows: [title] min-content [content] 1fr;
+        overflow: hidden;
+        resize: both;
+        height: 80vh;
+        width: max-content;
+        max-height: 80vh;
+        max-width: 80vw;
+        min-width: calc-size(min-content, min(size, 80vw));
+        min-height: calc-size(min-content, min(size, 80vh));
         background-color: var(--mantle);
         border-radius: .25rem;
         outline: none;
         padding: 0;
         border: 1px solid var(--outline);
-        min-width: fit-content;
+    }
+    dialog.shrink {
         height: fit-content;
-        resize: horizontal;
+        width: min-content;
     }
     dialog .content {
         position: relative;
         overflow-y: auto;
         color: var(--text);
+        min-width: calc-size(min-content, min(size, 80vw));
     }
     dialog .title {
         display: grid;

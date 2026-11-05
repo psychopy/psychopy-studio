@@ -86,6 +86,7 @@
     >
         <ParamsNotebook
             element={dlgComponent}
+            wide
         />
         {#snippet buttons()}
             <DialogButton
