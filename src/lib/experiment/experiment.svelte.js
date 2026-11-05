@@ -852,8 +852,22 @@ export class Experiment {
                 }, 
                 100000
             )
+            // get window size from settings
+            let size = $state.snapshot(this.settings.params['Window size (pixels)']?.val)
+            if (typeof size === "string") {
+                size = size.match(/\d+/g)?.map(Number)
+            }
+            let [width, height] = Array.isArray(size) ? size : []
             // start a server
-            return await python.psychojs.run($state.snapshot(this.file.parent), {__pilotToken: "local"})
+            return await python.psychojs.run(
+                $state.snapshot(this.file.parent), 
+                {
+                    __pilotToken: "local"
+                },
+                width,
+                height,
+                this.settings.params['Full-screen window']?.val
+            )
         } else {
             // todo: Run in JS on Pavlovia (not pilot)
         }
