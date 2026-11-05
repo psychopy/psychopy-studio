@@ -50,7 +50,6 @@
         position: relative;
         flex-direction: row;
         gap: .5rem;
-        flex-grow: 1;
     }
     .input-text-ctrl {
         flex-grow: 1;
