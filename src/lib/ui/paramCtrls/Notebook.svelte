@@ -7,7 +7,9 @@
     let {
         element=$bindable(),
         /** @prop @type {array<string>} List of param names not to show */
-        hideParams=[]
+        hideParams=[],
+        /** @prop @type {boolean} Set this to true for wider param notebooks (like in a Component dialog) */
+        wide=false
     } = $props();
 
     let pageIndex = $state()
@@ -41,22 +43,21 @@
     let highlightCategs = $state({})
 </script>
 
-<div class=params-container>
+<div 
+    class=container
+    class:wide
+>
     <!-- pre-notebook params -->
-    <div 
-        class=uncategorised-params-panel
-    >
-        {#if element.sortedParams.uncategorised}
-            {#each Object.entries(element.sortedParams.uncategorised) as [name, param]}
-                {#if ![...hideParams].includes(name)}
-                    <ParamCtrl 
-                        name={name} 
-                        param={param}
-                    />
-                {/if}
-            {/each}
-        {/if}
-    </div>
+    {#if element.sortedParams.uncategorised}
+        {#each Object.entries(element.sortedParams.uncategorised) as [name, param]}
+            {#if ![...hideParams].includes(name)}
+                <ParamCtrl 
+                    name={name} 
+                    param={param}
+                />
+            {/if}
+        {/each}
+    {/if}
     <!-- notebook -->
     {#if Object.keys(element.sortedParams).filter(value => value !== "uncategorised").length}
         <Notebook>
@@ -130,6 +131,20 @@
 </div>
 
 <style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        height: 100%;
+        width: 100%;
+        min-width: calc(min(50vw, 45rem));
+        padding: 1rem;
+        box-sizing: border-box;
+        align-items: stretch;
+    }
+    .container.wide {
+        min-width: calc(min(80vw, 65rem));
+    }
     .params-panel {
         display: flex;
         flex-direction: column;
@@ -138,27 +153,5 @@
         gap: 1rem;
         box-sizing: border-box;
         padding: 1rem;
-        padding-bottom: 3rem;
-        height: 100%;
-        width: 100%;
-        min-height: 10rem;
-        min-width: 45rem;
-    }
-    .uncategorised-params-panel {
-        display: grid;
-        grid-auto-flow: row;
-        align-content: start;
-        gap: .5rem;
-        width: 100%;
-        z-index: 3;
-    }
-    .params-container {
-        padding: 1rem;
-        height: 100%;
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
     }
 </style>

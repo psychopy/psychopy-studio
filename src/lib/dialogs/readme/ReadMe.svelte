@@ -14,6 +14,7 @@
 <Dialog
     title={script.file.name}
     bind:shown={shown}
+    shrink
 >
     <div class=readme-preview>
         {@html marked(script.content || "")}
@@ -35,7 +36,8 @@
 
 <style>
     .readme-preview {
-        width: 65rem;
+        width: 100%;
+        min-width: 55rem;
         min-height: 100%;
         box-sizing: border-box;
         padding: 1rem 2rem;

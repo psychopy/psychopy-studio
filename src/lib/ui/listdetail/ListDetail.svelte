@@ -133,5 +133,6 @@
         border-radius: .5rem;
         overflow: auto;
         width: 50rem;
+        flex-grow: 1;
     }
 </style>

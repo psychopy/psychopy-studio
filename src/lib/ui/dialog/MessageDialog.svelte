@@ -29,7 +29,6 @@
 <style>
     .dlg-message {
         padding: 1rem;
-        min-width: 20rem;
-        max-width: 45rem;
+        min-width: 45rem;
     }
 </style>
