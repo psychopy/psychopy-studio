@@ -2,6 +2,7 @@
     import DialogButton from "./DialogButton.svelte";
     import { Icon } from "$lib/ui/icon";
     import { onMount, setContext, untrack } from "svelte";
+    import { electron } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
 
     let {
@@ -66,7 +67,20 @@
 
     // update shown state on dialog close
     onMount(
-        evt => handle.addEventListener("close", evt => shown = false)
+        evt => {
+            // give parent window focus when dialog is shown
+            handle.addEventListener("toggle", evt => {
+                if (evt.newState === "open") {
+                    // mark shown
+                    shown = true;
+                    // focus parent window
+                    electron.windows.focus();
+                } else {
+                    // mark closed
+                    shown = false
+                }
+            })
+        }
     )
 
 </script>
