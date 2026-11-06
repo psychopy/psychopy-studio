@@ -79,9 +79,9 @@
     git.listen(
         (evt, message) => {
             current.output.pavlovia += message + "\n";
-            // focus runner and switch to pavlovia tab
-            showWindow("runner", true)
+            // switch to pavlovia tab and flash to indicate new input
             current.tab = "pavlovia";
+            electron?.windows.flash()
         }
     )
 

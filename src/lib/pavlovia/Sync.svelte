@@ -14,54 +14,62 @@
 
     let changes = $state.raw()
 
-    export async function sync(folder, user, force=false) {
+    export async function sync(folder, user) {
         let sha
-        // if indicated in exp settings, compile JS
-        if (current.experiment?.settings?.params?.['exportHTML'].val === "on Sync") {
-            await current.experiment.writeScript("PsychoJS")
-        }
-        // get remote
-        let remote = await git.getRemote(folder, user);
+        // get project name for marking start/end of sync in output
+        let name = folder.split(/[\\/]/).filter(Boolean).pop()
         // open runner to capture output (but don't focus it)
         showWindow("runner", false)
-        // if there is no remote, create one
-        if (remote === null) {
-            // prompt to create one
-            show.newProject = true;
-            if (await awaiting.newProject.promise) {
-                // if completed, get details
-                remote = await git.getRemote(folder, user);
-            } else {
-                // if cancelled, return
-                git.output("Cancelled by user.")
-                return
+        // mark started
+        git.output(`--- Started sync ${name} ---`)
+        try {
+            // if indicated in exp settings, compile JS
+            if (current.experiment?.settings?.params?.['exportHTML'].val === "on Sync") {
+                await current.experiment.writeScript("PsychoJS")
             }
-        }
-        // pull from remote
-        await git.pull(folder, user, false)
-        // scan for local changes
-        changes = await git.check(folder)
-        // stage any changes
-        if (changes.length) {
-            // prompt to commit
-            show.commit = true;
-            // wait until either given a commit, or told to cancel
-            try {
-                sha = await awaiting.commit.promise;
-            } catch {
-                // if cancelled, abort sync
-                git.output("Cancelled by user.")
-                return
+            // get remote
+            let remote = await git.getRemote(folder, user);
+            // if there is no remote, create one
+            if (remote === null) {
+                // prompt to create one
+                show.newProject = true;
+                if (await awaiting.newProject.promise) {
+                    // if completed, get details
+                    remote = await git.getRemote(folder, user);
+                } else {
+                    // if cancelled, return
+                    git.output(`--- Cancelled sync ${name} ---`)
+                    return
+                }
             }
-            // push changes
-            await git.push(folder, user, force)
-        } else {
-            // explain failure
-            git.output("Nothing to push.")
+            // pull from remote
+            await git.pull(folder, user)
+            // scan for local changes
+            changes = await git.check(folder)
+            // commit any changes
+            if (changes.length) {
+                // prompt to commit
+                show.commit = true;
+                // wait until either given a commit, or told to cancel
+                try {
+                    sha = await awaiting.commit.promise;
+                } catch {
+                    // if cancelled, abort sync
+                    git.output(`--- Cancelled sync ${name} ---`)
+                    return
+                }
+            }
+            // push changes (if any)
+            await git.push(folder, user)
+        } catch (err) {
+            // mark failed (then let error carry on as before)
+            git.output(`--- Failed sync ${name} ---`)
+            throw err
         }
         // focus runner
         showWindow("runner", true)
-        git.output(`Finished sync`)
+        // mark finished
+        git.output(`--- Finished sync ${name} ---`)
 
         return sha
     }

@@ -551,7 +551,7 @@ export async function newProject(details, folder, username) {
     await stage(folder)
     await commit("Create project", folder, username)
     // push (to create project)
-    await push(folder, username)
+    await push(folder, username, true)
 
     return {
         name: details.name,
@@ -695,6 +695,114 @@ export async function getProjectInfo({
 }
 
 
+/**
+ * Get the commits at the head of the current branch, both locally and on the remote. The remote 
+ * head is read from the remote tracking branch, so is only as recent as the last fetch unless 
+ * `fetch` is true.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {boolean} fetch If true, fetch the current branch from the remote first, so the remote
+ * head is up to date (requires `username`)
+ * @param {string} [username] User to authenticate as when fetching; not needed if `fetch` is false
+ *
+ * @returns {Promise<Array<string|null>>} Commit ids (oids) of the local and remote heads, as
+ * `[local, remote]`. Either is null if that branch doesn't exist (e.g. no local commits yet, or
+ * the branch has never been pushed), and both are null if no branch is checked out.
+ */
+export async function getHeads(folder, fetch=true, username=undefined) {
+    // get current branch
+    let branch = await git.currentBranch({
+        fs,
+        dir: folder
+    })
+    // fetch (update tracking branch) changes for the current branch, if requested
+    if (fetch) {
+        // get auth token
+        let token = await users[username].getToken()
+        // fetch
+        await git.fetch({
+            fs,
+            http,
+            dir: folder,
+            remote: "origin",
+            singleBranch: true,
+            onAuth: evt => {
+                return { username: "oauth2", password: token }
+            },
+            onMessage: output
+        }).catch(
+            // if there's no remote, this is fine, it'll just be null
+            err => err instanceof git.Errors.NotFoundError ? null : Promise.reject(err)
+        )
+    }
+    // get remote branch which the current branch tracks, falling back to one with the same name
+    let upstream = await git.getConfig({
+        fs,
+        dir: folder,
+        path: `branch.${branch}.merge`
+    }) || `refs/heads/${branch}`
+    // get tip of remote branch (from its tracking branch)
+    let remote = await git.resolveRef({
+        fs,
+        dir: folder,
+        ref: upstream.replace(/^refs\/heads\//, "refs/remotes/origin/")
+    }).catch(
+        // if there's no remote, tip is null
+        err => null
+    )
+    // get tip of local branch
+    let local = await git.resolveRef({
+        fs, 
+        dir: folder, 
+        ref: `refs/heads/${branch}`
+    }).catch(
+        // if we can't resolve a ref, then local is empty
+        err => null
+    )
+
+    return [local, remote]
+}
+
+
+/**
+ * Compare two commits and return whichever is the descendant of the other, i.e. whichever has the
+ * other in its history. This is by history rather than by date, so a commit is only returned if it
+ * already contains everything in the other one.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {string|null} a Commit id (oid) of the first commit, or null if there isn't one
+ * @param {string|null} b Commit id (oid) of the second commit, or null if there isn't one
+ *
+ * @returns {Promise<string|null>} Whichever of `a` or `b` is the descendant. If they're the same
+ * commit, returns `a`; if only one is given, returns that one; if neither is given, returns null.
+ *
+ * @throws {git.Errors.MergeNotSupportedError} If the two have diverged (neither contains the
+ * other), so neither is the descendant and they'd need merging
+ */
+export async function getDescendant(folder, a, b) {
+    // if they're the same commit (or both undefined) then return a because it is also b
+    if (a === b) return a
+    // if one ref is undefined, return the other one
+    if (!a) return b
+    if (!b) return a
+    // is one a descendent of the other?
+    for (let [oid, ancestor] of [
+        [a, b],
+        [b, a]
+    ]) {
+        if (await git.isDescendent({
+            fs,
+            dir: folder,
+            oid: oid,
+            ancestor: ancestor,
+            depth: -1
+        })) return oid
+    }
+    // if we've not returned yet, looks like a merge conflict!
+    throw new git.Errors.MergeNotSupportedError()
+}
+
+
 export async function clone({
     group: group,
     name: name,
@@ -813,46 +921,152 @@ export async function fork({
     return `${groupTo}/${name}`
 }
 
-
-export async function pull(folder, username, force=true) {
-    // log
-    output(`Getting changes from online...`)
-    // get auth token
-    let token = await users[username].getToken()
-    // set a default merge strategy if none set
-    if (await git.getConfig({
+/**
+ * Try to merge a commit (typically the remote head) into the current branch. Only merges which
+ * can be done automatically are attempted; if both sides have changed the same file(s) in
+ * conflicting ways, nothing is changed and an error is thrown. The merge is built from commits
+ * rather than files, so uncommitted local changes don't affect it, and the working tree is never
+ * updated; callers should checkout the result if they want files to match.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {string} remote Commit id (oid) or ref to merge into the current branch
+ * @param {boolean} apply If true, move the current branch to the merge result. If false, the
+ * merge commit is created but the branch is left where it is, so the result can be checked (e.g.
+ * with a dry-run checkout) before being applied.
+ * @param {string} username User to authenticate as
+ *
+ * @returns {Promise<string>} Commit id (oid) of the result: a new merge commit, or the head of
+ * whichever side already contains the other (if no merge commit is needed)
+ *
+ * @throws {Error} If local and remote have changes which can't be merged automatically
+ */
+export async function merge(folder, remote, apply, username) {
+    // get current branch
+    let branch = await git.currentBranch({
         fs,
-        dir: folder,
-        path: "pull.rebase"
-    }) === undefined) {
-        await git.setConfig({
+        dir: folder
+    })
+    // try to resolve, if it's simple
+    let result
+    try {
+        result = await git.merge({
             fs,
             dir: folder,
-            path: "pull.rebase",
-            value: false
+            ours: branch,
+            theirs: remote,
+            author: {
+                name: users[username].profile.name,
+                email: users[username].profile.email
+            },
+            message: `Merge changes from Pavlovia`,
+            abortOnConflict: true,
+            noUpdateBranch: !apply
         })
+    } catch (err) {
+        if (err instanceof git.Errors.MergeConflictError) {
+            // both sides changed the same lines of the same file(s)
+            throw new Error(
+                `Couldn't get changes from online, as the following files have been changed both locally and online: ${err.data.filepaths.join(", ")}`
+            )
+        }
+        if (err instanceof git.Errors.MergeNotSupportedError) {
+            // a conflict isomorphic-git can't handle (e.g. same file added on both sides)
+            throw new Error(
+                `Couldn't get changes from online, as local and online versions of this project have changes which can't be merged automatically.`
+            )
+        }
+        // any other error, don't handle
+        throw err
     }
-    // fetch changes
-    await git.fetch({
+
+    return result.oid
+}
+
+
+/**
+ * Fetch changes from the remote and bring the current branch up to date with them: fast-forwarding
+ * if possible, or creating a merge commit if local and remote have diverged. Uncommitted local
+ * changes are kept, unless they'd be overwritten by incoming changes, in which case nothing is
+ * changed and an error is thrown. Also throws (without changing anything) if local and remote
+ * have changed the same file(s) in ways that can't be merged automatically.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {string} username User to authenticate as
+ */
+export async function pull(folder, username) {
+    // log
+    output(`Getting changes from online...`)
+    // get current branch
+    let branch = await git.currentBranch({
         fs,
-        http,
-        dir: folder,
-        remote: "origin",
-        author: {
-            name: users[username].profile.name,
-            email: users[username].profile.email
-        },
-        onAuth: evt => { 
-            return { username: "oauth2", password: token } 
-        },
-        onMessage: output
+        dir: folder
     })
-    // checkout latest
+    if (!branch) {
+        throw new Error("Cannot get changes as no branch is checked out.")
+    }
+    // get commits at the head of local and remote branches
+    let [local, remote] = await getHeads(folder, true, username)
+    // figure out which is the descendant (i.e. contains the other)
+    let target = await getDescendant(folder, local, remote).catch(
+        async err => {
+            if (err instanceof git.Errors.MergeNotSupportedError) {
+                // try to handle simple merges, without applying
+                return merge(folder, remote, false, username)
+            } else {
+                throw err
+            }
+        }
+    )
+    // if local is up to date, nothing to pull
+    if (target === local) {
+        output(`Already up to date.`)
+        return
+    }
+    // check that applying incoming changes won't overwrite any uncommitted local changes (throws
+    // CheckoutConflictError if it would) before moving the branch, so a conflict leaves everything
+    // as it was
     await git.checkout({
         fs,
         dir: folder,
-        force: force
+        ref: target,
+        dryRun: true,
+        noUpdateHead: true
     })
+    // move local branch to remote (fast-forward) or merge commit
+    await git.writeRef({
+        fs,
+        dir: folder,
+        ref: `refs/heads/${branch}`,
+        value: target,
+        force: true
+    })
+    // update files to match
+    try {
+        await git.checkout({
+            fs,
+            dir: folder,
+            ref: branch
+        })
+    } catch (err) {
+        // if files couldn't be updated (e.g. one is locked), move the branch back to where it was
+        if (local) {
+            await git.writeRef({
+                fs,
+                dir: folder,
+                ref: `refs/heads/${branch}`,
+                value: local,
+                force: true
+            })
+        } else {
+            // if there was no local branch before, remove it again
+            await git.deleteRef({
+                fs,
+                dir: folder,
+                ref: `refs/heads/${branch}`
+            })
+        }
+        throw err
+    }
     output(`Finished getting changes.`)
 }
 
@@ -931,11 +1145,52 @@ export async function commit(message, folder, username) {
 }
 
 
-export async function push(folder, username, force=false) {
+/**
+ * Send local commits on the current branch to the remote ("origin"). Unless creating the project,
+ * the remote is fetched first and compared with local, so that:
+ * - if the remote already contains everything local has, nothing is sent;
+ * - if local and remote have diverged (e.g. participant data was added online since the last
+ *   pull), changes from online are pulled (and merged) first, so the push is a fast-forward.
+ * Never force pushes, so commits online are never discarded.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {string} username User to authenticate as
+ * @param {boolean} [create=false] If true, this is the first push of a new project, which creates it
+ * on Pavlovia. As the project doesn't exist online yet, it can't be fetched to compare with local,
+ * so the check is skipped and local commits are pushed straight away.
+ *
+ * @throws {Error} If changes from online need merging first and can't be merged automatically,
+ * or would overwrite uncommitted local changes (see `pull`)
+ */
+export async function push(folder, username, create=false) {
     // log
     output(`Sending changes to Pavlovia...`)
     // get auth token
     let token = await users[username].getToken()
+    // check that there's actually something to push
+    // (if creating the project, there always is)
+    if (!create) {
+        // get commits at the head of local and remote branches
+        let [local, remote] = await getHeads(folder, true, username)
+        // figure out which is the descendant (i.e. contains the other)
+        let target = await getDescendant(folder, local, remote).catch(
+            async err => {
+                if (err instanceof git.Errors.MergeNotSupportedError) {
+                    // online has changed since we last pulled, so get those changes first
+                    await pull(folder, username)
+                    // local now contains remote, so there's something to push
+                    return null  
+                } else {
+                    throw err
+                }
+            }
+        )
+        // if remote is up to date, nothing to push
+        if (target === remote) {
+            output(`No changes to send.`)
+            return
+        }
+    }
     // push
     await git.push({
         fs,
@@ -945,7 +1200,6 @@ export async function push(folder, username, force=false) {
         onAuth: evt => { 
             return {username: "oauth2", password: token} 
         },
-        force: force,
         onMessage: output
     })
 }
@@ -981,11 +1235,11 @@ export const handlers = {
     clone: ipcMain.handle("git.clone", (evt, details, username) => clone(details, username)),
     fork: ipcMain.handle("git.fork", (evt, details, username) => fork(details, username)),
     listProjectForks: ipcMain.handle("git.listProjectForks", (evt, project, username) => listProjectForks(project, username)),
-    pull: ipcMain.handle("git.pull", (evt, folder, user, force=true) => pull(folder, user, force)),
+    pull: ipcMain.handle("git.pull", (evt, folder, user) => pull(folder, user)),
     check: ipcMain.handle("git.check", (evt, folder) => check(folder)),
     stage: ipcMain.handle("git.stage", (evt, folder, files=undefined) => stage(folder, files)),
     commit: ipcMain.handle("git.commit", (evt, message, folder, user) => commit(message, folder, user)),
-    push: ipcMain.handle("git.push", (evt, folder, user, force=false) => push(folder, user, force)),
+    push: ipcMain.handle("git.push", (evt, folder, user) => push(folder, user)),
     newProject: ipcMain.handle("git.newProject", (evt, details, folder, user) => newProject(details, folder, user)),
     loadProjects: ipcMain.handle("git.loadProjects", (evt) => loadProjects()),
     linkProject: ipcMain.handle("git.linkProject", (evt, key, folder) => linkProject(key, folder))
