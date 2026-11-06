@@ -18,7 +18,7 @@
         bind:value={current.directory}
     />
 
-    <TreeRoot>
+    <TreeRoot flush>
         <FolderNode
             bind:value={current.directory}
             top

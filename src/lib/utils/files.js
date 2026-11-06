@@ -35,6 +35,45 @@ export function parsePath(file) {
 
 
 /**
+ * Convert a flat list of file paths into a nested tree reflecting the folder structure. Folders
+ * are represented as `{name, children}` objects and files as strings, e.g.
+ *
+ *     ["a/b.png", "c/a/d.csv"]
+ *
+ * becomes
+ *
+ *     [{name: "a", children: ["b.png"]}, {name: "c", children: [{name: "a", children: ["d.csv"]}]}]
+ */
+export function pathsToTree(paths) {
+    let root = []
+    for (let file of paths) {
+        // split into parts (handling \ as well as /), ignoring empty segments
+        let parts = file.replaceAll("\\", "/").split("/").filter(Boolean)
+        // start at the top level
+        let level = root
+        // descend through folders, creating as needed
+        for (let name of parts.slice(0, -1)) {
+            let folder = level.find(
+                item => typeof item === "object" && item.name === name
+            )
+            if (folder === undefined) {
+                folder = {name: name, children: []}
+                level.push(folder)
+            }
+            level = folder.children
+        }
+        // add file at the bottom
+        let name = parts.at(-1)
+        if (name !== undefined && !level.includes(name)) {
+            level.push(name)
+        }
+    }
+
+    return root
+}
+
+
+/**
  * Convert a filters list in the JS style (as in e.g. `window.showOpenFilePicker`) to the Electron 
  * style (as in e.g. `electron.files.openDialog`)
  */
