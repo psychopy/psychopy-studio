@@ -1,5 +1,7 @@
 <script>
     import { Dialog, DialogButton } from "$lib/ui/dialog";
+    import { TreeRoot, TreeBranch, FileTreeNode } from "$lib/ui/tree";
+    import { pathsToTree } from "$lib/utils/files";
     import { git } from "$lib/globals.svelte";
     import { getContext } from "svelte";
     import { translate } from "$lib/translation";
@@ -15,6 +17,23 @@
     let message = $state("")
 </script>
 
+{#snippet treeNode(tree)}
+    {#if typeof tree === "string"}
+        <FileTreeNode
+            file={tree}
+        />
+    {:else}
+        <TreeBranch
+            label={tree.name}
+            open
+        >
+            {#each tree.children as child}
+                {@render treeNode(child)}
+            {/each}
+        </TreeBranch>
+    {/if}
+{/snippet}
+
 <Dialog 
     title={translate("Commit changes")}
     onopen={evt => {
@@ -27,11 +46,11 @@
         {translate("Briefly describe the changes made since last sync.")}
         <input bind:value={message} />
         {translate("Changed files:")}
-        <div class=changes>
-            {#each changes as file}
-                <span>{file}</span>
+        <TreeRoot>
+            {#each pathsToTree(changes) as node}
+                {@render treeNode(node)}
             {/each}
-        </div>
+        </TreeRoot>
     </div>
     {#snippet buttons()}
         <DialogButton
@@ -71,15 +90,5 @@
         gap: .5rem;
         padding: 1rem;
         min-width: 35rem;
-    }
-    .changes {
-        display: flex;
-        flex-direction: column;
-        gap: .2rem;
-        background-color: var(--base);
-        border: 1px solid var(--overlay);
-        border-radius: .5rem;
-        padding: .5rem 1rem;
-        font-family: var(--mono);
     }
 </style>
