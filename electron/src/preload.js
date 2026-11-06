@@ -10,6 +10,7 @@ const electron = {
     emit: (tag, data) => ipcRenderer.send(tag, data),
     listen: (tag, lsnr) => ipcRenderer.on(tag, lsnr),
     focus: (id) => ipcRenderer.invoke("electron.windows.focus", id).then(resp => resp),
+    flash: (id) => ipcRenderer.invoke("electron.windows.flash", id).then(resp => resp),
     devtools: (id) => ipcRenderer.invoke("electron.windows.devtools", id).then(resp => resp),
     close: (id) => ipcRenderer.invoke("electron.windows.close", id).then(resp => resp),
     hideMenu: () => ipcRenderer.invoke("electron.windows.hideMenu").then(resp => resp),

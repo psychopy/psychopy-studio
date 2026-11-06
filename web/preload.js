@@ -15,6 +15,7 @@ export const electron = {
     emit: (tag, data) => {},
     listen: (tag, lsnr) => {},
     focus: (id) => {},
+    flash: (id) => {},
     devtools: (id) => {},
     close: (id) => {},
     hideMenu: () => {},

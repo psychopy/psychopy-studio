@@ -45,7 +45,7 @@ function onFileOpen(evt, file) {
   }
   if (file.startsWith("psychopy-studio://")) {
     params = file.match(/psychopy-studio\:\/\/(?<group>.*?)\/(?<name>.*?)$/).groups
-    newWindow(`runner?projectOpen=${params.group}/${params.name}`, true, false, [800, 600])
+    newWindow(`runner?projectOpen=${params.group}/${params.name}`, true, false)
   } else if (file.endsWith(".psyexp")) {
     // open psyexp in Builder
     newWindow(`builder?fileOpen=${file}`, true, false)
@@ -245,6 +245,7 @@ const handlers = {
       )),
       send: ipcMain.handle("electron.windows.send", (evt, id, tag, data) => windows[id].webContents.send(tag, data)),
       focus: ipcMain.handle("electron.windows.focus", (evt, id) => windows[id || evt.sender.id].focus()),
+      flash: ipcMain.handle("electron.windows.flash", (evt, id) => windows[id || evt.sender.id].requestAttention(true)),
       devtools: ipcMain.handle("electron.windows.devtools", (evt, id) => windows[id || evt.sender.id].openDevTools()),
       close: ipcMain.handle("electron.windows.close", (evt, id) => windows[id || evt.sender.id].close()),
       hideMenu: ipcMain.handle("electron.windows.hideMenu", (evt) => windows[evt.sender.id].removeMenu()),

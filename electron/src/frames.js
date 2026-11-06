@@ -31,6 +31,9 @@ export async function newWindow(target = null, show = true, fullscreen = false) 
       preload: path.join(import.meta.dirname, 'preload.js')
     }
   });
+  // setup flash behaviour
+  win.requestAttention = () => win.flashFrame(!win.isFocused())
+  win.on("focus", evt => win.flashFrame(false))
   // prevent default key behaviour for CMD+R
   win.webContents.on("before-input-event", (evt, input) => {
     if (input.modifiers.includes("meta") && input.key.toLowerCase() === "r") {
@@ -85,8 +88,8 @@ export async function newWindow(target = null, show = true, fullscreen = false) 
       if (fullscreen) {
         win.maximize();
       }
-      // give focus
-      win.focus();
+      // flash until looked at
+      win.requestAttention();
       // make sure the splash screen is closed
       if (!windows.splash.isDestroyed()) {
         windows.splash.close()
