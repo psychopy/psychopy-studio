@@ -856,36 +856,23 @@ export async function pull(folder, username, force=true) {
     output(`Finished getting changes.`)
 }
 
-
-export async function stage(folder) {
+/**
+ * Check for changes in the given folder
+ */
+export async function check(folder) {
     // log
     output(`Scanning for local changes...`)
-    // track changed files
-    let changed = []
-    // iterate through files
-    for (let file of fs.globSync("**/*.*", { cwd: folder })) {
-        // fix slashes on Windows
-        file = file.replaceAll("\\", "/")
-        // get file status
-        let status = await git.status({
-            fs,
-            dir: folder,
-            filepath: file
-        })
-        // skip if gitignored or unchanged
-        if (["ignored", "unmodified", "*unmodified"].includes(status)) {
-            continue
-        }
-        // stage
-        await git.add({
-            fs, 
-            dir: folder, 
-            filepath: file,
-            onMessage: output
-        })
-        // note change
-        changed.push(file)
-    }
+    // get status of every file in HEAD, the index and the working directory (excludes gitignored files)
+    let matrix = await git.statusMatrix({
+        fs,
+        dir: folder
+    })
+    // anything which isn't identical in HEAD, working directory and index is a change
+    let changed = matrix.filter(
+        ([, head, workdir, stage]) => !(head === 1 && workdir === 1 && stage === 1)
+    ).map(
+        ([file]) => file
+    )
     // log changes
     if (changed.length) {
         output(`${changed.length} files changed:\n${changed.join("\n")}`)
@@ -894,6 +881,35 @@ export async function stage(folder) {
     }
 
     return changed
+}
+
+
+export async function stage(folder, files=undefined) {
+    // if not given a list of files, get changes
+    if (files === undefined) {
+        files = await check(folder)
+    }
+    // iterate through changed files
+    for (let file of files) {
+        if (fs.existsSync(path.join(folder, file))) {
+            // stage each new or modified file
+            await git.add({
+                fs,
+                dir: folder,
+                filepath: file,
+                onMessage: output
+            })
+        } else {
+            // stage the deletion of each deleted file
+            await git.remove({
+                fs,
+                dir: folder,
+                filepath: file
+            })
+        }
+    }
+
+    return files
 }
 
 
@@ -966,7 +982,8 @@ export const handlers = {
     fork: ipcMain.handle("git.fork", (evt, details, username) => fork(details, username)),
     listProjectForks: ipcMain.handle("git.listProjectForks", (evt, project, username) => listProjectForks(project, username)),
     pull: ipcMain.handle("git.pull", (evt, folder, user, force=true) => pull(folder, user, force)),
-    stage: ipcMain.handle("git.stage", (evt, folder) => stage(folder)),
+    check: ipcMain.handle("git.check", (evt, folder) => check(folder)),
+    stage: ipcMain.handle("git.stage", (evt, folder, files=undefined) => stage(folder, files)),
     commit: ipcMain.handle("git.commit", (evt, message, folder, user) => commit(message, folder, user)),
     push: ipcMain.handle("git.push", (evt, folder, user, force=false) => push(folder, user, force)),
     newProject: ipcMain.handle("git.newProject", (evt, details, folder, user) => newProject(details, folder, user)),

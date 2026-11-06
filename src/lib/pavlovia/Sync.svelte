@@ -12,6 +12,7 @@
         button
     } = $props()
 
+    let changes = $state.raw()
 
     export async function sync(folder, user, force=false) {
         let sha
@@ -39,7 +40,7 @@
         // pull from remote
         await git.pull(folder, user, false)
         // scan for local changes
-        let changes = await git.stage(folder)
+        changes = await git.check(folder)
         // stage any changes
         if (changes.length) {
             // prompt to commit
@@ -84,4 +85,5 @@
 <CommitDlg 
     bind:shown={show.commit}
     bind:awaiting={awaiting.commit}
+    bind:changes={changes}
 />
