@@ -551,7 +551,7 @@ export async function newProject(details, folder, username) {
     await stage(folder)
     await commit("Create project", folder, username)
     // push (to create project)
-    await push(folder, username)
+    await push(folder, username, true)
 
     return {
         name: details.name,
@@ -1118,30 +1118,51 @@ export async function commit(message, folder, username) {
 }
 
 
-export async function push(folder, username) {
+/**
+ * Send local commits on the current branch to the remote ("origin"). Unless creating the project,
+ * the remote is fetched first and compared with local, so that:
+ * - if the remote already contains everything local has, nothing is sent;
+ * - if local and remote have diverged (e.g. participant data was added online since the last
+ *   pull), changes from online are pulled (and merged) first, so the push is a fast-forward.
+ * Never force pushes, so commits online are never discarded.
+ *
+ * @param {string} folder Folder containing the repo
+ * @param {string} username User to authenticate as
+ * @param {boolean} [create=false] If true, this is the first push of a new project, which creates it
+ * on Pavlovia. As the project doesn't exist online yet, it can't be fetched to compare with local,
+ * so the check is skipped and local commits are pushed straight away.
+ *
+ * @throws {Error} If changes from online need merging first and can't be merged automatically,
+ * or would overwrite uncommitted local changes (see `pull`)
+ */
+export async function push(folder, username, create=false) {
     // log
     output(`Sending changes to Pavlovia...`)
     // get auth token
     let token = await users[username].getToken()
-    // get commits at the head of local and remote branches
-    let [local, remote] = await getHeads(folder, true, username)
-    // figure out which is the descendant (i.e. contains the other)
-    let target = await getDescendant(folder, local, remote).catch(
-        async err => {
-            if (err instanceof git.Errors.MergeNotSupportedError) {
-                // online has changed since we last pulled, so get those changes first
-                await pull(folder, username)
-                // local now contains remote, so there's something to push
-                return null  
-            } else {
-                throw err
+    // check that there's actually something to push
+    // (if creating the project, there always is)
+    if (!create) {
+        // get commits at the head of local and remote branches
+        let [local, remote] = await getHeads(folder, true, username)
+        // figure out which is the descendant (i.e. contains the other)
+        let target = await getDescendant(folder, local, remote).catch(
+            async err => {
+                if (err instanceof git.Errors.MergeNotSupportedError) {
+                    // online has changed since we last pulled, so get those changes first
+                    await pull(folder, username)
+                    // local now contains remote, so there's something to push
+                    return null  
+                } else {
+                    throw err
+                }
             }
+        )
+        // if remote is up to date, nothing to push
+        if (target === remote) {
+            output(`No changes to send.`)
+            return
         }
-    )
-    // if remote is up to date, nothing to push
-    if (target === remote) {
-        output(`No changes to send.`)
-        return
     }
     // push
     await git.push({
