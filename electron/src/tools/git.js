@@ -735,11 +735,17 @@ export async function getHeads(folder, fetch=true, username=undefined) {
             err => err instanceof git.Errors.NotFoundError ? null : Promise.reject(err)
         )
     }
-    // get tip of remote branch
+    // get remote branch which the current branch tracks, falling back to one with the same name
+    let upstream = await git.getConfig({
+        fs,
+        dir: folder,
+        path: `branch.${branch}.merge`
+    }) || `refs/heads/${branch}`
+    // get tip of remote branch (from its tracking branch)
     let remote = await git.resolveRef({
-        fs, 
-        dir: folder, 
-        ref: `refs/remotes/origin/${branch}`
+        fs,
+        dir: folder,
+        ref: upstream.replace(/^refs\/heads\//, "refs/remotes/origin/")
     }).catch(
         // if there's no remote, tip is null
         err => null
