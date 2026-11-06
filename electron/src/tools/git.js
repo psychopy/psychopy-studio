@@ -862,25 +862,17 @@ export async function pull(folder, username, force=true) {
 export async function check(folder) {
     // log
     output(`Scanning for local changes...`)
-    // track changed files
-    let changed = []
-    // iterate through files
-    for (let file of fs.globSync("**/*.*", { cwd: folder })) {
-        // fix slashes on Windows
-        file = file.replaceAll("\\", "/")
-        // get file status
-        let status = await git.status({
-            fs,
-            dir: folder,
-            filepath: file
-        })
-        // skip if gitignored or unchanged
-        if (["ignored", "unmodified", "*unmodified"].includes(status)) {
-            continue
-        }
-        // note change
-        changed.push(file)
-    }
+    // get status of every file in HEAD, the index and the working directory (excludes gitignored files)
+    let matrix = await git.statusMatrix({
+        fs,
+        dir: folder
+    })
+    // anything which isn't identical in HEAD, working directory and index is a change
+    let changed = matrix.filter(
+        ([, head, workdir, stage]) => !(head === 1 && workdir === 1 && stage === 1)
+    ).map(
+        ([file]) => file
+    )
     // log changes
     if (changed.length) {
         output(`${changed.length} files changed:\n${changed.join("\n")}`)
@@ -899,13 +891,22 @@ export async function stage(folder, files=undefined) {
     }
     // iterate through changed files
     for (let file of files) {
-        // stage each
-        await git.add({
-            fs, 
-            dir: folder, 
-            filepath: file,
-            onMessage: output
-        })
+        if (fs.existsSync(path.join(folder, file))) {
+            // stage each new or modified file
+            await git.add({
+                fs,
+                dir: folder,
+                filepath: file,
+                onMessage: output
+            })
+        } else {
+            // stage the deletion of each deleted file
+            await git.remove({
+                fs,
+                dir: folder,
+                filepath: file
+            })
+        }
     }
 
     return files
