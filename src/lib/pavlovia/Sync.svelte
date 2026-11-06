@@ -38,7 +38,7 @@
             }
         }
         // pull from remote
-        await git.pull(folder, user, false)
+        await git.pull(folder, user)
         // scan for local changes
         changes = await git.check(folder)
         // stage any changes

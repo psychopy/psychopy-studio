@@ -147,7 +147,7 @@ const git = {
   clone: (details, username) => ipcRenderer.invoke("git.clone", details, username).then(resp => resp),
   fork: (details, username) => ipcRenderer.invoke("git.fork", details, username).then(resp => resp),
   listProjectForks: (project, username) => ipcRenderer.invoke("git.listProjectForks", project, username).then(resp => resp),
-  pull: (folder, user, force=true) => ipcRenderer.invoke("git.pull", folder, user, force).then(resp => resp),
+  pull: (folder, user) => ipcRenderer.invoke("git.pull", folder, user).then(resp => resp),
   check: (folder) => ipcRenderer.invoke("git.check", folder).then(resp => resp),
   stage: (folder, files=undefined) => ipcRenderer.invoke("git.stage", folder, files).then(resp => resp),
   commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user).then(resp => resp),
