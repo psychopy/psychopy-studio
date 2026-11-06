@@ -151,7 +151,7 @@ const git = {
   check: (folder) => ipcRenderer.invoke("git.check", folder).then(resp => resp),
   stage: (folder, files=undefined) => ipcRenderer.invoke("git.stage", folder, files).then(resp => resp),
   commit: (message, folder, user) => ipcRenderer.invoke("git.commit", message, folder, user).then(resp => resp),
-  push: (folder, user, force=false) => ipcRenderer.invoke("git.push", folder, user, force).then(resp => resp),
+  push: (folder, user) => ipcRenderer.invoke("git.push", folder, user).then(resp => resp),
   newProject: (details, folder, user) => ipcRenderer.invoke("git.newProject", details, folder, user).then(resp => resp),
   loadProjects: () => ipcRenderer.invoke("git.loadProjects").then(resp => resp),
   linkProject: (key, folder) => ipcRenderer.invoke("git.linkProject", key, folder).then(resp => resp),

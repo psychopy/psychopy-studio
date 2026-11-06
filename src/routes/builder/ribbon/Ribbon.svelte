@@ -243,8 +243,7 @@
                     tooltip={translate("Sync experiment")} 
                     onclick={(evt) => sync(
                         $state.snapshot(current.experiment.file.parent), 
-                        $state.snapshot(current.user),
-                        true
+                        $state.snapshot(current.user)
                     )}
                     disabled={!current.user || !current.experiment.file.file}
                     ghost

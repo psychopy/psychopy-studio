@@ -14,7 +14,7 @@
 
     let changes = $state.raw()
 
-    export async function sync(folder, user, force=false) {
+    export async function sync(folder, user) {
         let sha
         // if indicated in exp settings, compile JS
         if (current.experiment?.settings?.params?.['exportHTML'].val === "on Sync") {
@@ -41,7 +41,7 @@
         await git.pull(folder, user)
         // scan for local changes
         changes = await git.check(folder)
-        // stage any changes
+        // commit any changes
         if (changes.length) {
             // prompt to commit
             show.commit = true;
@@ -53,12 +53,9 @@
                 git.output("Cancelled by user.")
                 return
             }
-            // push changes
-            await git.push(folder, user, force)
-        } else {
-            // explain failure
-            git.output("Nothing to push.")
         }
+        // push changes (if any)
+        await git.push(folder, user)
         // focus runner
         showWindow("runner", true)
         git.output(`Finished sync`)

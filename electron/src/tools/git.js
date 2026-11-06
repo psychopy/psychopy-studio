@@ -927,13 +927,14 @@ export async function fork({
  * @param {boolean} apply If true, move the current branch to the merge result. If false, the
  * merge commit is created but the branch is left where it is, so the result can be checked (e.g.
  * with a dry-run checkout) before being applied.
+ * @param {string} username User to authenticate as
  *
  * @returns {Promise<string>} Commit id (oid) of the result: a new merge commit, or the head of
  * whichever side already contains the other (if no merge commit is needed)
  *
  * @throws {Error} If local and remote have changes which can't be merged automatically
  */
-export async function merge(folder, remote, apply=true) {
+export async function merge(folder, remote, apply, username) {
     // get current branch
     let branch = await git.currentBranch({
         fs,
@@ -989,8 +990,6 @@ export async function merge(folder, remote, apply=true) {
 export async function pull(folder, username) {
     // log
     output(`Getting changes from online...`)
-    // get auth token
-    let token = await users[username].getToken()
     // get current branch
     let branch = await git.currentBranch({
         fs,
@@ -1006,7 +1005,7 @@ export async function pull(folder, username) {
         async err => {
             if (err instanceof git.Errors.MergeNotSupportedError) {
                 // try to handle simple merges, without applying
-                return merge(folder, remote, false)
+                return merge(folder, remote, false, username)
             } else {
                 throw err
             }
@@ -1119,11 +1118,31 @@ export async function commit(message, folder, username) {
 }
 
 
-export async function push(folder, username, force=false) {
+export async function push(folder, username) {
     // log
     output(`Sending changes to Pavlovia...`)
     // get auth token
     let token = await users[username].getToken()
+    // get commits at the head of local and remote branches
+    let [local, remote] = await getHeads(folder, true, username)
+    // figure out which is the descendant (i.e. contains the other)
+    let target = await getDescendant(folder, local, remote).catch(
+        async err => {
+            if (err instanceof git.Errors.MergeNotSupportedError) {
+                // online has changed since we last pulled, so get those changes first
+                await pull(folder, username)
+                // local now contains remote, so there's something to push
+                return null  
+            } else {
+                throw err
+            }
+        }
+    )
+    // if remote is up to date, nothing to push
+    if (target === remote) {
+        output(`No changes to send.`)
+        return
+    }
     // push
     await git.push({
         fs,
@@ -1133,7 +1152,6 @@ export async function push(folder, username, force=false) {
         onAuth: evt => { 
             return {username: "oauth2", password: token} 
         },
-        force: force,
         onMessage: output
     })
 }
@@ -1173,7 +1191,7 @@ export const handlers = {
     check: ipcMain.handle("git.check", (evt, folder) => check(folder)),
     stage: ipcMain.handle("git.stage", (evt, folder, files=undefined) => stage(folder, files)),
     commit: ipcMain.handle("git.commit", (evt, message, folder, user) => commit(message, folder, user)),
-    push: ipcMain.handle("git.push", (evt, folder, user, force=false) => push(folder, user, force)),
+    push: ipcMain.handle("git.push", (evt, folder, user) => push(folder, user)),
     newProject: ipcMain.handle("git.newProject", (evt, details, folder, user) => newProject(details, folder, user)),
     loadProjects: ipcMain.handle("git.loadProjects", (evt) => loadProjects()),
     linkProject: ipcMain.handle("git.linkProject", (evt, key, folder) => linkProject(key, folder))
