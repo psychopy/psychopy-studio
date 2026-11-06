@@ -856,8 +856,10 @@ export async function pull(folder, username, force=true) {
     output(`Finished getting changes.`)
 }
 
-
-export async function stage(folder) {
+/**
+ * Check for changes in the given folder
+ */
+export async function check(folder) {
     // log
     output(`Scanning for local changes...`)
     // track changed files
@@ -876,13 +878,6 @@ export async function stage(folder) {
         if (["ignored", "unmodified", "*unmodified"].includes(status)) {
             continue
         }
-        // stage
-        await git.add({
-            fs, 
-            dir: folder, 
-            filepath: file,
-            onMessage: output
-        })
         // note change
         changed.push(file)
     }
@@ -894,6 +889,26 @@ export async function stage(folder) {
     }
 
     return changed
+}
+
+
+export async function stage(folder, files=undefined) {
+    // if not given a list of files, get changes
+    if (files === undefined) {
+        files = await check(folder)
+    }
+    // iterate through changed files
+    for (let file of files) {
+        // stage each
+        await git.add({
+            fs, 
+            dir: folder, 
+            filepath: file,
+            onMessage: output
+        })
+    }
+
+    return files
 }
 
 
@@ -966,7 +981,8 @@ export const handlers = {
     fork: ipcMain.handle("git.fork", (evt, details, username) => fork(details, username)),
     listProjectForks: ipcMain.handle("git.listProjectForks", (evt, project, username) => listProjectForks(project, username)),
     pull: ipcMain.handle("git.pull", (evt, folder, user, force=true) => pull(folder, user, force)),
-    stage: ipcMain.handle("git.stage", (evt, folder) => stage(folder)),
+    check: ipcMain.handle("git.check", (evt, folder) => check(folder)),
+    stage: ipcMain.handle("git.stage", (evt, folder, files=undefined) => stage(folder, files)),
     commit: ipcMain.handle("git.commit", (evt, message, folder, user) => commit(message, folder, user)),
     push: ipcMain.handle("git.push", (evt, folder, user, force=false) => push(folder, user, force)),
     newProject: ipcMain.handle("git.newProject", (evt, details, folder, user) => newProject(details, folder, user)),
