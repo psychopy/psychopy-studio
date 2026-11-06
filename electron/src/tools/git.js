@@ -1041,11 +1041,32 @@ export async function pull(folder, username) {
         force: true
     })
     // update files to match
-    await git.checkout({
-        fs,
-        dir: folder,
-        ref: branch
-    })
+    try {
+        await git.checkout({
+            fs,
+            dir: folder,
+            ref: branch
+        })
+    } catch (err) {
+        // if files couldn't be updated (e.g. one is locked), move the branch back to where it was
+        if (local) {
+            await git.writeRef({
+                fs,
+                dir: folder,
+                ref: `refs/heads/${branch}`,
+                value: local,
+                force: true
+            })
+        } else {
+            // if there was no local branch before, remove it again
+            await git.deleteRef({
+                fs,
+                dir: folder,
+                ref: `refs/heads/${branch}`
+            })
+        }
+        throw err
+    }
     output(`Finished getting changes.`)
 }
 
