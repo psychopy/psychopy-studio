@@ -19,7 +19,25 @@ export function createFiles(windowObject = globalThis.window) {
             if (handles.has(file)) {
                 return (await handles.get(file).getFile()).text();
             }
-            return storage?.getItem(file);
+            const stored = storage?.getItem(file);
+            if (stored != null) {
+                return stored;
+            }
+            // fall back to fetching bundled content (e.g. sample experiments)
+            if (typeof windowObject.fetch !== "function") {
+                return null;
+            }
+            // resolve relative paths against the site root
+            const url = file.startsWith("/") ? file : `/${file}`;
+            try {
+                const response = await windowObject.fetch(url);
+                if (response.ok) {
+                    return await response.text();
+                }
+            } catch {
+                // network errors fall through to null
+            }
+            return null;
         },
         save: async (file, content) => {
             if (handles.has(file)) {

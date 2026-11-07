@@ -52,7 +52,7 @@ export const electron = {
     mkdir: (path, recursive=true) => {},
     openDialog: files.openDialog,
     saveDialog: files.saveDialog,
-    scandir: (root) => {},
+    scandir: (root) => [],
     showItemInFolder: (folder) => {},
     openPath: (path) => {},
     openExternal: (url) => files.openExternal,

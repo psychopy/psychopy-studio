@@ -109,3 +109,55 @@ test("reports a blocked popup as null", async () => {
 
     assert.equal(await files.openExternal("https://example.com"), null);
 });
+test("falls back to fetching bundled content when a file is not stored", async () => {
+  const fetchCalls = [];
+  const files = createFiles({
+    localStorage: createStorage(),
+    fetch: async (url) => {
+      fetchCalls.push(url);
+      if (url === "/examples/reaction_time.psyexp") {
+        return { ok: true, text: async () => "<PsychoPy2experiment />" };
+      }
+      return { ok: false };
+    }
+  });
+
+  assert.equal(
+    await files.load("/examples/reaction_time.psyexp"),
+    "<PsychoPy2experiment />"
+  );
+  // relative paths are resolved against the site root
+  assert.equal(
+    await files.load("examples/reaction_time.psyexp"),
+    "<PsychoPy2experiment />"
+  );
+  // missing content falls back to null
+  assert.equal(await files.load("missing.psyexp"), null);
+  assert.deepEqual(fetchCalls, [
+    "/examples/reaction_time.psyexp",
+    "/examples/reaction_time.psyexp",
+    "/missing.psyexp"
+  ]);
+});
+
+test("prefers stored content over fetching bundled content", async () => {
+  const files = createFiles({
+    localStorage: createStorage(),
+    fetch: async () => {
+      throw new Error("should not fetch");
+    }
+  });
+
+  await files.save("experiment.psyexp", "<stored />");
+  assert.equal(await files.load("experiment.psyexp"), "<stored />");
+});
+
+test("returns null when fetching bundled content fails", async () => {
+  const files = createFiles({
+    fetch: async () => {
+      throw new Error("network down");
+    }
+  });
+
+  assert.equal(await files.load("examples/reaction_time.psyexp"), null);
+});
