@@ -59,7 +59,7 @@ export const electron = {
     downloadFolder: (url, target, name) => {}
   },
   clipboard: createClipboard(),
-  state: createState,
+  state: createState(),
   system: createSystem(),
   version: getVersion,
   platform: getPlatform,
