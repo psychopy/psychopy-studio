@@ -3,6 +3,16 @@ import test from "node:test";
 
 import { createState } from "./state.js";
 
+test("reads cached profiles synchronously and updates them asynchronously", async () => {
+    const state = createState();
+    const components = { TextComponent: { name: "Text" } };
+
+    assert.deepEqual(state.getProfiles(), {});
+    await state.setProfiles("components", components);
+    assert.deepEqual(state.getProfiles(), { components });
+    assert.deepEqual(createState().getProfiles(), {});
+});
+
 test("merges partial frame updates", async () => {
     const frame = { view: "builder", files: [] };
     const state = createState(frame);
