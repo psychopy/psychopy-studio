@@ -126,7 +126,8 @@
 		"electron:start": "electron electron/src/index.cjs",
 		"electron:lint": "echo \"No linting configured\"",
 		"build": "npm run svelte:build && electron-builder build",
-		"dev": "concurrently \"npm run svelte:dev\" \"wait-on http://localhost:5173 && npm run electron:start\""
+		"dev": "concurrently \"npm run svelte:dev\" \"wait-on http://localhost:5173 && npm run electron:start\"",
+		"test": "node --test"
 	},
 	"devDependencies": {
 		"@electron/fuses": "^2.1.3",
