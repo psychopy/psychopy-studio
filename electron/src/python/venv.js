@@ -82,15 +82,22 @@ export class PythonVenv {
          * @param {ChildProcess} _process 
          */
         function hardkill(_process) {
-            // skip anything not started, already stopped, or not a child process
-            if (!_process?.pid) {
+            // skip anything not started, already exited, or not a child process
+            if (!_process?.pid || _process.exitCode !== null || _process.signalCode !== null) {
                 return
             }
-            // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
-            if (process.platform === 'win32') {
-                _process.kill()
-            } else {
-                process.kill(_process.pid)
+            try {
+                // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
+                if (process.platform === 'win32') {
+                    _process.kill()
+                } else {
+                    process.kill(_process.pid)
+                }
+            } catch (err) {
+                // ignore if it exited since we checked
+                if (err.code !== "ESRCH") {
+                    throw err
+                }
             }
         }
         // kill liaison
