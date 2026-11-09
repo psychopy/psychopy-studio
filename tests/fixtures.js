@@ -54,24 +54,27 @@ export const test = base.extend({
 			env.PSYCHOPY_TEST = "1";
 			// launch the app
 			let app = await electron.launch({
-				args: ['electron/src/index.cjs', '--no-splash'],
+				args: ['electron/src/index.cjs'],
 				env: env
 			});
 			// wait for the first window to load
 			let window = await app.firstWindow();
 			await window.waitForLoadState('domcontentloaded');
-			// get the Python install message once available
-			let pythonMsg = window.getByTestId("setup-python-message")
-			// output the Python installation logs
-			pythonMsg.getAttribute("data-logs").then(console.log).catch(() => null)
-			// check that the resulting message is a success
-			await expect(pythonMsg, "Python install failed").toHaveAttribute(
-				"data-status", "success", { timeout: 10 * 60_000 }
-			)
-			// close the Python setup dialog by clicking the OK button
-			let pythonDlg = window.getByTestId("setup-python-dlg")
-			await getButtonByRole(pythonDlg, "OK").click()
-			await expect(pythonDlg).toBeHidden();
+			// wait for Python install, if we're reinstalling
+			if (env.PSYCHOPY_TEST_CLEAN === "1") {
+				// get the Python install message once available
+				let pythonMsg = window.getByTestId("setup-python-message")
+				// output the Python installation logs
+				pythonMsg.getAttribute("data-logs").then(console.log).catch(() => null)
+				// check that the resulting message is a success
+				await expect(pythonMsg, "Python install failed").toHaveAttribute(
+					"data-status", "success", { timeout: 10 * 60_000 }
+				)
+				// close the Python setup dialog by clicking the OK button
+				let pythonDlg = window.getByTestId("setup-python-dlg")
+				await getButtonByRole(pythonDlg, "OK").click()
+				await expect(pythonDlg).toBeHidden();
+			}
 			// run tests
 			await use(app);
 			// close the app

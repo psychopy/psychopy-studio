@@ -1,7 +1,7 @@
 import { test, expect, openView } from './fixtures.js';
 
-test.describe('Runner', () => {
-	/** @type {import('@playwright/test').Page} */
+test.describe("Runner", () => {
+	/** @type {import('@playwright/test').Page} The page on which to run these tests */
 	let page;
 
 	test.beforeAll(async ({ app }) => {
@@ -12,7 +12,7 @@ test.describe('Runner', () => {
 		await page?.close();
 	});
 
-	test('opens', async () => {
+	test("Opens", async () => {
 		await expect(page).toHaveTitle(/PsychoPy Runner/);
 	});
 });

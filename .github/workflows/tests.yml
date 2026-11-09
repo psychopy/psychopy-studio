@@ -37,10 +37,10 @@ jobs:
       # run tests (Linux runners have no display, so use a virtual one)
       - name: Run tests (Linux)
         if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum npm test
+        run: xvfb-run --auto-servernum PSYCHOPY_TEST_CLEAN=1 npm test
       - name: Run tests
         if: runner.os != 'Linux'
-        run: npm test
+        run: PSYCHOPY_TEST_CLEAN=1 npm test
       # upload traces (can be inspected with `npx playwright show-trace`)
       - name: Upload test results
         if: ${{ !cancelled() }}

@@ -7,8 +7,10 @@ const { appVersion, isDev, isTest } = require('./tools/version.js');
 // if running in a test, redirect appData so tests don't touch the user's folder
 if (isTest) {
   app.setPath("appData", path.join(app.getPath("appData"), "psychopy4.tests"))
-  // clear any state left over from a previous test run, so each run starts fresh
-  fs.rmSync(app.getPath("appData"), { recursive: true, force: true })
+  // if test specifies a clean run, delete the user folder to all prefs revert to default and Python reinstalls
+  if (process.env.PSYCHOPY_TEST_CLEAN === "1") {
+    fs.rmSync(app.getPath("appData"), { recursive: true, force: true })
+  }
 }
 
 // make sure psychopy4 folder exists before importing subpackages
@@ -114,8 +116,8 @@ const createWindow = () => {
   }
   // mark started
   started = true
-  // should we show a splash window? (off if disabled in prefs or launched with --no-splash)
-  let showSplash = prefs.params?.showSplash?.val !== "False" && !argv.values['no-splash']
+  // should we show a splash window? (off if disabled in prefs, launched with --no-splash, or running the test suite)
+  let showSplash = prefs.params?.showSplash?.val !== "False" && !argv.values['no-splash'] && !isTest
   // create splash
   if (showSplash) {
     windows.splash = new BrowserWindow({
