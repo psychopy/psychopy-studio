@@ -5,11 +5,8 @@ test.describe('Core', () => {
 	let page;
 
 	test.beforeAll(async ({ app }) => {
+		// use the window opened at startup (shared with other tests, so not closed afterwards)
 		page = await app.firstWindow();
-	});
-
-	test.afterAll(async () => {
-		await page?.close();
 	});
 
 	test("Electron API available to frontend", async ({ app }) => {

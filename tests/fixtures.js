@@ -8,18 +8,15 @@ import { _electron as electron, test as base, expect } from '@playwright/test';
  * @returns {Promise<import('@playwright/test').Page>}
  */
 export async function openView(app, target) {
+	// note which windows are already open
+	let before = new Set(app.windows());
 	// use any open window to ask Electron for a new one (resolves once the new window emits "ready")
-	let id = await app.windows()[0].evaluate(
+	await app.windows()[0].evaluate(
 		target => electron.windows.new(target),
 		target
 	);
-	// find the page belonging to the new window
-	let page = await app.evaluate(
-		({ webContents }, id) => webContents.fromId(id).getURL(),
-		id
-	).then(
-		url => app.windows().find(win => win.url() === url)
-	);
+	// find the new window (by elimination, as several windows may share a URL)
+	let page = app.windows().find(win => !before.has(win));
 	await page.waitForLoadState('domcontentloaded');
 
 	return page;
