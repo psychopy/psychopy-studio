@@ -78,6 +78,7 @@
             NO: translate("No"),
             HELP: translate("Help"),
         }[role]}
+        data-role={role}
         onclick={handler}
         primary={role === "OK"}
         affirmative={role === "YES"}

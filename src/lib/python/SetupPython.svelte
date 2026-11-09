@@ -63,6 +63,7 @@
 
 <MessageDialog
     bind:shown={status.dlg.shown}
+    data-testid=setup-python-dlg
 >
     {@html marked(status.dlg.message || "")}
     <p>
@@ -72,11 +73,22 @@
         <CodeOutput bind:value={status.logs} />
     </div>
     {#await status.ready.promise then ready}
-        <div class=finished-msg>
+        <div 
+            class=finished-msg
+            data-testid=setup-python-message
+            data-status=success
+            data-logs={status.logs}
+        >
             {translate("Install completed successfully, you can safely close this window.")}
         </div>
     {:catch err}
-        <div class=finished-msg style:color=var(--red)>
+        <div 
+            class=finished-msg 
+            style:color=var(--red)
+            data-testid=setup-python-message
+            data-status=fail
+            data-logs={status.logs}
+        >
             <Icon 
                 src="/icons/sym-error.svg"
                 size=1rem

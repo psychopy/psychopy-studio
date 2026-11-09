@@ -65,6 +65,14 @@ class Preferences extends HasParams {
             let file = await electron.paths.prefs()
             // make sure it exists
             if (!(await electron.files.exists(file))) {
+                // when testing, override some defaults
+                if (await electron.isTest()) {
+                    // always install to the user folder, as this is redirected for tests
+                    this.params.environmentsFolder.val = "user"
+                    // never show startup tips, to save tests dismissing the dlg
+                    this.params.showStartupTips.val = false
+                }
+
                 await this.save()
             }
             // load data from file

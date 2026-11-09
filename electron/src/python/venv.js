@@ -26,6 +26,8 @@ export class PythonVenv {
         this.scripts = {}
         this.shells = {}
         this.psychojs = {}
+        // promise for setup in progress, if any
+        this.settingUp = undefined
     }
 
     /**
@@ -82,10 +84,22 @@ export class PythonVenv {
          * @param {ChildProcess} _process 
          */
         function hardkill(_process) {
-            if (process.platform === 'win32') {
-                _process.kill(0)
-            } else {
-                process.kill(_process.pid)
+            // skip anything not started, already exited, or not a child process
+            if (!_process?.pid || _process.exitCode !== null || _process.signalCode !== null) {
+                return
+            }
+            try {
+                // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
+                if (process.platform === 'win32') {
+                    _process.kill()
+                } else {
+                    process.kill(_process.pid)
+                }
+            } catch (err) {
+                // ignore if it exited since we checked
+                if (err.code !== "ESRCH") {
+                    throw err
+                }
             }
         }
         // kill liaison
@@ -102,16 +116,27 @@ export class PythonVenv {
         }
         // kill any PsychoJS servers
         for (let server of Object.values(this.psychojs)) {
-            hardkill(server.process)
+            server.process?.close()
         }
     }
 
     /**
-     * Setup this virtual environment; make sure it exists and install necessary packages.
-     * 
+     * Setup this virtual environment; make sure it exists and install necessary packages. If setup
+     * is already in progress (e.g. requested again by another caller), returns the same promise
+     * rather than running it twice at once.
+     *
      * @param {"release"|"dev"|false} prerelease Branch to install unreleased psychopy-lib from, or undefined for a released version
      */
-    async setup(prerelease=false) {
+    setup(prerelease=false) {
+        if (!this.settingUp) {
+            this.settingUp = this._setup(prerelease).finally(() => {
+                this.settingUp = undefined
+            })
+        }
+        return this.settingUp
+    }
+
+    async _setup(prerelease=false) {
         // remember prerelease setting so the venv can be recreated the same way
         this.prerelease = prerelease
         // make an executable if there isn't one

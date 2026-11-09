@@ -9,7 +9,7 @@
         id,
         /** @prop @type {string} Text to display in the title bar of this dialog */
         title="",
-        /** @prop @type {import("svelte").Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
+        /** @prop @type {Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
         buttons=undefined,
         /** @bindable @type {Boolean} State dictating whether this dialog is shown */
         shown=$bindable(),
@@ -21,8 +21,10 @@
         shrink=false,
         /** @prop @type {boolean} Whether or not to include a close button */
         closable=true,
-        /** @interface */
-        children=undefined
+        /** @prop {Snippet} children Child elements are rendered */
+        children=undefined,
+        /** @prop {ComponentProps} props Additional props are passed to the `dialog` element */
+        ...props
     } = $props();
 
     let handle;
@@ -97,6 +99,7 @@
         }
     }}
     class:shrink
+    {...props}
 >
     {#if shown}
         <div class="title">

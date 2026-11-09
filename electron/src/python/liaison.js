@@ -18,6 +18,7 @@ export class Liaison {
         this.socket = undefined
         // ready markers
         this.started = false
+        this.starting = undefined
         this.open = Liaison.marker()
         this.ready = Liaison.marker()
         this.pending = []
@@ -38,7 +39,23 @@ export class Liaison {
     }
 
 
-    async start() {
+    /**
+     * Start Liaison. If it's already starting/started (e.g. requested by another window), returns the
+     * same promise rather than spawning a second Python process.
+     */
+    start() {
+        if (!this.starting) {
+            this.starting = this._start().catch(err => {
+                // allow a retry if starting failed
+                this.starting = undefined
+                this.started = false
+                throw err
+            })
+        }
+        return this.starting
+    }
+
+    async _start() {
         // mark started
         this.started = true
         // get liaison constants
@@ -210,6 +227,7 @@ export class Liaison {
         // reset ready markers, but only replace settled ones - anything awaiting an unsettled one
         // (e.g. a `python.liaison.ready` invoke) would otherwise be orphaned and never get a reply
         this.started = false
+        this.starting = undefined
         if (this.open.settled) {
             this.open = Liaison.marker()
         }

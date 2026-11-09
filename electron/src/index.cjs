@@ -2,11 +2,22 @@ const path = require('node:path');
 const fs = require("fs");
 const proc = require("child_process");
 const { app, dialog, BrowserWindow, ipcMain, shell } = require('electron');
+const { appVersion, isDev, isTest } = require('./tools/version.js');
+
+// if running in a test, redirect appData so tests don't touch the user's folder
+if (isTest) {
+  app.setPath("appData", path.join(app.getPath("appData"), "psychopy4.tests"))
+  // if test specifies a clean run, delete the user folder to all prefs revert to default and Python reinstalls
+  if (process.env.PSYCHOPY_TEST_CLEAN === "1") {
+    fs.rmSync(app.getPath("appData"), { recursive: true, force: true })
+  }
+}
 
 // make sure psychopy4 folder exists before importing subpackages
 if (!fs.existsSync(path.join(app.getPath("appData"), "psychopy4"))) {
   fs.mkdirSync(
-    path.join(app.getPath("appData"), "psychopy4")
+    path.join(app.getPath("appData"), "psychopy4"),
+    { recursive: true }
   )
 }
 
@@ -16,13 +27,13 @@ const { handlers: filesHandlers } = require("./files.js");
 const logging = require("./tools/logging.js");
 const { UsageReport } = require("./tools/usage.js");
 const { favicon, splash } = require("./resources/index.js");
-const { appVersion, isDev } = require('./tools/version.js');
 const { handlers: stateHandlers, lastState, newFrame, updateFrame, saveState } = require('./tools/state.js');
 const { windows, newWindow, setMenu } = require("./frames.js");
 const { details: svelte, startSvelte } = require("./svelte.js");
 const { prefs, prefsFile } = require("./tools/preferences.js");
 const { requestKeyboardAccess, hasKeyboardAccess } = require("./tools/system.js");
 const { default: test } = require('node:test');
+const { parseArgs } = require("node:util");
 
 // get a single-instance lock
 const lock = app.requestSingleInstanceLock()
@@ -32,6 +43,22 @@ app.setPath("userData", path.join(app.getPath("appData"), "psychopy4", ".node"))
 
 // setup a clipboard
 clipboard = undefined
+
+// parse calling arguments
+const argv = parseArgs({
+  // skip the executable (and the script path, when running unpackaged)
+  args: process.argv.slice(isDev ? 2 : 1),
+  options: {
+    builder: { type: "boolean", short: "b" },
+    coder: { type: "boolean", short: "c" },
+    runner: { type: "boolean", short: "r" },
+    "no-splash": { type: "boolean" },
+  },
+  // allow a file path to be passed without a flag
+  allowPositionals: true,
+  // don't throw on flags we don't define (Electron/Chromium/OS may add their own)
+  strict: false,
+});
 
 // send usage stats
 let usageReport = new UsageReport()
@@ -54,7 +81,7 @@ function onFileOpen(evt, file) {
     newWindow(`runner?fileOpen=${file}`, true, false)
   } else {
     // log anything else and leave default
-    logging.error(`Requested file is not a PsychoPy file (.psyexp or .psyrun): ${process.argv[1]}`)
+    logging.error(`Requested file is not a PsychoPy file (.psyexp or .psyrun): ${file}`)
   }
 }
 app.on("open-file", onFileOpen)
@@ -89,30 +116,30 @@ const createWindow = () => {
   }
   // mark started
   started = true
+  // should we show a splash window? (off if disabled in prefs, launched with --no-splash, or running the test suite)
+  let showSplash = prefs.params?.showSplash?.val !== "False" && !argv.values['no-splash'] && !isTest
   // create splash
-  windows.splash = new BrowserWindow({
-    icon: favicon,
-    title: "PsychoPy Studio",
-    width: 720,
-    height: 400,
-    show: false,
-    transparent: true,
-    frame: false,
-    alwaysOnTop: true
-  });
-  windows.splash.loadFile(splash);
-  windows.splash.center();
-  if (prefs.params?.showSplash?.val !== "False") {
-    // only show if requested via prefs
+  if (showSplash) {
+    windows.splash = new BrowserWindow({
+      icon: favicon,
+      title: "PsychoPy Studio",
+      width: 720,
+      height: 400,
+      show: false,
+      transparent: true,
+      frame: false,
+      alwaysOnTop: true
+    });
+    windows.splash.loadFile(splash);
+    windows.splash.center();
     windows.splash.show();
   }
-
   // start svelte
   let startedSvelte = startSvelte()
   // start timers so that we have a min time to show the splash and a max time to stop waiting for Svelte
   let mintime = new Promise((resolve, reject) => setTimeout(
     resolve, 
-    prefs.params?.showSplash?.val !== "False" ? 1000 : 0)
+    showSplash ? 1000 : 0)
   );
   let maxtime = new Promise((resolve, reject) => setTimeout(
     resolve, 
@@ -148,15 +175,17 @@ function startingWindows() {
     targets = ["builder"]
   }
   // if given a launch arg, ignore prefs
-  if ( ["--builder", "-b"].includes(process.argv[isDev ? 2 : 1]) ) {
+  if ( argv.values.builder ) {
     targets = ["builder"]
-  } else if ( ["--coder", "-c"].includes(process.argv[isDev ? 2 : 1]) ) {
+  } else if ( argv.values.coder ) {
     targets = ["coder"]
-  } else if ( ["--runner", "-r"].includes(process.argv[isDev ? 2 : 1]) ) {
+  } else if ( argv.values.runner ) {
     targets = ["runner"]
-  } else if (process.argv[isDev ? 2 : 1] && process.platform === "win32") {
+  } else if (argv.positionals.length) {
     // if on windows, file to open may have been passed via args
-    onFileOpen(undefined, process.argv[isDev ? 2 : 1])
+    argv.positionals.forEach(
+      file => onFileOpen(undefined, file)
+    )
     return
   }
   // open starting windows
@@ -229,7 +258,7 @@ process.on('SIGTERM', app.quit);
 // save app state before closing windows on quit
 app.on("before-quit", (evt, code) => saveState());
 // make sure the Svelte process is killed on exit
-app.on("quit", (evt, code) => svelte.process?.kill?.(0));
+app.on("quit", (evt, code) => svelte.process?.kill?.());
 
 
 /* handlers which can be invoked by electron */
@@ -272,6 +301,7 @@ const handlers = {
     },
     version: ipcMain.handle("electron.version", (evt) => appVersion),
     platform: ipcMain.handle("electron.platform", (evt) => process.platform),
+    isTest: ipcMain.handle("electron.isTest", (evt) => isTest),
     quit: ipcMain.handle("electron.quit", (evt) => app.quit())
   },
   python: pythonHandlers,

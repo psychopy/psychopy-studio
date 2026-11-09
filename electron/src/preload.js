@@ -56,6 +56,7 @@ const electron = {
   },
   version: () => ipcRenderer.invoke("electron.version").then(resp => resp),
   platform: () => ipcRenderer.invoke("electron.platform").then(resp => resp),
+  isTest: () => ipcRenderer.invoke("electron.isTest").then(resp => resp),
   quit: () => ipcRenderer.invoke("electron.quit")
 };
 contextBridge.exposeInMainWorld('electron', electron)

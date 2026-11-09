@@ -1,5 +1,6 @@
 import proc from "child_process";
 import { app } from "electron";
+import { createRequire } from "node:module";
 import logging from "./tools/logging.js";
 import { isDev } from "./tools/version.js";
 import path from "node:path";
@@ -166,11 +167,18 @@ export async function startSvelte() {
      */
     async function startSvelteDev() {
         logging.log(`Starting Vite dev server at ${details.address.host}:${details.address.port}`)
-        // start process
-        details.process = proc.exec(
-            `vite dev --host=${details.address.host} --port=${details.address.port}`
+        // get location of vite
+        let viteRequire = createRequire(import.meta.url)
+        let vitePkg = viteRequire.resolve("vite/package.json");
+        let viteBin = path.join(path.dirname(vitePkg), viteRequire(vitePkg).bin.vite);
+        // start process (forked rather than via a shell, so killing it kills Vite itself on all platforms)
+        details.process = proc.fork(
+            viteBin,
+            ["dev", `--host=${details.address.host}`, `--port=${details.address.port}`],
+            { silent: true }
         );
         // listen to stdout
+        details.process.stdout.setEncoding("utf8");
         details.process.stdout.on("data", msg => {
             // look for ready message
             let readyMatch = msg.match(

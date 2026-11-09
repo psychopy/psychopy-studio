@@ -5,12 +5,14 @@
         id,
         /** @prop @type {String} Text to display in the title bar of this dialog */
         title="",
-        /** @prop @type {import("svelte").Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
+        /** @prop @type {Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
         buttons=undefined,
         /** @returns @type {HTMLElement} Handle of this dialog's HTML Element */
         shown=$bindable(),
-        /** @prop Children are assumed to be the message */
-        children=undefined
+        /** @prop {Snippet} children Child elements are rendered */
+        children=undefined,
+        /** @prop {ComponentProps} props Additional props are passed to the `Dialog` element */
+        ...props
     } = $props();
 </script>
 
@@ -20,6 +22,7 @@
     buttons={buttons}
     bind:shown={shown}
     shrink={true}
+    {...props}
 >
     <div class="dlg-message">
         {@render children?.()}
