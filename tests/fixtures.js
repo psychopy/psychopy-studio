@@ -80,7 +80,8 @@ export const test = base.extend({
 			// close the app
 			await app.close();
 		},
-		{ scope: 'worker', timeout: 60_000 }
+		// long timeout, as a clean run waits for Python to install
+		{ scope: 'worker', timeout: 16 * 60_000 }
 	]
 });
 
