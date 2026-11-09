@@ -2,11 +2,20 @@ const path = require('node:path');
 const fs = require("fs");
 const proc = require("child_process");
 const { app, dialog, BrowserWindow, ipcMain, shell } = require('electron');
+const { appVersion, isDev, isTest } = require('./tools/version.js');
+
+// if running in a test, redirect appData so tests don't touch the user's folder
+if (isTest) {
+  app.setPath("appData", path.join(app.getPath("appData"), "psychopy4.tests"))
+  // clear any state left over from a previous test run, so each run starts fresh
+  fs.rmSync(app.getPath("appData"), { recursive: true, force: true })
+}
 
 // make sure psychopy4 folder exists before importing subpackages
 if (!fs.existsSync(path.join(app.getPath("appData"), "psychopy4"))) {
   fs.mkdirSync(
-    path.join(app.getPath("appData"), "psychopy4")
+    path.join(app.getPath("appData"), "psychopy4"),
+    { recursive: true }
   )
 }
 
@@ -16,7 +25,6 @@ const { handlers: filesHandlers } = require("./files.js");
 const logging = require("./tools/logging.js");
 const { UsageReport } = require("./tools/usage.js");
 const { favicon, splash } = require("./resources/index.js");
-const { appVersion, isDev } = require('./tools/version.js');
 const { handlers: stateHandlers, lastState, newFrame, updateFrame, saveState } = require('./tools/state.js');
 const { windows, newWindow, setMenu } = require("./frames.js");
 const { details: svelte, startSvelte } = require("./svelte.js");
@@ -272,6 +280,7 @@ const handlers = {
     },
     version: ipcMain.handle("electron.version", (evt) => appVersion),
     platform: ipcMain.handle("electron.platform", (evt) => process.platform),
+    isTest: ipcMain.handle("electron.isTest", (evt) => isTest),
     quit: ipcMain.handle("electron.quit", (evt) => app.quit())
   },
   python: pythonHandlers,

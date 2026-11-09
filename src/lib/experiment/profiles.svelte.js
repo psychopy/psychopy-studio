@@ -39,25 +39,34 @@ export var profiles = $state({
         value: {},
         pending: trackPromise(),
         isFallback: undefined,
-        getter: "psychopy.experiment:getElementProfiles"
+        getter: async (timeout) => await python.liaison.send("app", {
+            command: "run",
+            args: ["psychopy.experiment:getElementProfiles"]
+        }, timeout)
     },
     loops: {
         value: {},
         pending: trackPromise(),
         isFallback: undefined,
-        getter: "psychopy.experiment:getLoopProfiles"
+        getter: async (timeout) => await python.liaison.send("app", {
+            command: "run",
+            args: ["psychopy.experiment:getLoopProfiles"]
+        }, timeout)
     },
     devices: {
         value: {},
         pending: trackPromise(),
         isFallback: undefined,
-        getter: "psychopy.experiment:getDeviceProfiles"
+        getter: async (timeout) => await python.liaison.send("app", {
+            command: "run",
+            args: ["psychopy.experiment:getDeviceProfiles"]
+        }, timeout)
     },
     preferences: {
         value: FallbackPreferencesProfile,
         pending: trackPromise(),
         isFallback: undefined,
-        getter: undefined
+        getter: async (timeout) => FallbackPreferencesProfile
     }
 })
 
@@ -80,13 +89,10 @@ export async function refresh(key, timeout=undefined, force=false) {
     }
     // get the relevant promise now, in case it's overwritten mid-function
     let pending = profiles[key].pending
-    // get profiles from Python
+    // get profiles from supplied getters
     let data
     try {
-        data = await python.liaison.send("app", {
-            command: "run",
-            args: [profiles[key].getter]
-        }, timeout)
+        data = await profiles[key].getter(timeout)
     } catch (err) {
         // get last saved profiles
         let saved = electron?.state.getProfiles()?.[key]

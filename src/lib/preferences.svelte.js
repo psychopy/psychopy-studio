@@ -65,6 +65,11 @@ class Preferences extends HasParams {
             let file = await electron.paths.prefs()
             // make sure it exists
             if (!(await electron.files.exists(file))) {
+                // when testing, override some defaults
+                if (await electron.isTest()) {
+                    this.params.environmentsFolder.val = "user"
+                }
+
                 await this.save()
             }
             // load data from file

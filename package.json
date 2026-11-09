@@ -126,17 +126,19 @@
 		"electron:start": "electron electron/src/index.cjs",
 		"electron:lint": "echo \"No linting configured\"",
 		"build": "npm run svelte:build && electron-builder build",
-		"dev": "concurrently \"npm run svelte:dev\" \"wait-on http://localhost:5173 && npm run electron:start\""
+		"dev": "npm run electron:start",
+		"test": "playwright test",
+		"test:ui": "playwright test --ui"
 	},
 	"devDependencies": {
 		"@electron/fuses": "^2.1.3",
 		"@fontsource/fira-mono": "^5.0.0",
 		"@neoconfetti/svelte": "^2.0.0",
+		"@playwright/test": "^1.65.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.70.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
-		"concurrently": "^10.0.6",
 		"electron": "^44.0.0",
 		"electron-builder": "*",
 		"estree-walker": "^3.0.3",
