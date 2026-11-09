@@ -137,7 +137,7 @@
 		"@sveltejs/kit": "^2.70.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"concurrently": "^10.0.6",
-		"electron": "^44.0.0",
+		"electron": "^44.10.0",
 		"electron-builder": "*",
 		"estree-walker": "^3.0.3",
 		"i18next-cli": "^1.80.5",
