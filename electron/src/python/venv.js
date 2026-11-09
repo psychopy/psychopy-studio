@@ -82,8 +82,13 @@ export class PythonVenv {
          * @param {ChildProcess} _process 
          */
         function hardkill(_process) {
+            // skip anything not started, already stopped, or not a child process
+            if (!_process?.pid) {
+                return
+            }
+            // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
             if (process.platform === 'win32') {
-                _process.kill(0)
+                _process.kill()
             } else {
                 process.kill(_process.pid)
             }
@@ -102,7 +107,7 @@ export class PythonVenv {
         }
         // kill any PsychoJS servers
         for (let server of Object.values(this.psychojs)) {
-            hardkill(server.process)
+            server.process?.close()
         }
     }
 
