@@ -26,6 +26,8 @@ export class PythonVenv {
         this.scripts = {}
         this.shells = {}
         this.psychojs = {}
+        // promise for setup in progress, if any
+        this.settingUp = undefined
     }
 
     /**
@@ -119,11 +121,22 @@ export class PythonVenv {
     }
 
     /**
-     * Setup this virtual environment; make sure it exists and install necessary packages.
-     * 
+     * Setup this virtual environment; make sure it exists and install necessary packages. If setup
+     * is already in progress (e.g. requested again by another caller), returns the same promise
+     * rather than running it twice at once.
+     *
      * @param {"release"|"dev"|false} prerelease Branch to install unreleased psychopy-lib from, or undefined for a released version
      */
-    async setup(prerelease=false) {
+    setup(prerelease=false) {
+        if (!this.settingUp) {
+            this.settingUp = this._setup(prerelease).finally(() => {
+                this.settingUp = undefined
+            })
+        }
+        return this.settingUp
+    }
+
+    async _setup(prerelease=false) {
         // remember prerelease setting so the venv can be recreated the same way
         this.prerelease = prerelease
         // make an executable if there isn't one
