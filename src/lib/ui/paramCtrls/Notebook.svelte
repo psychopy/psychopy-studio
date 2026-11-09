@@ -148,6 +148,7 @@
     .params-panel {
         display: flex;
         flex-direction: column;
+        flex-grow: 1;
         align-items: stretch;
         justify-content: stretch;
         gap: 1rem;
