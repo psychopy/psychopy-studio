@@ -158,8 +158,8 @@
         resize: both;
         height: 80vh;
         width: max-content;
-        max-height: 80vh;
-        max-width: 80vw;
+        max-height: 90vh;
+        max-width: 90vw;
         min-width: calc-size(min-content, min(size, 80vw));
         min-height: calc-size(min-content, min(size, 80vh));
         background-color: var(--mantle);
