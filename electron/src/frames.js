@@ -88,7 +88,7 @@ export async function newWindow(target = null, show = true, fullscreen = false) 
       // give focus
       win.focus();
       // make sure the splash screen is closed
-      if (!windows.splash.isDestroyed()) {
+      if (windows.splash && !windows.splash.isDestroyed()) {
         windows.splash.close()
       }
       // show dev tools if debugging
