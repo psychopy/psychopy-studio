@@ -73,6 +73,7 @@
     icon={element.iconSVG}
     disabled={element instanceof Component && !(current.routine instanceof Routine)}
     onclick={element instanceof Component ? newComponent : newRoutine}
+    data-testclass={element instanceof Component ? "component" : "routine"}
     vertical
     large
 />

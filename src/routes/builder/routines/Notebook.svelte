@@ -22,7 +22,9 @@
     })
 </script>
 
-<Notebook>
+<Notebook
+    id=routines-notebook
+>
     {#snippet placeholder()}
         {#if current.experiment.loading}
             <div class=loading-msg>

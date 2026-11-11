@@ -6,7 +6,10 @@
         onselect=(index, data) => {},
         /** @interface @type {Array<HTMLElement>} Child elements of this notebook */
         placeholder=undefined,
-        children=undefined
+        /** @prop {Snippet} children Child elements are presumed to be tabs */
+        children=undefined,
+        /** @prop {ComponentProperties} props Other properties are passed through to the main div */
+        ...props
     } = $props()
 
     let pages = $state({
@@ -34,6 +37,7 @@
 
 <div 
     class=notebook
+    {...props}
 >
     <div 
         class=notebook-tabs

@@ -10,12 +10,15 @@
         tooltip=undefined,
         /** @bindable State controlling whether this panel button is open */
         open=$bindable(),
-        /** @interface */
-        children=undefined
+        /** @prop {Snippet} children Child elements are the contents shown/hidden by the button */
+        children=undefined,
+        /** @prop {ComponentProperties} props Other properties are passed to the `button` element */
+        ...props
     } = $props()
 </script>
 
 <button
+    {...props}
     class=panel-button
     class:active={open}
     aria-expanded={Boolean(open)}
