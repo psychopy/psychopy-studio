@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures.js';
+import { test } from '../fixtures.js';
 
 
 test.describe("Runner", () => {

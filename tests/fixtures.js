@@ -1,5 +1,5 @@
-import { _electron as electron, test as base, expect } from '@playwright/test';
-import { openView, getButtonByAction } from './tools.js';
+import { _electron as electron, test as base } from '@playwright/test';
+import { expect, openView, getButtonByAction } from './tools.js';
 
 /**
  * Test object with an `app` fixture, which launches PsychoPy Studio once per worker (without a
@@ -89,5 +89,3 @@ export const test = base.extend({
 		{ scope: 'worker' }
 	],
 });
-
-export { expect };
