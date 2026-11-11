@@ -3,6 +3,7 @@
     import Tooltip from "$lib/ui/tooltip/Tooltip.svelte";
     import { MessageArray, Message } from "$lib/ui/message";
     import { MessageDialog, DialogButton } from "$lib/ui/dialog";
+    import { getContext } from "svelte";
     import { translate } from "$lib/translation";
 
     let {

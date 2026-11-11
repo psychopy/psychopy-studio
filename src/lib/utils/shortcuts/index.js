@@ -1,2 +1,2 @@
 export { default as Shortcuts } from "./Shortcuts.svelte";
-export { Callback, getCallbacks } from "./callback.svelte.js";
+export { Callback } from "./callback.svelte.js";
