@@ -30,6 +30,7 @@
 
     // reference current in context for ease of access
     setContext("current", current)
+    setContext("callbacks", callbacks)
     // listen for messages from other windows
     if (electron) {
         // for opening files via another window

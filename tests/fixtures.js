@@ -1,5 +1,5 @@
 import { _electron as electron, test as base, expect } from '@playwright/test';
-import { openView, getButtonByRole } from './tools.js';
+import { openView, getButtonByAction } from './tools.js';
 
 /**
  * Test object with an `app` fixture, which launches PsychoPy Studio once per worker (without a
@@ -35,7 +35,7 @@ export const test = base.extend({
 				)
 				// close the Python setup dialog by clicking the OK button
 				let pythonDlg = window.getByTestId("setup-python-dlg")
-				await getButtonByRole(pythonDlg, "OK").click()
+				await getButtonByAction(pythonDlg, "OK").click()
 				await expect(pythonDlg).toBeHidden();
 			}
 			// run tests

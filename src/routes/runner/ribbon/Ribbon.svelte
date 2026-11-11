@@ -32,15 +32,14 @@
         <Button
             icon="/icons/btn-new.svg" 
             tooltip={translate("New configuration")} 
-            onclick={callbacks.new.fcn}
-            disabled={callbacks.new.disabled}
+            action="new"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-open.svg" 
             tooltip={translate("Open configuration")} 
-            onclick={callbacks.openConfiguration.fcn}
+            action="openConfiguration"
             disabled={callbacks.open.disabled}
             ghost
             tight
@@ -48,16 +47,14 @@
         <Button
             icon="/icons/btn-save.svg" 
             tooltip={translate("Save configuration")} 
-            onclick={callbacks.save.fcn}
-            disabled={callbacks.save.disabled}
+            action="save"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-saveas.svg" 
             tooltip={translate("Save configuration as")}
-            onclick={callbacks.saveAs.fcn} 
-            disabled={callbacks.saveAs.disabled}
+            action="saveAs"
             ghost
             tight
         />
@@ -76,8 +73,7 @@
         <Button
             icon="/icons/btn-send{current.runlist[current.selection]?.file.ext === ".psyexp" ? "builder" : "coder"}.svg" 
             tooltip={current.runlist[current.selection]?.file.ext === ".psyexp" ? translate("Open selection in Builder") : translate("Open selection in Coder")}
-            onclick={callbacks.openSelection.fcn}
-            disabled={callbacks.openSelection.disabled}
+            action="openSelection"
             ghost
             tight
         />
@@ -88,8 +84,7 @@
             <Button
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}py.svg" 
                 tooltip={current.runlist[current.selection]?.pilotMode ? translate("Pilot experiment locally") : translate("Run experiment locally")}
-                onclick={callbacks.runPython.fcn}
-                disabled={callbacks.runPython.disabled}
+                action="runPython"
                 bind:awaiting={current.awaiting.runpy}
                 cancel={callbacks.stopPython.fcn}
                 ghost
@@ -98,8 +93,7 @@
             <Button
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}js.svg" 
                 tooltip={current.runlist[current.selection]?.pilotMode ? translate("Pilot experiment in browser") : translate("Run experiment in browser")} 
-                onclick={callbacks.runJS.fcn}
-                disabled={callbacks.runJS.disabled}
+                action="runJS"
                 bind:awaiting={current.awaiting.runjs}
                 ghost
                 tight
@@ -119,14 +113,14 @@
         <Button
             icon="/icons/btn-builder.svg" 
             tooltip={translate("Builder view")} 
-            onclick={callbacks.showBuilder.fcn} 
+            action="showBuilder"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-coder.svg" 
             tooltip={translate("Coder view")} 
-            onclick={callbacks.showCoder.fcn} 
+            action="showCoder"
             ghost
             tight
         />
@@ -134,7 +128,7 @@
             <Button
                 icon="/icons/btn-runner.svg" 
                 tooltip={translate("Runner view")} 
-                onclick={callbacks.showRunner.fcn} 
+                action="showRunner"
                 disabled
                 ghost
                 tight

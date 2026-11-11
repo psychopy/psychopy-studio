@@ -78,16 +78,14 @@
         <Button
             icon="/icons/btn-save.svg" 
             tooltip={translate("Save file")} 
-            onclick={callbacks.save.fcn}
-            disabled={callbacks.save.disabled}
+            action="save"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-saveas.svg"
             tooltip={translate("Save file as")}
-            onclick={callbacks.saveAs.fcn}
-            disabled={callbacks.saveAs.disabled}
+            action="saveAs"
             ghost
             tight
         />
@@ -97,16 +95,14 @@
         <Button
             icon="/icons/btn-undo.svg" 
             tooltip={translate("Undo")} 
-            onclick={callbacks.undo.fcn} 
-            disabled={callbacks.undo.disabled} 
+            action="undo"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-redo.svg" 
             tooltip={translate("Redo")} 
-            onclick={callbacks.redo.fcn} 
-            disabled={callbacks.redo.disabled} 
+            action="redo"
             ghost
             tight
         />
@@ -181,8 +177,7 @@
             <Button
                 icon="/icons/btn-send{current.experiment.pilotMode ? "pilot" : "run"}.svg" 
                 tooltip={translate("Send experiment to runner")} 
-                onclick={callbacks.sendToRunner.fcn}
-                disabled={callbacks.sendToRunner.disabled}
+                action="sendToRunner"
                 ghost
                 tight
             /> 
@@ -194,19 +189,17 @@
             <Button
                 icon="/icons/btn-compilepy.svg" 
                 tooltip={translate("Write experiment as a .py file")} 
-                onclick={evt => callbacks.compilePython.fcn()}
+                action="compilePython"
                 bind:awaiting={awaiting.compilepy}
-                disabled={callbacks.compilePython.disabled}
                 ghost
                 tight
             /> 
             <Button
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}py.svg" 
                 tooltip={current.experiment.pilotMode ? translate("Pilot experiment locally") : translate("Run experiment locally")}
-                onclick={evt => callbacks.runPython.fcn()}
+                action="runPython"
                 bind:awaiting={awaiting.runpy}
                 cancel={evt => callbacks.stopPython.fcn()}
-                disabled={callbacks.runPython.disabled}
                 ghost
                 tight
             />
@@ -216,17 +209,15 @@
             <Button
                     icon="/icons/btn-compilejs.svg" 
                     tooltip={translate("Write experiment as a .js file")} 
-                    onclick={(evt) => callbacks.compileJS.fcn()}
+                    action="compileJS"
                     bind:awaiting={awaiting.compilejs}
-                    disabled={callbacks.compileJS.disabled}
                     ghost
                     tight
                 />
                 <Button
                     icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}js.svg" 
                     tooltip={current.experiment.pilotMode ? translate("Pilot experiment in browser") : translate("Run experiment in browser")}
-                    onclick={(evt) => callbacks.runJS.fcn()}
-                    disabled={callbacks.runJS.disabled}
+                    action="runJS"
                     bind:awaiting={awaiting.runjs}
                     ghost
                     tight
@@ -266,7 +257,7 @@
         <Button
             icon="/icons/btn-builder.svg" 
             tooltip={translate("Builder view")} 
-            onclick={callbacks.showBuilder.fcn} 
+            action="showBuilder"
             disabled
             ghost
             tight
@@ -274,7 +265,7 @@
         <Button
             icon="/icons/btn-coder.svg" 
             tooltip={translate("Coder view")} 
-            onclick={callbacks.showCoder.fcn} 
+            action="showCoder"
             ghost
             tight
         />
@@ -282,7 +273,7 @@
             <Button
                 icon="/icons/btn-runner.svg" 
                 tooltip={translate("Runner view")} 
-                onclick={callbacks.showRunner.fcn} 
+                action="showRunner"
                 ghost
                 tight
             />

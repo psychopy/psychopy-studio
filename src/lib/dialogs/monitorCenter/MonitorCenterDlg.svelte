@@ -151,15 +151,15 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={monitors.save}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={monitors.save}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={monitors.refresh}
         />
     {/snippet}

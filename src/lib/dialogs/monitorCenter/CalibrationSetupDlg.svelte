@@ -86,11 +86,11 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={calibrate}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={reset}
         />
     {/snippet}

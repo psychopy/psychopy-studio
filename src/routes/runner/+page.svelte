@@ -23,6 +23,7 @@
     
 
     setContext("current", current)
+    setContext("callbacks", callbacks)
 
     // parse url params
     let params = new URLSearchParams(location.search)

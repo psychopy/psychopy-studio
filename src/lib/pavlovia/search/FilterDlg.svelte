@@ -34,15 +34,15 @@
     {#snippet buttons()}
         <DialogButton 
             onclick={evt => filters = draft}
-            role="OK"
+            action="OK"
         />
         <DialogButton 
             label={translate("Clear")}
             onclick={evt => draft = {}}
-            role="OTHER"
+            action="OTHER"
         />
         <DialogButton 
-            role="CANCEL"
+            action="CANCEL"
         />
     {/snippet}
 </Dialog>

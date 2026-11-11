@@ -30,7 +30,7 @@
     {translate("{}' has unsaved changes, save now?").replace("{}", current.experiment.file.name)}
     {#snippet buttons()}
         <DialogButton
-            role=YES
+            action=YES
             onclick={(evt) => {
                 // if yes, save and do action
                 callbacks.save.fcn()
@@ -38,13 +38,13 @@
             }}
         />
         <DialogButton
-            role=NO
+            action=NO
             onclick={(evt) => {
                 // if no, just do action
                 action(evt)
             }}
         />
-        <DialogButton role=CANCEL />
+        <DialogButton action=CANCEL />
     {/snippet}
 </MessageDialog>
 {/if}

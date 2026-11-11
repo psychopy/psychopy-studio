@@ -105,7 +105,7 @@
     {/await}
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             disabled={status.dlg.busy}
         />
     {/snippet}

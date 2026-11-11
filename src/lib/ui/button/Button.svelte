@@ -10,8 +10,13 @@
         label=undefined,
         /** @prop @type {string|import("svelte").Snippet|undefined} Path to icon for this button, or a snippet to render in its place, if any */
         icon=undefined,
+        /**
+         * @prop @type {String|undefined} Name of the action (e.g. save, undo, etc.) this button
+         * performs. Clicking runs the view's callback for this action (if any) as well as `onclick`.
+         */
+        action=undefined,
         /** @prop @type {(evt: PointerEvent) => undefined} Function to call when this button is pressed */
-        onclick,
+        onclick=undefined,
         /** @prop @type {string|undefined} Hover text for this button, if any */
         tooltip=undefined,
         /** @prop @type {boolean} Shorthand for size="small" */
@@ -48,8 +53,8 @@
         awaiting=$bindable(),
         /** @prop @type {function|undefined} If action is cancellable, supply a function to cancel it */
         cancel=undefined,
-        /** @prop @type {boolean} Disable this button */
-        disabled = false,
+        /** @prop @type {boolean|undefined} Disable this button (if undefined, follows the callback for `action`, if any) */
+        disabled = undefined,
         /** @interface @type {import("svelte/elements").HTMLButtonAttributes} Any other attributes (e.g. role, id, aria-*) are passed through to the underlying <button> */
         ...attrs
     } = $props()
@@ -58,6 +63,35 @@
         tooltip: false,
         error: false
     })
+
+    // get the callback (if any) for this button's action
+    let callbacks = getContext("callbacks") ?? {}
+    let callback = $derived(action ? callbacks[action] : undefined)
+    // use the given disabled state if set, otherwise the action's callback (if any)
+    let isDisabled = $derived(disabled ?? callback?.disabled ?? false)
+
+    /**
+     * Run the callback for this button's action (unless disabled) and its `onclick` function.
+     *
+     * @param {PointerEvent} evt Event triggered on click
+     * @returns {any} Whatever the function(s) returned, combined into one promise if any of them
+     * returned a promise (so that `awaiting` waits for all of them)
+     */
+    function run(evt) {
+        let results = []
+        if (callback && !callback.disabled) {
+            results.push(callback.fcn())
+        }
+        if (onclick) {
+            results.push(onclick(evt))
+        }
+        // if anything is async, await all of it
+        if (results.some(result => result instanceof Promise)) {
+            return Promise.all(results)
+        }
+
+        return results.at(-1)
+    }
 
     // name to use when referring to this button, falling back to tooltip if there is no label (or if label is a snippet, as it can't be used as text)
     let name = $derived(typeof label === "string" ? label : tooltip)
@@ -77,10 +111,11 @@
 {#snippet button(status)}
     <button
         {...attrs}
-        disabled={disabled} 
+        data-action={action}
+        disabled={isDisabled} 
         onclick={{
             // if completed/not started, execute method
-            ready: evt => awaiting = onclick(evt),
+            ready: evt => awaiting = run(evt),
             // if awaiting, execute cancel method
             awaiting: evt => cancel?.(evt),
             // if errored, show error
@@ -179,7 +214,7 @@
         {err.message}
         {#snippet buttons()}
             <DialogButton
-                role=OK
+                action=OK
                 onclick={evt => awaiting = Promise.resolve(false)}
             />
         {/snippet}

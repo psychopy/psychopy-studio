@@ -136,16 +136,16 @@
     />
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             disabled={btnsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={(evt) => element.initiator.restore.set()}
             disabled={btnsDisabled.APPLY}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={(evt) => element.initiator.restore.apply()}
         />
     {/snippet}

@@ -20,7 +20,7 @@
         {@html marked(script.content || "")}
     </div>
     {#snippet buttons()}
-        <DialogButton role=OK />
+        <DialogButton action=OK />
         <DialogButton
             label={translate("Edit")}
             onclick={evt => openIn(script.file, "coder")}

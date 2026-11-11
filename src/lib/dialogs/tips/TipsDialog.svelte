@@ -54,7 +54,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={evt => {
                 if (hide) {
                     prefs.params.showStartupTips.val = false;

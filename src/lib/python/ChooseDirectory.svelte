@@ -61,7 +61,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={evt => {
                 prefs.params.environmentsFolder.val = $state.snapshot(selected);
                 prefs.save()

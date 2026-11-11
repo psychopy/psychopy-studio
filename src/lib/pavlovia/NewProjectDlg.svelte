@@ -47,7 +47,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={async evt => {
                 // create a new project
                 await git.newProject(
@@ -65,7 +65,7 @@
             }}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={evt => awaiting.resolve(false)}
         />
     {/snippet}

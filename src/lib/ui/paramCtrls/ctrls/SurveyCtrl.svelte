@@ -76,11 +76,11 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={(evt) => param.val = selected.survey.surveyId}
             disabled={selected.survey === undefined}
         />
-        <DialogButton role=CANCEL />
+        <DialogButton action=CANCEL />
     {/snippet}
 </Dialog>
 

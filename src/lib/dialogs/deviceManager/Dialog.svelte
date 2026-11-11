@@ -253,12 +253,12 @@
 
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={apply}
             disabled={btnsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={apply}
             disabled={btnsDisabled.APPLY}
         />
@@ -267,7 +267,7 @@
             onclick={saveDevicesFile}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={restore.apply}
         />
     {/snippet}

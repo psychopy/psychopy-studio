@@ -93,11 +93,11 @@
         />
         {#snippet buttons()}
             <DialogButton
-                role=OK
+                action=OK
                 disabled={btnsDisabled.OK}
             />
             <DialogButton
-                role=CANCEL
+                action=CANCEL
                 onclick={(evt) => {
                     current.inserting.restore.apply()
                     // stop inserting
@@ -105,7 +105,7 @@
                 }}
             />
             <DialogButton
-                role=HELP
+                action=HELP
                 onclick="https://www.psychopy.org/builder/flow.html#loops"
             />
         {/snippet}

@@ -49,12 +49,12 @@
     />
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={apply}
             disabled={btnsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={apply}
             disabled={btnsDisabled.APPLY}
         />
@@ -65,14 +65,14 @@
             />
         {/each}
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={evt => {
                 element.restore.apply()
             }}
         />
         {#if element.helpLink}
             <DialogButton
-                role=HELP
+                action=HELP
                 onclick={element.helpLink}
             />
         {/if}

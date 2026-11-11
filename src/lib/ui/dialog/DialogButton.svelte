@@ -4,9 +4,9 @@
     import { translate } from "$lib/translation";
 
     let {
-        /** @prop @type {"OK"|"APPLY"|"CANCEL"|"YES"|"NO"|"HELP"|undefined} Standard role of this button, determining its position, default label, styling and whether it closes the dialog */
-        role=undefined,
-        /** @prop @type {string|undefined} Label for this button, if not using the default for its role */
+        /** @prop @type {"OK"|"APPLY"|"CANCEL"|"YES"|"NO"|"HELP"|string|undefined} Action of this button: one of the standard dialog actions (determining its position, default label, styling and whether it closes the dialog) and/or the name of a callback, as for `Button` */
+        action=undefined,
+        /** @prop @type {string|undefined} Label for this button, if not using the default for its action */
         label=undefined,
         /** @prop @type {Function|string|undefined} Function to call when this button is pressed (or, for HELP, a link to open) */
         onclick=undefined,
@@ -17,10 +17,10 @@
     // get dialog for context
     let dialog = getContext("dialog")
 
-    // augment onclick according to role
+    // augment onclick according to action
     function handler(evt) {
         // handle when HELP button supplies onclick as a string
-        if (role === "HELP" && typeof onclick === "string") {
+        if (action === "HELP" && typeof onclick === "string") {
             window.open(onclick, '_blank');
             return
         }
@@ -28,24 +28,24 @@
             onclick?.(evt);
         } finally {
             // close dialog if needed (even if onclick errored)
-            if (["OK", "CANCEL", "YES", "NO"].includes(role)) {
+            if (["OK", "CANCEL", "YES", "NO"].includes(action)) {
                 dialog.shown = false;
             }
         }
     }
 
-    // store own snippet and handler in parent's context (re-registering if role changes)
+    // store own snippet and handler in parent's context (re-registering if action changes)
     $effect(() => {
-        let registeredRole = role;
+        let registeredAction = action;
         let entry = {
             snippet: button,
             onclick: handler,
             isDisabled: () => Boolean(props.disabled)
         }
         untrack(() => {
-            if (registeredRole) {
-                // if button has a role, store it against that role
-                dialog.buttons[registeredRole] = entry
+            if (registeredAction) {
+                // if button has an action, store it against that action
+                dialog.buttons[registeredAction] = entry
             } else {
                 // otherwise, store it against OTHER
                 dialog.buttons.OTHER.push(entry)
@@ -53,9 +53,9 @@
         })
         // remove from parent's context when unmounted (compare by snippet, as entry gets proxied)
         return () => {
-            if (registeredRole) {
-                if (dialog.buttons[registeredRole]?.snippet === button) {
-                    delete dialog.buttons[registeredRole]
+            if (registeredAction) {
+                if (dialog.buttons[registeredAction]?.snippet === button) {
+                    delete dialog.buttons[registeredAction]
                 }
             } else {
                 let i = dialog.buttons.OTHER.findIndex(other => other.snippet === button)
@@ -77,12 +77,12 @@
             YES: translate("Yes"),
             NO: translate("No"),
             HELP: translate("Help"),
-        }[role]}
-        data-role={role}
+        }[action]}
+        action={action}
         onclick={handler}
-        primary={role === "OK"}
-        affirmative={role === "YES"}
-        negative={role === "NO"}
+        primary={action === "OK"}
+        affirmative={action === "YES"}
+        negative={action === "NO"}
         horizontal
         {...props}
     />

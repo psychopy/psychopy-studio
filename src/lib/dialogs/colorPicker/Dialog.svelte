@@ -74,17 +74,17 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={apply}
             disabled={buttonsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={apply}
             disabled={buttonsDisabled.APPLY}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={evt => {
                 value = restore.color;
                 space = restore.space;

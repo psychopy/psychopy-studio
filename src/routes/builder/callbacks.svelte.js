@@ -117,8 +117,6 @@ function quit() {
 
 /* Edit */
 function undo() {
-    // skip if a dialog is open
-    if (Object.values(dialogsOpen).some(val => val)) return
     // undo last action in experiment history
     current.experiment.history.undo();
     // restore focus to tab if possible
@@ -128,8 +126,6 @@ function undo() {
 }
 
 function redo() {
-    // skip if a dialog is open
-    if (Object.values(dialogsOpen).some(val => val)) return
     // redo first action in experiment future
     current.experiment.history.redo();
     // restore focus to tab if possible
@@ -383,12 +379,14 @@ export default {
     quit: new Callback(quit, undefined, "quit"),
     undo: new Callback(
         undo,
-        () => !current.experiment.history.past.length,
+        // disabled if a dialog is open, so that Electron's native undo is used instead
+        () => Object.values(dialogsOpen).some(val => val) || !current.experiment.history.past.length,
         "undo"
     ),
     redo: new Callback(
         redo,
-        () => !current.experiment.history.future.length,
+        // disabled if a dialog is open, so that Electron's native redo is used instead
+        () => Object.values(dialogsOpen).some(val => val) || !current.experiment.history.future.length,
         "redo"
     ),
     togglePiloting: new Callback(

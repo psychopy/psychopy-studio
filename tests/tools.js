@@ -21,13 +21,13 @@ export async function openView(app, target) {
 }
 
 /**
- * Get a dialog button by its role
+ * Get a dialog button by its action
  * 
  * @param {import('@playwright/test').Locator} dlg Dialog containing the button
- * @param {"OK"|"APPLY"|"CANCEL"|"YES"|"NO"|"HELP"} role Role of the button to get
+ * @param {"OK"|"APPLY"|"CANCEL"|"YES"|"NO"|"HELP"} action Action of the button to get
  * 
  * @returns {import('@playwright/test').Locator} Locator corresponding to the button
  */
-export function getButtonByRole(dlg, role) {
-	return dlg.locator(`button[data-role="${role}"]`)
+export function getButtonByAction(dlg, action) {
+	return dlg.locator(`button[data-action="${action}"]`)
 }

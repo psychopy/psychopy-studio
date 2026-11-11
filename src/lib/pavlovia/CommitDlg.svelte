@@ -54,7 +54,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={async evt => {
                 changes = await git.stage(
                     current.experiment.file.parent,
@@ -72,7 +72,7 @@
             }}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={evt => {
                 // resolve promise
                 awaiting.reject(false);

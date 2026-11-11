@@ -9,7 +9,7 @@
     let {
         /** @prop @type {string} Text to display in the title bar of this dialog */
         title="",
-        /** @prop @type {Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
+        /** @prop @type {Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their action), or a list of actions to create default buttons for */
         buttons=undefined,
         /** @bindable @type {Boolean} State dictating whether this dialog is shown */
         shown=$bindable(),
@@ -137,9 +137,9 @@
             {@render context.buttons.HELP?.snippet()}
             <div class=gap></div>
             {#if Array.isArray(buttons)}
-                <!-- if given an array of roles, create default buttons for those roles -->
-                {#each buttons as role}
-                    <DialogButton role={role} />
+                <!-- if given an array of actions, create default buttons for those actions -->
+                {#each buttons as action}
+                    <DialogButton action={action} />
                 {/each}
             {:else}
                 {@render buttons?.()}
