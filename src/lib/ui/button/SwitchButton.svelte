@@ -1,5 +1,6 @@
 <script>
     import Tooltip from "$lib/ui/tooltip/Tooltip.svelte";
+    import { getContext } from "svelte";
 
     let {
         /** @prop @type {string} Text label for this button, if any */
@@ -8,27 +9,43 @@
         tooltip=undefined,
         /** @prop @type {string} Starting  */
         value=$bindable(),
-        /** @prop @type {function} Function to call when this switch is toggled */
-        onclick=() => {},
-        /** @prop @type {boolean} Disable this button */
-        disabled=false
+        /**
+         * @prop @type {String|undefined} Name of the action (e.g. togglePiloting) this switch
+         * performs. Toggling runs the view's callback for this action (if any) as well as `ontoggle`.
+         */
+        action=undefined,
+        /** @prop @type {(value: boolean) => any} Function to call when this switch is toggled, receives the new value */
+        ontoggle=(value) => {},
+        /** @prop @type {boolean|undefined} Disable this button (if undefined, follows the callback for `action`, if any) */
+        disabled=undefined
     } = $props()
 
     let showTooltip = $state.raw(false)
+
+    // get the callback (if any) for this switch's action
+    let callbacks = getContext("callbacks") ?? {}
 </script>
 
-<button 
-    class="switch-ctrl" 
-    onclick={(evt) => {
-        value = !value;
-        onclick(evt)
+<button
+    class="switch-ctrl"
+    data-action={action}
+    onclick={evt => {
+        if (action && !callbacks[action]?.disabled) {
+            // if there's an associated callback, run it
+            callbacks[action].fcn()
+        } else {
+            // otherwise just toggle the value
+            value = !value
+        }
+        // run ontoggle function
+        return ontoggle(value)
     }}
     aria-label="{labels[0]}/{labels[1]} switch ({value ? labels[1] : labels[0]} selected)"
     onmouseenter={() => showTooltip = true}
     onmouseleave={() => showTooltip = false}
     onfocusin={() => showTooltip = true}
     onfocusout={() => showTooltip = false}
-    disabled={disabled}
+    disabled={disabled ?? callbacks[action]?.disabled ?? false}
 >
     {#if tooltip}
         <Tooltip

@@ -5,7 +5,6 @@
     import PrefsDialog from '$lib/dialogs/preferences/PrefsDialog.svelte';
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { electron, python } from "$lib/globals.svelte";
-    import { showDevTools } from "$lib/utils/views.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
     import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
     import semver from "semver";
@@ -35,30 +34,22 @@
         <MenuItem 
             icon="/icons/btn-new.svg" 
             label={translate("New file")}
-            shortcut="new"
-            onclick={callbacks.new.fcn}
-            disabled={callbacks.new.disabled}
+            action="new"
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
             label={translate("Open file...")} 
-            shortcut="open"
-            onclick={callbacks.open.fcn} 
-            disabled={callbacks.open.disabled}
+            action="open"
         />
         <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
-            shortcut="save"
-            onclick={callbacks.save.fcn}
-            disabled={callbacks.save.disabled}
+            action="save"
         />
         <MenuItem 
             icon="/icons/btn-saveas.svg" 
             label={translate("Save file as...")}
-            shortcut="saveAs"
-            onclick={callbacks.saveAs.fcn} 
-            disabled={callbacks.saveAs.disabled}
+            action="saveAs"
         />
 
         <MenuSeparator />
@@ -70,71 +61,66 @@
         />
         <MenuItem
             label={translate("Reset preferences")}
-            onclick={callbacks.resetPrefs.fcn}
+            action="resetPrefs"
         />
 
         <MenuSeparator />
 
         <MenuItem
             label={translate("Minimize window")}
-            role="minimize"
+            action="minimize"
         />
         <MenuItem
             label={translate("Close window")}
-            onclick={window.close}
-            role="close"
+            action="close"
         />
         <MenuItem
             label={translate("Quit")}
-            shortcut="quit"
-            role="quit"
+            action="quit"
         />
     </SubMenu>
     
     <SubMenu label={translate("View")} icon="/icons/rbn-windows.svg">
         <MenuItem 
             label={translate("Reload window")}
-            role="reload"
+            action="reload"
         />
         <MenuItem 
             label={translate("Force reload window")}
-            role="forceReload"
+            action="forceReload"
         />
 
         <MenuSeparator />
 
         <MenuItem
             label={translate("Zoom in")}
-            role="zoomIn"
+            action="zoomIn"
         />
         <MenuItem
             label={translate("Zoom out")}
-            role="zoomOut"
+            action="zoomOut"
         />
         <MenuItem
             label={translate("Reset zoom")}
-            role="resetZoom"
+            action="resetZoom"
         />
 
         <MenuSeparator />
 
         <MenuItem 
             label={translate("Show Builder")}
-            onclick={callbacks.showBuilder.fcn}
+            action="showBuilder"
         />
         <MenuItem 
             label={translate("Show Coder")}
-            onclick={callbacks.showCoder.fcn}
+            action="showCoder"
         />
 
         <MenuSeparator />
 
         <MenuItem 
             label={translate("Show developer tools")}
-            onclick={showDevTools}
-            disabled={callbacks.showDevTools.disabled}
-            shortcut="showDevTools",
-            role="toggleDevTools"
+            action="showDevTools"
         />
     </SubMenu>
 
@@ -142,9 +128,7 @@
         <SubMenu label={translate("Run")} icon="/icons/btn-runpy.svg" disabled={current.selection === undefined}>
             <MenuItem 
                 label={translate("Toggle pilot mode")}
-                onclick={callbacks.togglePiloting.fcn}
-                disabled={callbacks.togglePiloting.disabled}
-                shortcut="togglePilot"
+                action="togglePiloting"
             />
 
             <MenuSeparator />
@@ -152,16 +136,12 @@
             <MenuItem 
                 label={current.runlist[current.selection]?.pilotMode ? translate("Pilot in Python") : translate("Run in Python")}
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}py.svg" 
-                onclick={callbacks.runPython.fcn}
-                disabled={callbacks.runPython.disabled}
-                shortcut="runPython"
+                action="runPython"
             />
             <MenuItem
                 label={current.runlist[current.selection]?.pilotMode ? translate("Pilot in browser") : translate("Run in browser")}
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}js.svg" 
-                onclick={callbacks.runJS.fcn}
-                disabled={callbacks.runJS.disabled}
-                shortcut="runJS"
+                action="runJS"
             />
         </SubMenu>
     {/if}
@@ -190,13 +170,13 @@
 
             <MenuItem 
                 label={translate("Open PsychoPy user folder")}
-                onclick={callbacks.openUserFolder.fcn}
+                action="openUserFolder"
             />
         {/if}
         {#if python}
             <MenuItem 
                 label={translate("Reinstall Python")}
-                onclick={callbacks.reinstallPython.fcn}
+                action="reinstallPython"
             />
         {/if}
     </SubMenu>
@@ -204,19 +184,19 @@
     <SubMenu label={translate("Help")}>
         <MenuItem
             label={translate("App info")}
-            role="about"
+            action="about"
         />
         <MenuItem 
             label={translate("PsychoPy Homepage")}
-            onclick={callbacks.gotoHomepage.fcn}
+            action="gotoHomepage"
         />
         <MenuItem 
             label={translate("Documentation")}
-            onclick={callbacks.gotoDocumentation.fcn}
+            action="gotoDocumentation"
         />
         <MenuItem 
             label={translate("Help Forum")}
-            onclick={callbacks.gotoForum.fcn}
+            action="gotoForum"
         />
         <MenuSeparator />
         {#if electron}

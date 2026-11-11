@@ -20,7 +20,7 @@
 
 
 <Dialog
-    id=plugin-mgr
+    data-testid=plugin-mgr
     title={translate("Plugins & packages")}
     bind:shown={shown}
     buttons={["OK"]}

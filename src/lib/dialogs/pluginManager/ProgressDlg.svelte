@@ -24,7 +24,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={evt => output = ""}
         />
     {/snippet}

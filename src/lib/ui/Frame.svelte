@@ -2,12 +2,14 @@
     import { electron } from "$lib/globals.svelte";
 
     let {
-        /** @param @type {function} Callback to execute when a file is dropped on this frame */
+        /** @param {function} onFileDrop Callback to execute when a file is dropped on this frame */
         onFileDrop = (evt, file) => {},
-        /** @interface */
+        /** @prop {Snippet} ribbon Snippet containing the frame ribbon, i.e. the bar at the top containing sectioned controls */
         ribbon=undefined,
-        /** @interface */
-        children
+        /** @prop {Snippet} children Child elements are rendered */
+        children,
+        /** @prop {ComponentProperties} props Other props are passed to the div element */
+        ...props
     } = $props();
 
     let hover = $state({
@@ -32,6 +34,7 @@
         }
     }}
     role="region"
+    {...props}
 >
     {#if hover.show}
         <div class=hover-indicator bind:this={hover.indicator}></div>

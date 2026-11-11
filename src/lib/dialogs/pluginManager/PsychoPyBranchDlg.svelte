@@ -18,7 +18,7 @@
 
 
 <Dialog
-    id=plugin-mgr
+    data-testid=plugin-mgr
     title="Install PsychoPy from Git"
     bind:shown={shown}
     shrink
@@ -56,7 +56,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={evt => {
                 showProgress = true
                 shown = false
@@ -66,7 +66,7 @@
                 )
             }}
         />
-        <DialogButton role=CANCEL />
+        <DialogButton action=CANCEL />
     {/snippet}
 </Dialog>
 

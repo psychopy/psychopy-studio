@@ -1,6 +1,6 @@
 import { electron, python } from '$lib/globals.svelte.js';
 import { current } from './globals.svelte.js';
-
+import { dialogsOpen } from "$lib/ui/dialog";
 import path from "path-browserify";
 import { newWindow, openIn, showDevTools, focusNextPanel, showBuilder, showCoder, showRunner } from "$lib/utils/views.svelte"
 import { browseFileOpen, browseFileSave, parsePath } from "$lib/utils/files.js";
@@ -11,13 +11,24 @@ import { Callback } from "$lib/utils/shortcuts";
 import { resetPrefs, openUserFolder, reinstallPython, gotoHomepage, gotoDocumentation, gotoForum } from "$lib/utils/callbacks.js"
 
 
+/**
+ * Whether each save prompt (shown before an action which would discard unsaved changes) is shown,
+ * keyed by the action it precedes.
+ */
+export const prompts = $state({
+    NEW: false,
+    OPEN: false,
+    PYCOMPILE: false,
+    PYRUN: false
+});
+
 /* File */
 
-function file_new() {
+export function file_new() {
     newWindow("builder")
 }
 
-async function file_open() {
+export async function file_open() {
     // open file browser
     let file = await browseFileOpen(
         [
@@ -117,6 +128,7 @@ function quit() {
 
 /* Edit */
 function undo() {
+    // undo last action in experiment history
     current.experiment.history.undo();
     // restore focus to tab if possible
     if (current.routine && current.routine.name in current.experiment.routines) {
@@ -125,6 +137,7 @@ function undo() {
 }
 
 function redo() {
+    // redo first action in experiment future
     current.experiment.history.redo();
     // restore focus to tab if possible
     if (current.routine && current.routine.name in current.experiment.routines) {
@@ -356,8 +369,9 @@ async function runJS() {
 
 
 export default {
-    new: new Callback(file_new, undefined, "new"),
-    open: new Callback(file_open, undefined, "open"),
+    // show the save prompt, which calls file_new/file_open once unsaved changes are dealt with
+    new: new Callback(() => prompts.NEW = true, undefined, "new"),
+    open: new Callback(() => prompts.OPEN = true, undefined, "open"),
     revealFolder: new Callback(
         revealFolder,
         () => current.experiment.file?.parent === undefined,
@@ -377,12 +391,14 @@ export default {
     quit: new Callback(quit, undefined, "quit"),
     undo: new Callback(
         undo,
-        () => !current.experiment.history.past.length,
+        // disabled if a dialog is open, so that Electron's native undo is used instead
+        () => Object.values(dialogsOpen).some(val => val) || !current.experiment.history.past.length,
         "undo"
     ),
     redo: new Callback(
         redo,
-        () => !current.experiment.history.future.length,
+        // disabled if a dialog is open, so that Electron's native redo is used instead
+        () => Object.values(dialogsOpen).some(val => val) || !current.experiment.history.future.length,
         "redo"
     ),
     togglePiloting: new Callback(

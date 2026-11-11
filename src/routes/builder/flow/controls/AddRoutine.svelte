@@ -70,7 +70,7 @@
 <!-- dialog for creating a new Routine -->
 {#if current.inserting instanceof Routine}
     <Dialog 
-        id=new-routine
+        data-testid=new-routine
         title={translate("New Routine")}
         bind:shown={showNewRoutineDialog} 
         onopen={() => current.inserting.settings.restore.set()}
@@ -80,7 +80,7 @@
         />
         {#snippet buttons()}
             <DialogButton
-                role=OK
+                action=OK
                 onclick={(evt) => {
                     // add to experiment
                     current.inserting.exp = current.experiment
@@ -91,7 +91,7 @@
                 )}
             />
             <DialogButton
-                role=CANCEL
+                action=CANCEL
                 onclick={(evt) => {
                     current.inserting.settings.restore.apply()
                     // stop inserting
@@ -99,7 +99,7 @@
                 }}
             />
             <DialogButton
-                role=HELP
+                action=HELP
                 onclick="https://www.psychopy.org/builder/routines.html#routines"
             />
         {/snippet}

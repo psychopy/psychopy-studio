@@ -190,10 +190,13 @@ function startingWindows() {
   }
   // open starting windows
   for (let target of targets) {
-    // get previous states for this target
-    let states = Object.values(lastState.frames).filter(
-      item => item.view === target
-    )
+    // get previous states for this target, if not testing
+    let states = []
+    if (!isTest) {
+      states = Object.values(lastState.frames).filter(
+        item => item.view === target
+      )
+    }
     // if no previous states, make a fresh one
     if (!states.length) {
       states.push({

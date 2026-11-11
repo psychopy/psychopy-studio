@@ -79,7 +79,7 @@
 
 {#if element instanceof Component}
     <Dialog
-        id=new-component
+        data-testid=new-component
         title={translate("New {}").replace("{}", titleCase(element.tag))}
         bind:shown={showDialog}
         onopen={() => dlgComponent.restore.set()}
@@ -90,7 +90,7 @@
         />
         {#snippet buttons()}
             <DialogButton
-                role=OK
+                action=OK
                 onclick={(evt) => {
                     // add to experiment
                     current.routine.addComponent(dlgComponent);
@@ -100,12 +100,12 @@
                 disabled={btnsDisabled.OK}
             />
             <DialogButton
-                role=CANCEL
+                action=CANCEL
                 onclick={() => dlgComponent.restore.apply()}
             />
             {#if dlgComponent.helpLink}
                 <DialogButton
-                    role=HELP
+                    action=HELP
                     onclick={dlgComponent.helpLink}
                 />
             {/if}

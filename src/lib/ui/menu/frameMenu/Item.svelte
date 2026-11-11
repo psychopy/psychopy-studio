@@ -10,22 +10,28 @@
         label,
         /** @prop @type {String|undefined} Path to an icon for this page's tab */
         icon=undefined,
-        /** @prop @type {String} Name of the keyboard shortcut (if any) for this menu item */
-        shortcut=undefined,
-        /** @prop @type {String} Role of the button (e.g. copy, paste, etc.), mostly used for accelerators on Mac */
-        role=undefined,
-        /** 
-         * @prop @type {function} Function to call when this item is clicked, given 3 params:
-         * 
-         * @param evt {MouseEvent} Event triggered on click
-         * @param data {any} Arbitrary data associated with this menu item 
+        /**
+         * @prop @type {String|undefined} Name of the action (e.g. copy, paste, save, etc.) this 
+         * item performs. Clicking runs the view's callback for this action (if any) as well as 
+         * `onclick`, and the keyboard shortcut of the same name (if any) is used as the 
+         * accelerator. If there's nothing to run (no `onclick`, and no callback or the callback is 
+         * disabled), it's passed to Electron as the item's role, so Electron's built-in actions 
+         * (cut, paste, zoomIn, etc.) can be used. Electron's built-in roles override any click 
+         * callback, so this is the only case where they're passed.
          */
-        onclick=(evt, data) => {},
+        action=undefined,
+        /**
+         * @prop @type {function} Function to call when this item is clicked, given 3 params:
+         *
+         * @param evt {MouseEvent} Event triggered on click
+         * @param data {any} Arbitrary data associated with this menu item
+         */
+        onclick=undefined,
         /** @prop @type {any} Arbitrary data associated with this menu item  */
         data={},
         /** @prop @type {boolean} Close menu on click? */
         close=true,
-        /** @prop @type {boolean} Is this item able to be clicked on? */
+        /** @prop @type {boolean|undefined} Is this item unable to be clicked on? (if undefined, follows the callback for `action`, if any) */
         disabled=$bindable(),
         /** @slot Render an optional submenu on this item */
         submenu=undefined
@@ -34,21 +40,25 @@
     // generate a unique ID which electron will use to call this button's method
     let id = $props.id()
 
+    // get the callback (if any) for this item's action
+    let callbacks = getContext("callbacks") ?? {}
+    let callback = $derived(action ? callbacks[action] : undefined)
+    // use the given disabled state if set, otherwise the action's callback (if any)
+    let isDisabled = $derived(disabled ?? callback?.disabled ?? false)
+    // is there anything to run on click?
+    let clickable = $derived(onclick !== undefined || (callback !== undefined && !callback.disabled))
+
     // get an Electron-friendly object representing this menu item
     function getProfile() {
         // start off with the basics
         let profile = {
             label: $state.snapshot(label),
-            enabled: !$state.snapshot(disabled),
-            click: id
-        }
-        // only assign a role if one is given
-        if (role) {
-            profile.role = $state.snapshot(role)
-        }
-        // assign an accellerator matching the shortcut
-        if (shortcut && shortcut in prefs.shortcuts) {
-            profile.accelerator = prefs.shortcuts[shortcut].val.join("+")
+            enabled: !isDisabled,
+            click: id,
+            // use action as Electron role if there's nothing to run on click
+            role: (action && !clickable) ? $state.snapshot(action) : undefined,
+            // use the action's shortcut as accelerator
+            accelerator: (action && action in prefs.shortcuts) ? prefs.shortcuts[action].val.join("+") : undefined,
         }
 
         return profile
@@ -66,8 +76,12 @@
     })
     // listen for calls from backend
     electron.windows.listen(`menu:${id}`, evt => {
+        // execute the callback for this item's action (unless disabled)
+        if (callback && !callback.disabled) {
+            callback.fcn()
+        }
         // execute front-end onclick function
-        onclick(evt, data)
+        onclick?.(evt, data)
     })
     // keep the template up to date as this item's values change
     $effect(() => Object.assign(
@@ -76,15 +90,15 @@
     ))
 </script>
 
-{#if onclick && !electron}
+{#if !electron}
     <MenuItem
         label={label}
         icon={icon}
-        shortcut={shortcut}
+        action={action}
         onclick={onclick}
         data={data}
         close={close}
-        bind:disabled={disabled}
+        disabled={disabled}
         submenu={submenu}
     />
 {/if}

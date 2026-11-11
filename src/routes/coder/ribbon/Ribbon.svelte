@@ -28,30 +28,28 @@
         <Button
             icon="/icons/btn-new.svg" 
             tooltip={translate("New file")} 
-            onclick={callbacks.new.fcn}
+            action="new"
             ghost
             tight
         /> 
         <Button
             icon="/icons/btn-open.svg" 
             tooltip={translate("Open file")} 
-            onclick={callbacks.open.fcn} 
+            action="open"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-save.svg" 
             tooltip={translate("Save file")} 
-            onclick={callbacks.save.fcn}
-            disabled={callbacks.save.disabled}
+            action="save"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-saveas.svg" 
             tooltip={translate("Save file as")}
-            onclick={callbacks.saveAs.fcn} 
-            disabled={callbacks.saveAs.disabled}
+            action="saveAs"
             ghost
             tight
         />
@@ -61,24 +59,21 @@
         <Button
             icon="/icons/btn-undo.svg" 
             tooltip={translate("Undo")}
-            onclick={callbacks.undo.fcn} 
-            disabled={callbacks.undo.disabled} 
+            action="undo"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-redo.svg" 
             tooltip={translate("Redo")} 
-            onclick={callbacks.redo.fcn} 
-            disabled={callbacks.redo.disabled} 
+            action="redo"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-find.svg" 
             tooltip={translate("Find")} 
-            onclick={callbacks.find.fcn}
-            disabled={callbacks.find.disabled}
+            action="find"
             ghost
             tight
         />
@@ -99,8 +94,7 @@
             <Button
                 icon="/icons/btn-send{current.pages[current.tab]?.pilotMode ? "pilot" : "run"}.svg" 
                 tooltip={translate("Send experiment to runner")} 
-                onclick={callbacks.sendToRunner.fcn}
-                disabled={callbacks.sendToRunner.disabled}
+                action="sendToRunner"
                 ghost
                 tight
             /> 
@@ -111,8 +105,7 @@
             <Button
                 icon="/icons/btn-{current.pages[current.tab]?.pilotMode ? "pilot" : "run"}py.svg" 
                 tooltip={current.pages[current.tab]?.pilotMode ? translate("Pilot locally") : translate("Run locally")}
-                onclick={evt => callbacks.runPython.fcn()}
-                disabled={callbacks.runPython.disabled}
+                action="runPython"
                 bind:awaiting={awaiting.runpy}
                 cancel={evt => callbacks.stopPython.fcn()}
                 ghost
@@ -133,14 +126,14 @@
         <Button
             icon="/icons/btn-builder.svg" 
             tooltip={translate("Builder view")} 
-            onclick={callbacks.showBuilder.fcn} 
+            action="showBuilder"
             ghost
             tight
         />
         <Button
             icon="/icons/btn-coder.svg" 
             tooltip={translate("Coder view")} 
-            onclick={callbacks.showCoder.fcn} 
+            action="showCoder"
             disabled
             ghost
             tight
@@ -149,7 +142,7 @@
             <Button
                 icon="/icons/btn-runner.svg" 
                 tooltip={translate("Runner view")} 
-                onclick={callbacks.showRunner.fcn} 
+                action="showRunner"
                 ghost
                 tight
             />

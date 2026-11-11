@@ -58,14 +58,14 @@
             ).replaceAll("{}", info.namespace.name)}
             {#snippet buttons()}
                 <DialogButton
-                    role=YES
+                    action=YES
                     onclick={evt => forkProject(
                         project,
                         $state.snapshot(current.user)
                     )}
                 />
                 <DialogButton
-                    role=NO
+                    action=NO
                     onclick={evt => cloneProject(
                         project,
                         $state.snapshot(current.user)

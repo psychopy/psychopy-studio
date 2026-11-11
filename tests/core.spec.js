@@ -1,4 +1,5 @@
-import { test, expect, openView } from './fixtures.js';
+import { test } from './fixtures.js';
+import { expect } from "./tools.js";
 
 test.describe('Core', () => {
 	/** @type {import('@playwright/test').Page} The page on which to run these tests*/

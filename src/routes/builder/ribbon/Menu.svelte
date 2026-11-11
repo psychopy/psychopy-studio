@@ -2,6 +2,7 @@
     import callbacks from '../callbacks.svelte.js';
     import { getContext } from "svelte";
     import { Menu, MenuItem, MenuSeparator, SubMenu } from '$lib/ui/menu/frameMenu';
+    import { dialogsOpen } from "$lib/ui/dialog";
     import PrefsDialog from '$lib/dialogs/preferences/PrefsDialog.svelte';
     import ParamsDialog from "$lib/ui/paramCtrls/ParamsDialog.svelte";
     import { FindDialog } from "$lib/dialogs/find";
@@ -32,7 +33,9 @@
         bugReport: false,
         browseDemosDlg: false,
         searchProjectsDlg: false
-    })
+    });
+
+    let anyDialogOpen = $derived(Object.values(dialogsOpen).some(val => val))
 </script>
 
 
@@ -46,36 +49,26 @@
         <MenuItem 
             icon="/icons/btn-new.svg" 
             label={translate("New file")}
-            shortcut="new"
-            onclick={callbacks.new.fcn}
-            disabled={callbacks.new.disabled}
+            action="new"
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
             label={translate("Open file...")} 
-            shortcut="open"
-            onclick={callbacks.open.fcn} 
-            disabled={callbacks.open.disabled}
+            action="open"
         />
         <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
-            shortcut="save"
-            onclick={callbacks.save.fcn} 
-            disabled={callbacks.save.disabled}
+            action="save"
         />
         <MenuItem
             icon="/icons/btn-saveas.svg"
             label={translate("Save file as...")}
-            shortcut="saveAs"
-            onclick={callbacks.saveAs.fcn} 
-            disabled={callbacks.saveAs.disabled}
+            action="saveAs"
         />
         <MenuItem
             label={translate("Reveal in file explorer")}
-            onclick={callbacks.revealFolder.fcn}
-            disabled={callbacks.revealFolder.disabled}
-            shortcut="revealFolder"
+            action="revealFolder"
         />
 
         <MenuSeparator />
@@ -87,24 +80,22 @@
         />
         <MenuItem
             label={translate("Reset preferences")}
-            onclick={callbacks.resetPrefs.fcn}
+            action="resetPrefs"
         />
 
         <MenuSeparator />
 
         <MenuItem
             label={translate("Minimize window")}
-            role="minimize"
+            action="minimize"
         />
         <MenuItem
             label={translate("Close window")}
-            onclick={window.close}
-            role="close"
+            action="close"
         />
         <MenuItem
             label={translate("Quit")}
-            shortcut="quit"
-            role="quit"
+            action="quit"
         />
     </SubMenu>
 
@@ -112,16 +103,14 @@
         <MenuItem 
             label={translate("Undo")}
             icon="/icons/btn-undo.svg"
-            onclick={callbacks.undo.fcn}
-            disabled={callbacks.undo.disabled}
-            shortcut="undo"
+            disabled={anyDialogOpen ? false : undefined}
+            action="undo"
         />
         <MenuItem 
             label={translate("Redo")}
             icon="/icons/btn-redo.svg"
-            onclick={callbacks.redo.fcn}
-            disabled={callbacks.redo.disabled}
-            shortcut="redo"
+            disabled={anyDialogOpen ? false : undefined}
+            action="redo"
         />
         
         <MenuSeparator />
@@ -129,17 +118,17 @@
         <MenuItem 
             label={translate("Cut text")}
             icon="/icons/btn-cut.svg"
-            role="cut"
+            action="cut"
         />
         <MenuItem 
             label={translate("Copy text")}
             icon="/icons/btn-copy.svg"
-            role="copy"
+            action="copy"
         />
         <MenuItem 
             label={translate("Paste text")}
             icon="/icons/btn-paste.svg"
-            role="paste"
+            action="paste"
         />
 
         <MenuSeparator />
@@ -148,54 +137,51 @@
             label={translate("Find in experiment...")}
             icon="/icons/btn-find.svg"
             onclick={evt => show.findDlg = true}
-            shortcut="find"
+            action="find"
         />
     </SubMenu>
 
     <SubMenu label={translate("View")} icon="/icons/rbn-windows.svg">
         <MenuItem 
             label={translate("Reload window")}
-            role="reload"
+            action="reload"
         />
         <MenuItem 
             label={translate("Force reload window")}
-            role="forceReload"
+            action="forceReload"
         />
 
         <MenuSeparator />
 
         <MenuItem
             label={translate("Zoom in")}
-            role="zoomIn"
+            action="zoomIn"
         />
         <MenuItem
             label={translate("Zoom out")}
-            role="zoomOut"
+            action="zoomOut"
         />
         <MenuItem
             label={translate("Reset zoom")}
-            role="resetZoom"
+            action="resetZoom"
         />
 
         <MenuSeparator />
 
         <MenuItem 
             label={translate("Show Coder")}
-            onclick={callbacks.showCoder.fcn}
+            action="showCoder"
         />
         <MenuItem 
             label={translate("Show Runner")}
-            onclick={callbacks.showRunner.fcn}
+            action="showRunner"
         />
 
         <MenuSeparator />
 
         <MenuItem 
             label={translate("Show developer tools")}
-            onclick={callbacks.showDevTools.fcn}
-            disabled={callbacks.showDevTools.disabled}
-            shortcut="showDevTools"
-            role="toggleDevTools"
+            action="showDevTools"
         />
     </SubMenu>
 
@@ -210,7 +196,7 @@
         <MenuItem 
             label={translate("Show readme")}
             icon="/icons/btn-new.svg"
-            onclick={evt => callbacks.showReadme.fcn()}
+            action="showReadme"
         />
 
         <MenuSeparator />
@@ -218,13 +204,13 @@
         <MenuItem 
             label={translate("Copy current Routine")}
             icon="/icons/btn-copy.svg"
-            onclick={evt => callbacks.copyRoutine.fcn()}
+            action="copyRoutine"
         />
 
         <MenuItem 
             label={translate("Paste Routine")}
             icon="/icons/btn-paste.svg"
-            onclick={evt => callbacks.pasteRoutine.fcn()}
+            action="pasteRoutine"
         />
     </SubMenu>
 
@@ -232,16 +218,12 @@
         <SubMenu label={translate("Run")} icon="/icons/btn-runpy.svg">
             <MenuItem 
                 label={translate("Toggle pilot mode")}
-                onclick={callbacks.togglePiloting.fcn}
-                disabled={callbacks.togglePiloting.disabled}
-                shortcut="togglePilot"
+                action="togglePiloting"
             />
             <MenuItem 
                 label={translate("Send to Runner")}
                 icon="/icons/btn-send{current.experiment.pilotMode ? "pilot" : "run"}.svg" 
-                onclick={callbacks.sendToRunner.fcn}
-                disabled={callbacks.sendToRunner.disabled}
-                shortcut="sendToRunner"
+                action="sendToRunner"
             />
 
             <MenuSeparator />
@@ -249,16 +231,12 @@
             <MenuItem 
                 label={translate("Compile Python")}
                 icon="/icons/btn-compilepy.svg" 
-                onclick={evt => callbacks.compilePython.fcn()}
-                disabled={callbacks.compilePython.disabled}
-                shortcut="compilePython"
+                action="compilePython"
             /> 
             <MenuItem 
                 label={current.experiment.pilotMode ? translate("Pilot in Python") : translate("Run in Python")}
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}py.svg" 
-                onclick={evt => callbacks.runPython.fcn()}
-                disabled={callbacks.runPython.disabled}
-                shortcut="runPython"
+                action="runPython"
             />
 
             <MenuSeparator />
@@ -266,16 +244,12 @@
             <MenuItem 
                 label={translate("Compile JS")} 
                 icon="/icons/btn-compilejs.svg" 
-                onclick={(evt) => callbacks.compileJS.fcn()}
-                disabled={callbacks.compileJS.disabled}
-                shortcut="compileJS"
+                action="compileJS"
             />
             <MenuItem 
                 label={current.experiment.pilotMode ? "Pilot in browser" : "Run in browser"}
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}js.svg" 
-                onclick={(evt) => callbacks.runJS.fcn()}
-                disabled={callbacks.runJS.disabled}
-                shortcut="runJS"
+                action="runJS"
             />
         </SubMenu>
     {/if}
@@ -346,13 +320,13 @@
 
             <MenuItem 
                 label={translate("Open PsychoPy user folder")}
-                onclick={callbacks.openUserFolder.fcn}
+                action="openUserFolder"
             />
         {/if}
         {#if python}
             <MenuItem 
                 label={translate("Reinstall Python")}
-                onclick={callbacks.reinstallPython.fcn}
+                action="reinstallPython"
             />
             <MenuItem
                 label="Install PsychoPy from Git..."
@@ -364,19 +338,19 @@
     <SubMenu label={translate("Help")}>
         <MenuItem
             label={translate("App info")}
-            role="about"
+            action="about"
         />
         <MenuItem 
             label={translate("PsychoPy Homepage")}
-            onclick={callbacks.gotoHomepage.fcn}
+            action="gotoHomepage"
         />
         <MenuItem 
             label={translate("Documentation")}
-            onclick={callbacks.gotoDocumentation.fcn}
+            action="gotoDocumentation"
         />
         <MenuItem 
             label={translate("Help Forum")}
-            onclick={callbacks.gotoForum.fcn}
+            action="gotoForum"
         />
         <MenuSeparator />
         {#if electron}

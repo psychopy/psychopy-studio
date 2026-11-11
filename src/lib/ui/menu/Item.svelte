@@ -8,18 +8,22 @@
         label,
         /** @prop @type {String|undefined} Path to an icon for this page's tab */
         icon=undefined,
-        /** @prop @type {String} Name of the keyboard shortcut (if any) for this menu item */
-        shortcut=undefined,
+        /**
+         * @prop @type {String|undefined} Name of the action (e.g. save, undo, etc.) this item
+         * performs. Clicking runs the view's callback for this action (if any) as well as
+         * `onclick`, and the keyboard shortcut of the same name (if any) is shown.
+         */
+        action=undefined,
         /** * @prop @type {function} Function to call when this item is clicked, given 3 params:
          * * @param evt {MouseEvent} Event triggered on click
-         * @param data {any} Arbitrary data associated with this menu item 
+         * @param data {any} Arbitrary data associated with this menu item
          */
-        onclick=(evt, data) => {},
+        onclick=undefined,
         /** @prop @type {any} Arbitrary data associated with this menu item  */
         data={},
         /** @prop @type {boolean} Close menu on click? */
         close=true,
-        /** @prop @type {boolean} Is this item able to be clicked on? */
+        /** @prop @type {boolean|undefined} Is this item unable to be clicked on? (if undefined, follows the callback for `action`, if any) */
         disabled=$bindable(),
         /** @slot Render an optional submenu on this item */
         submenu=undefined,
@@ -30,6 +34,12 @@
     // function to close parent
     let closeMenu = getContext("closeMenu");
 
+    // get the callback (if any) for this item's action
+    let callbacks = getContext("callbacks") ?? {};
+    let callback = $derived(action ? callbacks[action] : undefined);
+    // use the given disabled state if set, otherwise the action's callback (if any)
+    let isDisabled = $derived(disabled ?? callback?.disabled ?? false)
+
     // define some key labels
     let keyLabels = {
         CONTROL: "CTRL",
@@ -39,17 +49,22 @@
 
 
 <button  
-    class=menu-item 
+    class=menu-item
+    data-action={action}
     {...rest}
     onclick={(evt) => {
+        // execute the callback for this item's action (unless disabled)
+        if (callback && !callback.disabled) {
+            callback.fcn()
+        }
         // execute the given function, with arbitrary data given on init
-        onclick(evt, data);
+        onclick?.(evt, data);
         // close menu if requested
         if (close) {
             closeMenu()
         }
     }}
-    disabled={disabled}
+    disabled={isDisabled}
 >
     <Icon 
         src={icon}
@@ -59,8 +74,8 @@
         {label}
     </span>
     <span class=shortcut>
-        {#if shortcut in prefs.shortcuts}
-            {prefs.shortcuts[shortcut].val.map(
+        {#if action in prefs.shortcuts}
+            {prefs.shortcuts[action].val.map(
                 item => keyLabels[item] || item
             ).join("+")}
         {/if}

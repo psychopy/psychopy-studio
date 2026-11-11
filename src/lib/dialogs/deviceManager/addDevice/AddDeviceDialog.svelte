@@ -32,7 +32,7 @@
 </script>
 
 <Dialog
-    id=add-device
+    data-testid=add-device
     title={translate("Add device...")}
     bind:shown={shown}
     onopen={evt => {
@@ -128,7 +128,7 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={(evt) => {
                 // populate
                 devices[param.val] = new Device(selection.backend.__name__, selection.device);
@@ -136,7 +136,7 @@
             }}
             disabled={disableBtns.OK}
         />
-        <DialogButton role=CANCEL />
+        <DialogButton action=CANCEL />
     {/snippet}
 </Dialog>
 

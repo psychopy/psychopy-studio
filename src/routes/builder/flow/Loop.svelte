@@ -123,7 +123,7 @@
 
 <!-- dialog to open when clicked on -->
 <Dialog 
-    id="loop-{element.name}" 
+    data-testid="loop-{element.name}" 
     title={element.name}
     bind:shown={showDialog} 
     onopen={() => element.initiator.restore.set()}
@@ -136,16 +136,16 @@
     />
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             disabled={btnsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={(evt) => element.initiator.restore.set()}
             disabled={btnsDisabled.APPLY}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={(evt) => element.initiator.restore.apply()}
         />
     {/snippet}

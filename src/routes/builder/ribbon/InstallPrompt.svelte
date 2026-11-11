@@ -24,7 +24,7 @@
         })
     )}
         <MessageDialog
-            id=install-prompt
+            data-testid=install-prompt
             bind:shown={shown}
             buttons={["CANCEL"]}
         >

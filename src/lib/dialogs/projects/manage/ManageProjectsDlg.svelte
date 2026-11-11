@@ -45,7 +45,7 @@
 
 
 <Dialog
-    id=manageProjects
+    data-testid=manageProjects
     title={translate("Local projects")}
     bind:shown={shown}
     buttons={["OK"]}

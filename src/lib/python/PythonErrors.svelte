@@ -46,10 +46,10 @@
                 </div>
                 {#snippet buttons()}
                     <DialogButton
-                        role=OK
+                        action=OK
                         onclick={evt => errors[i].dismissed = true}
                     />
-                    <DialogButton role=CANCEL />
+                    <DialogButton action=CANCEL />
                 {/snippet}
             </MessageDialog>
         {/if}

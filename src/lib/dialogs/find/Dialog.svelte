@@ -33,7 +33,7 @@
 </script>
 
 <Dialog
-    id=find-in-experiment
+    data-testid=find-in-experiment
     title={translate("Find in experiment...")}
     onopen={(evt) => searchTerm = ""}
     bind:shown={shown}

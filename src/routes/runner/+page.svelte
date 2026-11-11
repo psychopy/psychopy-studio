@@ -23,6 +23,7 @@
     
 
     setContext("current", current)
+    setContext("callbacks", callbacks)
 
     // parse url params
     let params = new URLSearchParams(location.search)
@@ -105,6 +106,7 @@
 {/if}
 <Frame
     onFileDrop={(evt, file) => callbacks.addFile.fcn(file)}
+    data-testid=runner
 >
     {#snippet ribbon()}
         <Ribbon />

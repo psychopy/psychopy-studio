@@ -37,7 +37,7 @@
 </script>
 
 <Dialog
-    id=color-picker
+    data-testid=color-picker
     title={translate("Color Picker")}
     onopen={apply}
     bind:shown={shown}
@@ -74,17 +74,17 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={apply}
             disabled={buttonsDisabled.OK}
         />
         <DialogButton
-            role=APPLY
+            action=APPLY
             onclick={apply}
             disabled={buttonsDisabled.APPLY}
         />
         <DialogButton
-            role=CANCEL
+            action=CANCEL
             onclick={evt => {
                 value = restore.color;
                 space = restore.space;

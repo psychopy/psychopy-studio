@@ -21,6 +21,7 @@
 
     // reference current in context for ease of access
     setContext("current", current)
+    setContext("callbacks", callbacks)
 
     // parse url params
     let params = new URLSearchParams(location.search)
@@ -55,6 +56,7 @@
 <title>{translate("PsychoPy Coder")}</title>
 <Frame
     onFileDrop={(evt, file) => current.openFile(file)}
+    data-testid=coder
 >
     {#snippet ribbon()}
         <CoderRibbon />

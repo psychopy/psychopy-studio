@@ -44,7 +44,7 @@
 />
 
 <Dialog
-    id=browse-surveys
+    data-testid=browse-surveys
     title={translate("Pavlovia surveys")}
     bind:shown={showSurveysDlg}
 >
@@ -76,11 +76,11 @@
     </div>
     {#snippet buttons()}
         <DialogButton
-            role=OK
+            action=OK
             onclick={(evt) => param.val = selected.survey.surveyId}
             disabled={selected.survey === undefined}
         />
-        <DialogButton role=CANCEL />
+        <DialogButton action=CANCEL />
     {/snippet}
 </Dialog>
 
