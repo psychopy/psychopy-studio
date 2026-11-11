@@ -123,7 +123,7 @@
 
 <!-- dialog to open when clicked on -->
 <Dialog 
-    id="loop-{element.name}" 
+    data-testid="loop-{element.name}" 
     title={element.name}
     bind:shown={showDialog} 
     onopen={() => element.initiator.restore.set()}

@@ -31,7 +31,7 @@
 </script>
 
 <Dialog
-    id=component-filter
+    data-testid=component-filter
     title="Filter Components"
     bind:shown={shown}
     shrink

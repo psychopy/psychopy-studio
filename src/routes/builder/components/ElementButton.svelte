@@ -79,7 +79,7 @@
 
 {#if element instanceof Component}
     <Dialog
-        id=new-component
+        data-testid=new-component
         title={translate("New {}").replace("{}", titleCase(element.tag))}
         bind:shown={showDialog}
         onopen={() => dlgComponent.restore.set()}

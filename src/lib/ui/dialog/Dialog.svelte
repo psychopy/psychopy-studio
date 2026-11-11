@@ -1,12 +1,12 @@
 <script>
     import DialogButton from "./DialogButton.svelte";
     import { Icon } from "$lib/ui/icon";
+    import { dialogsOpen } from "./globals.svelte";
     import { onMount, setContext, untrack } from "svelte";
     import { electron } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
 
     let {
-        id,
         /** @prop @type {string} Text to display in the title bar of this dialog */
         title="",
         /** @prop @type {Snippet|Array<"OK"|"APPLY"|"CANCEL"|"YES"|"NO">|undefined} DialogButton components to display (positioned according to their role), or a list of roles to create default buttons for */
@@ -28,6 +28,8 @@
     } = $props();
 
     let handle;
+    // unique ID for this dialog
+    let id = $props.id();
 
     // pass context to children (namely buttons)
     let registeredButtons = $state({
@@ -48,6 +50,12 @@
             untrack(() => onclose())
             handle.close()
         }
+    })
+    // keep track of this dialog's shown state globally
+    $effect(() => {
+        dialogsOpen[id] = shown
+
+        return () => delete dialogsOpen[id]
     })
 
     // can the dialog be cancelled by the user right now?

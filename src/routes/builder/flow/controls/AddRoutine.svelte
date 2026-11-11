@@ -70,7 +70,7 @@
 <!-- dialog for creating a new Routine -->
 {#if current.inserting instanceof Routine}
     <Dialog 
-        id=new-routine
+        data-testid=new-routine
         title={translate("New Routine")}
         bind:shown={showNewRoutineDialog} 
         onopen={() => current.inserting.settings.restore.set()}

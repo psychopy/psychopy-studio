@@ -38,7 +38,7 @@
 
 
 <Dialog 
-    id="{element.name}-parameters"
+    data-testid="{element.name}-parameters"
     title={`${translate("Editing")}: ${element.name || element.tag}`}
     bind:shown={shown} 
     onclose={onclose}

@@ -44,7 +44,7 @@
 />
 
 <Dialog
-    id=browse-surveys
+    data-testid=browse-surveys
     title={translate("Pavlovia surveys")}
     bind:shown={showSurveysDlg}
 >

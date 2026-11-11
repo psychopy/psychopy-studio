@@ -190,7 +190,7 @@
 
 
 <Dialog
-    id="device-manager"
+    data-testid="device-manager"
     title={translate("Device manager")}
     onopen={restore.set}
     bind:shown={shown}

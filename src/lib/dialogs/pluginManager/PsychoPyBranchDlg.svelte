@@ -18,7 +18,7 @@
 
 
 <Dialog
-    id=plugin-mgr
+    data-testid=plugin-mgr
     title="Install PsychoPy from Git"
     bind:shown={shown}
     shrink

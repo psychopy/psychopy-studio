@@ -37,7 +37,7 @@
 </script>
 
 <Dialog
-    id=color-picker
+    data-testid=color-picker
     title={translate("Color Picker")}
     onopen={apply}
     bind:shown={shown}

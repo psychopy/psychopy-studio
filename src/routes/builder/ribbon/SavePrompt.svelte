@@ -24,7 +24,7 @@
 
 {#if current.experiment.history.past.length}
     <MessageDialog
-        id=save-prompt
+        data-testid=save-prompt
         bind:shown={shown}
     >
         {translate("'{}' has unsaved changes, save now?").replace("{}", current.experiment.file.name)}

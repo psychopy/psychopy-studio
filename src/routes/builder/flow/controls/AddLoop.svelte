@@ -82,7 +82,7 @@
     <!-- dialog for creating a new Loop -->
     {#if current.inserting instanceof LoopInitiator}
     <Dialog 
-        id=new-loop 
+        data-testid=new-loop 
         title={translate("New loop")}
         bind:shown={showDialog} 
         onopen={() => current.inserting.restore.set()}

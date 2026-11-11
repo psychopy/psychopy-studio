@@ -14,7 +14,7 @@
 </script>
 
 <Dialog
-    id=search-projects-filter
+    data-testid=search-projects-filter
     title={translate("Filter projects")}
     bind:shown={shown}
     onopen={() => draft = $state.snapshot(filters)}

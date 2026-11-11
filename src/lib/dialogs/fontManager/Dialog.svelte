@@ -29,7 +29,7 @@
 
 
 <Dialog
-    id=font-manager
+    data-testid=font-manager
     title={translate("Font Manager")}
     onopen={apply}
     bind:shown={shown}

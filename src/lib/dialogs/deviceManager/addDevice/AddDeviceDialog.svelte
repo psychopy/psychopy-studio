@@ -32,7 +32,7 @@
 </script>
 
 <Dialog
-    id=add-device
+    data-testid=add-device
     title={translate("Add device...")}
     bind:shown={shown}
     onopen={evt => {
