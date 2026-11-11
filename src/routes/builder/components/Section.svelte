@@ -10,6 +10,7 @@
 
 <PanelButton
     label={label}
+    data-testclass=component-category
 >
     <div class=component-section-buttons>
         {@render children?.()}

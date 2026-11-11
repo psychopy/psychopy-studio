@@ -74,6 +74,7 @@
                 <Pane defaultSize={3/4}>
                     <Panel 
                         title={translate("Routines")} 
+                        id=routines-panel
                     >
                         <RoutinesNotebook />
                     </Panel>
@@ -84,6 +85,7 @@
                 <Pane defaultSize={1/4}>
                     <Panel 
                         title={translate("Components")} 
+                        id=components-panel
                     >
                         <ComponentsPanel />
                     </Panel>
@@ -96,6 +98,7 @@
         <Pane defaultSize={1/3}>
             <Panel 
                 title={translate("Flow")} 
+                id=flow-panel
                 hspan={4}
             >
                 <FlowPanel />

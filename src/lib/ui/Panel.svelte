@@ -5,8 +5,10 @@
     let {
         /** @prop @type {string} Text to display in this panel's sash */
         title,
-        /** @interface */
-        children=undefined
+        /** @prop {Snippet} children Child elements are rendered in the body of the panel */
+        children=undefined,
+        /** @prop {ComponentProperties} props Other props are passed to the panel's div */
+        ...props
     } = $props()
 
     // state which keeps track of the index of each section
@@ -43,7 +45,11 @@
     })
 </script>
 
-<div class="panel" bind:this={handle}>
+<div 
+    {...props}
+    class="panel" 
+    bind:this={handle}
+>
     <div class="pnl-title">
         {title}
     </div>
