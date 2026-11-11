@@ -35,28 +35,28 @@
         <MenuItem 
             icon="/icons/btn-new.svg" 
             label={translate("New file")}
-            shortcut="new"
+            role="new"
             onclick={callbacks.new.fcn}
             disabled={callbacks.new.disabled}
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
             label={translate("Open file...")} 
-            shortcut="open"
+            role="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
         />
         <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
-            shortcut="save"
+            role="save"
             onclick={callbacks.save.fcn}
             disabled={callbacks.save.disabled}
         />
         <MenuItem 
             icon="/icons/btn-saveas.svg" 
             label={translate("Save file as...")}
-            shortcut="saveAs"
+            role="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
         />
@@ -86,7 +86,6 @@
         />
         <MenuItem
             label={translate("Quit")}
-            shortcut="quit"
             role="quit"
         />
     </SubMenu>
@@ -133,8 +132,7 @@
             label={translate("Show developer tools")}
             onclick={showDevTools}
             disabled={callbacks.showDevTools.disabled}
-            shortcut="showDevTools",
-            role="toggleDevTools"
+            role="showDevTools"
         />
     </SubMenu>
 
@@ -144,7 +142,7 @@
                 label={translate("Toggle pilot mode")}
                 onclick={callbacks.togglePiloting.fcn}
                 disabled={callbacks.togglePiloting.disabled}
-                shortcut="togglePilot"
+                role="togglePilot"
             />
 
             <MenuSeparator />
@@ -154,14 +152,14 @@
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}py.svg" 
                 onclick={callbacks.runPython.fcn}
                 disabled={callbacks.runPython.disabled}
-                shortcut="runPython"
+                role="runPython"
             />
             <MenuItem
                 label={current.runlist[current.selection]?.pilotMode ? translate("Pilot in browser") : translate("Run in browser")}
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}js.svg" 
                 onclick={callbacks.runJS.fcn}
                 disabled={callbacks.runJS.disabled}
-                shortcut="runJS"
+                role="runJS"
             />
         </SubMenu>
     {/if}

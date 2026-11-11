@@ -1,6 +1,6 @@
 import { electron, python } from '$lib/globals.svelte.js';
 import { current } from './globals.svelte.js';
-
+import { dialogsOpen } from "$lib/ui/dialog";
 import path from "path-browserify";
 import { newWindow, openIn, showDevTools, focusNextPanel, showBuilder, showCoder, showRunner } from "$lib/utils/views.svelte"
 import { browseFileOpen, browseFileSave, parsePath } from "$lib/utils/files.js";
@@ -117,6 +117,9 @@ function quit() {
 
 /* Edit */
 function undo() {
+    // skip if a dialog is open
+    if (Object.values(dialogsOpen).some(val => val)) return
+    // undo last action in experiment history
     current.experiment.history.undo();
     // restore focus to tab if possible
     if (current.routine && current.routine.name in current.experiment.routines) {
@@ -125,6 +128,9 @@ function undo() {
 }
 
 function redo() {
+    // skip if a dialog is open
+    if (Object.values(dialogsOpen).some(val => val)) return
+    // redo first action in experiment future
     current.experiment.history.redo();
     // restore focus to tab if possible
     if (current.routine && current.routine.name in current.experiment.routines) {

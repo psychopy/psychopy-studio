@@ -33,14 +33,14 @@
         <MenuItem 
             icon="/icons/btn-new.svg" 
             label={translate("New file")}
-            shortcut="new"
+            role="new"
             onclick={callbacks.new.fcn}
             disabled={callbacks.new.disabled}
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
             label={translate("Open file...")} 
-            shortcut="open"
+            role="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
         />
@@ -52,14 +52,14 @@
         <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
-            shortcut="save"
+            role="save"
             onclick={callbacks.save.fcn} 
             disabled={callbacks.save.disabled}
         />
         <MenuItem 
             icon="/icons/btn-saveas.svg" 
             label={translate("Save file as...")}
-            shortcut="saveAs"
+            role="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
         />
@@ -67,12 +67,12 @@
             label={translate("Reveal in file explorer")}
             onclick={callbacks.revealFolder.fcn}
             disabled={callbacks.revealFolder.disabled}
-            shortcut="revealFolder"
+            role="revealFolder"
         />
         <MenuItem
             label={translate("Close window")}
             onclick={window.close}
-            shortcut="close"
+            role="close"
         />
 
         <MenuSeparator />
@@ -101,7 +101,6 @@
         />
         <MenuItem
             label={translate("Quit")}
-            shortcut="quit"
             role="quit"
         />
     </SubMenu>
@@ -112,15 +111,13 @@
             icon="/icons/btn-undo.svg"
             onclick={callbacks.undo.fcn}
             disabled={callbacks.undo.disabled}
-            shortcut="undo"
-            role="undi"
+            role="undo"
         />
         <MenuItem 
             label={translate("Redo")}
             icon="/icons/btn-redo.svg"
             onclick={callbacks.redo.fcn}
             disabled={callbacks.redo.disabled}
-            shortcut="redo"
             role="redo"
         />
 
@@ -149,7 +146,7 @@
             icon="/icons/btn-find.svg"
             onclick={callbacks.find.fcn}
             disabled={callbacks.find.disabled}
-            shortcut="find"
+            role="find"
         />
     </SubMenu>
 
@@ -195,8 +192,7 @@
             label={translate("Show developer tools")}
             onclick={callbacks.showDevTools.fcn}
             disabled={callbacks.showDevTools.disabled}
-            shortcut="showDevTools"
-            role="toggleDevTools"
+            role="showDevTools"
         />
     </SubMenu>
 
@@ -206,14 +202,14 @@
                 label={translate("Toggle pilot mode")}
                 onclick={callbacks.togglePiloting.fcn}
                 disabled={callbacks.togglePiloting.disabled}
-                shortcut="togglePilot"
+                role="togglePilot"
             />
             <MenuItem 
                 label={translate("Send to Runner")}
                 icon="/icons/btn-send{current.pages[current.tab]?.pilotMode ? "pilot" : "run"}.svg" 
                 onclick={callbacks.sendToRunner.fcn}
                 disabled={callbacks.sendToRunner.disabled}
-                shortcut="sendToRunner"
+                role="sendToRunner"
             />
 
             <MenuSeparator />
@@ -223,7 +219,7 @@
                 icon="/icons/btn-{current.pages[current.tab]?.pilotMode?.pilotMode ? "pilot" : "run"}py.svg" 
                 onclick={evt => callbacks.runPython.fcn()}
                 disabled={callbacks.runPython.disabled}
-                shortcut="runPython"
+                role="runPython"
             />
 
         </SubMenu>

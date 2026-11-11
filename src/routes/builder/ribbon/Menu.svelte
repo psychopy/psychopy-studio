@@ -2,6 +2,7 @@
     import callbacks from '../callbacks.svelte.js';
     import { getContext } from "svelte";
     import { Menu, MenuItem, MenuSeparator, SubMenu } from '$lib/ui/menu/frameMenu';
+    import { dialogsOpen } from "$lib/ui/dialog";
     import PrefsDialog from '$lib/dialogs/preferences/PrefsDialog.svelte';
     import ParamsDialog from "$lib/ui/paramCtrls/ParamsDialog.svelte";
     import { FindDialog } from "$lib/dialogs/find";
@@ -32,7 +33,9 @@
         bugReport: false,
         browseDemosDlg: false,
         searchProjectsDlg: false
-    })
+    });
+
+    let anyDialogOpen = $derived(Object.values(dialogsOpen).some(val => val))
 </script>
 
 
@@ -46,28 +49,28 @@
         <MenuItem 
             icon="/icons/btn-new.svg" 
             label={translate("New file")}
-            shortcut="new"
+            role="new"
             onclick={callbacks.new.fcn}
             disabled={callbacks.new.disabled}
         />
         <MenuItem 
             icon="/icons/btn-open.svg" 
             label={translate("Open file...")} 
-            shortcut="open"
+            role="open"
             onclick={callbacks.open.fcn} 
             disabled={callbacks.open.disabled}
         />
         <MenuItem 
             icon="/icons/btn-save.svg" 
             label={translate("Save file")}
-            shortcut="save"
+            role="save"
             onclick={callbacks.save.fcn} 
             disabled={callbacks.save.disabled}
         />
         <MenuItem
             icon="/icons/btn-saveas.svg"
             label={translate("Save file as...")}
-            shortcut="saveAs"
+            role="saveAs"
             onclick={callbacks.saveAs.fcn} 
             disabled={callbacks.saveAs.disabled}
         />
@@ -75,7 +78,7 @@
             label={translate("Reveal in file explorer")}
             onclick={callbacks.revealFolder.fcn}
             disabled={callbacks.revealFolder.disabled}
-            shortcut="revealFolder"
+            role="revealFolder"
         />
 
         <MenuSeparator />
@@ -103,7 +106,6 @@
         />
         <MenuItem
             label={translate("Quit")}
-            shortcut="quit"
             role="quit"
         />
     </SubMenu>
@@ -112,16 +114,16 @@
         <MenuItem 
             label={translate("Undo")}
             icon="/icons/btn-undo.svg"
-            onclick={callbacks.undo.fcn}
-            disabled={callbacks.undo.disabled}
-            shortcut="undo"
+            onclick={anyDialogOpen ? undefined : callbacks.undo.fcn}
+            disabled={anyDialogOpen ? false : callbacks.undo.disabled}
+            role="undo"
         />
         <MenuItem 
             label={translate("Redo")}
             icon="/icons/btn-redo.svg"
-            onclick={callbacks.redo.fcn}
-            disabled={callbacks.redo.disabled}
-            shortcut="redo"
+            onclick={anyDialogOpen ? undefined : callbacks.redo.fcn}
+            disabled={anyDialogOpen ? false : callbacks.redo.disabled}
+            role="redo"
         />
         
         <MenuSeparator />
@@ -148,7 +150,7 @@
             label={translate("Find in experiment...")}
             icon="/icons/btn-find.svg"
             onclick={evt => show.findDlg = true}
-            shortcut="find"
+            role="find"
         />
     </SubMenu>
 
@@ -194,8 +196,7 @@
             label={translate("Show developer tools")}
             onclick={callbacks.showDevTools.fcn}
             disabled={callbacks.showDevTools.disabled}
-            shortcut="showDevTools"
-            role="toggleDevTools"
+            role="showDevTools"
         />
     </SubMenu>
 
@@ -234,14 +235,14 @@
                 label={translate("Toggle pilot mode")}
                 onclick={callbacks.togglePiloting.fcn}
                 disabled={callbacks.togglePiloting.disabled}
-                shortcut="togglePilot"
+                role="togglePilot"
             />
             <MenuItem 
                 label={translate("Send to Runner")}
                 icon="/icons/btn-send{current.experiment.pilotMode ? "pilot" : "run"}.svg" 
                 onclick={callbacks.sendToRunner.fcn}
                 disabled={callbacks.sendToRunner.disabled}
-                shortcut="sendToRunner"
+                role="sendToRunner"
             />
 
             <MenuSeparator />
@@ -251,14 +252,14 @@
                 icon="/icons/btn-compilepy.svg" 
                 onclick={evt => callbacks.compilePython.fcn()}
                 disabled={callbacks.compilePython.disabled}
-                shortcut="compilePython"
+                role="compilePython"
             /> 
             <MenuItem 
                 label={current.experiment.pilotMode ? translate("Pilot in Python") : translate("Run in Python")}
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}py.svg" 
                 onclick={evt => callbacks.runPython.fcn()}
                 disabled={callbacks.runPython.disabled}
-                shortcut="runPython"
+                role="runPython"
             />
 
             <MenuSeparator />
@@ -268,14 +269,14 @@
                 icon="/icons/btn-compilejs.svg" 
                 onclick={(evt) => callbacks.compileJS.fcn()}
                 disabled={callbacks.compileJS.disabled}
-                shortcut="compileJS"
+                role="compileJS"
             />
             <MenuItem 
                 label={current.experiment.pilotMode ? "Pilot in browser" : "Run in browser"}
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}js.svg" 
                 onclick={(evt) => callbacks.runJS.fcn()}
                 disabled={callbacks.runJS.disabled}
-                shortcut="runJS"
+                role="runJS"
             />
         </SubMenu>
     {/if}
