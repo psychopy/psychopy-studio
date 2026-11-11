@@ -105,6 +105,7 @@
 {/if}
 <Frame
     onFileDrop={(evt, file) => callbacks.addFile.fcn(file)}
+    data-testid=runner
 >
     {#snippet ribbon()}
         <Ribbon />

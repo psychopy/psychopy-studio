@@ -62,6 +62,7 @@
 
 <Frame
     onFileDrop={(evt, file) => callbacks.openFile.fcn(file)}
+    data-testid=builder
 >
     {#snippet ribbon()}
         <Ribbon />

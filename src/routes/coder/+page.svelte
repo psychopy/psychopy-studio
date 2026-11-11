@@ -55,6 +55,7 @@
 <title>{translate("PsychoPy Coder")}</title>
 <Frame
     onFileDrop={(evt, file) => current.openFile(file)}
+    data-testid=coder
 >
     {#snippet ribbon()}
         <CoderRibbon />
