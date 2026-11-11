@@ -1,5 +1,5 @@
 <script>
-    import callbacks from '../callbacks.svelte.js';
+    import callbacks, { prompts, file_new, file_open } from '../callbacks.svelte.js';
     import Menu from "./Menu.svelte";
     import { Ribbon, RibbonSection, RibbonGap } from '$lib/ui/ribbon';
     import { getContext } from "svelte";
@@ -40,13 +40,6 @@
             return ` "${current.experiment.history.future[0].msg}"`
         }
     })
-
-    let prompts = $state({
-        NEW: false,
-        OPEN: false,
-        PYCOMPILE: false,
-        PYRUN: false
-    });
 </script>
 
 <Ribbon>
@@ -56,24 +49,24 @@
         <Button
             icon="/icons/btn-new.svg" 
             tooltip={translate("New file")} 
-            onclick={(evt) => prompts.NEW = true}
+            action="new"
             ghost
             tight
         />
         <SavePrompt
             bind:shown={prompts.NEW}
-            action={callbacks.new.fcn}
-        />  
+            action={file_new}
+        />
         <Button
-            icon="/icons/btn-open.svg" 
-            tooltip={translate("Open file")} 
-            onclick={(evt) => prompts.OPEN = true} 
+            icon="/icons/btn-open.svg"
+            tooltip={translate("Open file")}
+            action="open"
             ghost
             tight
         />
         <SavePrompt
             bind:shown={prompts.OPEN}
-            action={callbacks.open.fcn}
+            action={file_open}
         />
         <Button
             icon="/icons/btn-save.svg" 
