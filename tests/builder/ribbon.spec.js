@@ -25,7 +25,7 @@ test.describe("Builder ribbon", () => {
         return btn.click();
     }
 
-    test("New button", async ({ app }) => {
+    test("New file", async ({ app }) => {
         // start listening for a new window
         let newWindowPromise = app.waitForEvent("window");
         // click the ribbon button
@@ -37,4 +37,55 @@ test.describe("Builder ribbon", () => {
         // close window
         await newWindow.close();
 	});
+
+    test("Undo/redo", async () => {
+        // get the undo and redo buttons
+        let undoBtn = getButtonByAction(ribbon, "undo");
+        let redoBtn = getButtonByAction(ribbon, "redo");
+        // get the indicator on the piloting toggle
+        let indicator = getButtonByAction(ribbon, "togglePiloting").locator(".indicator");
+        // click the piloting toggle so that the experiment has a change
+        await clickBtn("togglePiloting");
+        // undo should be enabled, and redo disabled
+        await expect(undoBtn).not.toBeDisabled();
+        await expect(redoBtn).toBeDisabled();
+        // get the value of the toggle button
+        let finishedLeft = await indicator.evaluate(el => el.classList.contains("left"));
+        // click the undo button
+        await clickBtn("undo");
+        // the piloting toggle should now have flipped (as the previous toggle is undone)
+        if (finishedLeft) {
+            await expect(indicator).not.toContainClass("left");
+        } else {
+            await expect(indicator).toContainClass("left");
+        }
+        // redo should be enabled
+        await expect(redoBtn).not.toBeDisabled();
+        // click the redo button
+        await clickBtn("redo");
+        // the piloting toggle should now have flipped (as the previous toggle is redone)
+        if (finishedLeft) {
+            await expect(indicator).toContainClass("left");
+        } else {
+            await expect(indicator).not.toContainClass("left");
+        }
+        // undo should once again be enabled, and redo disabled
+        await expect(undoBtn).not.toBeDisabled();
+        await expect(redoBtn).toBeDisabled();
+    })
+
+    test("Toggle piloting", async () => {
+        // get the indicator on the switch button
+        let indicator = getButtonByAction(ribbon, "togglePiloting").locator(".indicator");
+        // get the value of the toggle button
+        let startedLeft = await indicator.evaluate(el => el.classList.contains("left"));
+        // click the piloting toggle
+        await clickBtn("togglePiloting");
+        // has its value changed?
+        if (startedLeft) {
+            await expect(indicator).not.toContainClass("left");
+        } else {
+            await expect(indicator).toContainClass("left");
+        }
+    })
 });
