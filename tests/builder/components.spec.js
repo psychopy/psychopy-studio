@@ -434,9 +434,9 @@ test.describe("Builder Components/Standalone Routines", () => {
         // setup for test
         let context = await setupInputTypeTest("ResourceManagerComponent", "Basic", "resources")
         // each item has a file ctrl (with a browse button) and a delete button
-        let browseBtns = context.ctrl.getByRole("button", { name: "Browse for file...", exact: true })
-        let deleteBtns = context.ctrl.getByRole("button", { name: "Remove item", exact: true })
-        let addBtn = context.ctrl.getByRole("button", { name: "Add item", exact: true })
+        let browseBtns = context.ctrl.getByTestId("browse-file")
+        let deleteBtns = context.ctrl.getByTestId("remove-item")
+        let addBtn = context.ctrl.getByTestId("add-item")
         // count items to start with
         let n = await deleteBtns.count()
         // click "Add item"
@@ -474,9 +474,9 @@ test.describe("Builder Components/Standalone Routines", () => {
         // setup for test
         let context = await setupInputTypeTest("SettingsComponent", "Basic", "Experiment info")
         // each entry has a key input, a value input and a delete button
-        let keyInputs = context.ctrl.getByRole("textbox", { name: /^Name of .* key$/ })
-        let deleteBtns = context.ctrl.getByRole("button", { name: "Remove item", exact: true })
-        let addBtn = context.ctrl.getByRole("button", { name: "Add item", exact: true })
+        let keyInputs = context.ctrl.getByTestId("dict-key")
+        let deleteBtns = context.ctrl.getByTestId("remove-item")
+        let addBtn = context.ctrl.getByTestId("add-item")
         // count entries to start with
         let n = await keyInputs.count()
         // click "Add item"
@@ -489,7 +489,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         await keyInputs.last().fill("renamedKey")
         await expect(keyInputs.last(), "Key input should hold typed name").toHaveValue("renamedKey")
         // check that its value input now refers to the new key
-        let valueInput = context.ctrl.getByRole("textbox", { name: /^Starting value of renamedKey in / })
+        let valueInput = context.ctrl.getByTestId("dict-value:renamedKey")
         await expect(valueInput, "Renaming a key should rename its entry").toBeAttached()
         // remove the new entry
         await deleteBtns.last().click()
@@ -541,11 +541,11 @@ test.describe("Builder Components/Standalone Routines", () => {
         // find an option which isn't currently selected
         let target = context.ctrl.locator("button.rich-ctrl-item:not(.selected)").first()
         await expect(target, "RichChoice ctrl should have more than one option").toBeAttached()
-        let label = await target.getAttribute("aria-label")
+        let testid = await target.getAttribute("data-testid")
         // click its first non-link child, so we don't land on the "more info" link
         await target.locator("*:not(a, a *)").first().click()
         // check that it's now selected
-        let clicked = context.ctrl.getByRole("button", { name: label, exact: true })
+        let clicked = context.ctrl.getByTestId(testid)
         await expect(clicked, "RichChoice option should be selected when clicked").toHaveClass(/\bselected\b/)
         // check that it's the only selected option
         await expect(context.ctrl.locator("button.rich-ctrl-item.selected"), "Only one RichChoice option should be selected").toHaveCount(1)

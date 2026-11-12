@@ -81,6 +81,7 @@
             }}
             disabled={disabled}
             tooltip={translate("Remove item")}
+            data-testid=remove-item
             small
         />
     {/each}
@@ -115,6 +116,7 @@
             param.val.push("");
         }}
         tooltip={translate("Add item")}
+        data-testid=add-item
         disabled={disabled}
         small
     />

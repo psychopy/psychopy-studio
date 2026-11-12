@@ -96,6 +96,7 @@
                     }
                 }
                 aria-label={translate("Name of {} key").replace("{}", param.label)}
+                data-testid=dict-key
                 class:valid={param.valid.value} 
                 disabled={disabled}
             />
@@ -114,6 +115,7 @@
                 class:valid={param.valid.value} 
                 class:code={param.isCode} 
                 aria-label={translate("Starting value of {key} in {param}").replace("{key}", key).replace("{param}", param.label)}
+                data-testid="dict-value:{key}"
             />
             <Button
                 icon="/icons/btn-delete.svg"
@@ -122,6 +124,7 @@
                 }}
                 disabled={disabled}
                 tooltip={translate("Remove item")}
+                data-testid=remove-item
                 small
             />
         {/each}
@@ -142,6 +145,7 @@
             param.val[key] = "";
         }}
         tooltip={translate("Add item")}
+        data-testid=add-item
         disabled={disabled}
         small
     />

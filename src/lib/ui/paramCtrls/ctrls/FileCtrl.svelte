@@ -59,6 +59,7 @@
 <Button
     icon="/icons/btn-open.svg"
     tooltip="Browse for file..."
+    data-testid=browse-file
     onclick={getFile}
     disabled={disabled}
     small
