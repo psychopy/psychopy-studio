@@ -336,9 +336,24 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType validator", async () => {
+        // add a validator
+        let [validator, _] = await newElement("VisualValidatorRoutine")
         // setup for test
         let context = await setupInputTypeTest("ApertureComponent", "Testing", "validator")
-        // TODO: add a validator to the Routine and check that it's offered as an option
+        // wait for options to load
+        let options = context.ctrl.locator("option")
+        await expect(options.first()).not.toHaveText(/Loading/)
+        // does the control include the validator?
+        await expect(context.ctrl.locator(`option[value="${validator}"]`)).toBeAttached()
+        // close element dialog
+        let closeBtn = getButtonByAction(context.dlg, "CANCEL")
+        await closeBtn.click()
+        // delete validator
+        await deleteElement(validator)
+        // get ctrl again
+        ;[context.ctrl, context.dlg] = await getParamCtrl(context.element, context.categ, context.param, context.routine)
+        // does the control still include the validator? (it shouldn't)
+        await expect(context.ctrl.locator(`option[value="${validator}"]`)).not.toBeAttached()
         // teardown after test
         await teardownInputTypeTest(context)
     })
