@@ -235,21 +235,43 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     /** Tests for each inputType */
 
-    test("inputType name", async () => {
+    async function setupInputTypeTest(inputType, routine) {
         // get example param
-        let [cls, categ, param] = inputTypes['name']
+        let [cls, categ, param] = inputTypes[inputType]
         // create element
-        let [element, routine] = await newElement(cls, "trial")
+        let element
+        [element, routine] = await newElement(cls, routine)
         // get param ctrl
         let [ctrl, dlg] = await getParamCtrl(element, categ, param, routine)
-        // check that its value is the element name
-        await expect(ctrl, "Name param should match element's name").toHaveValue(element)
+
+        return {
+            inputType: inputType,
+            cls: cls,
+            categ: categ,
+            param: param,
+            element: element,
+            routine: routine,
+            ctrl: ctrl,
+            dlg: dlg
+        }
+    }
+
+    async function teardownInputTypeTest(context) {
         // close dialog
-        if (dlg) {
-            let closeBtn = getButtonByAction(dlg, "CANCEL")
+        if (context.dlg) {
+            let closeBtn = getButtonByAction(context.dlg, "CANCEL")
             await closeBtn.click()
         }
         // delete element
-        await deleteElement(element, routine)
+        await deleteElement(context.element, context.routine)
+    }
+
+    test("inputType name", async () => {
+        // setup for test
+        let context = await setupInputTypeTest("name", "trial")
+        // check that its value is the element name
+        await expect(context.ctrl, "Name param should match element's name").toHaveValue(context.element)
+        // teardown after test
+        await teardownInputTypeTest(context)
     })
 })
