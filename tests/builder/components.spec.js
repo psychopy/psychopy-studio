@@ -41,6 +41,13 @@ test.describe("Builder Components/Standalone Routines", () => {
                 }
             }
         }
+        // wait for Components to load in from Python
+        let collapsed = page.locator("#components .components:not([data-fallback=true]) button[data-testclass=component-category]:not(.active)")
+        await expect(collapsed.first()).toBeVisible({ timeout: 60_000 })
+        // expand all categories so buttons are visible
+        while (await collapsed.count()) {
+            await collapsed.first().click()
+        }
     })
 
     test.afterAll(async () => {
@@ -136,13 +143,6 @@ test.describe("Builder Components/Standalone Routines", () => {
     }
 
     async function newElement(cls, routine=undefined) {
-        // wait for Components to load in from Python
-        let collapsed = page.locator("#components .components:not([data-fallback=true]) button[data-testclass=component-category]:not(.active)")
-        await expect(collapsed.first()).toBeVisible({ timeout: 60_000 })
-        // expand all categories so buttons are visible
-        while (await collapsed.count()) {
-            await collapsed.first().click()
-        }
         if (routine) {
             // make sure routine is selected
             let tab = await getRoutineTab(routine)
