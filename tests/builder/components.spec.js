@@ -466,23 +466,23 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType dict", async () => {
+        // not yet tested because there's no ID's input
+        /**
         // setup for test
         let context = await setupInputTypeTest("dict", "trial")
         // TODO: check adding, renaming and removing keys
         // teardown after test
         await teardownInputTypeTest(context)
+         */
     })
 
     test("inputType screen", async () => {
-        // not yet tested as it appears only in experiment settings
-        /**
         // setup for test
         let context = await setupInputTypeTest("screen", "trial")
         // check that typed values are held
         await checkTextCtrl(context, "2")
         // teardown after test
         await teardownInputTypeTest(context)
-        /*
     })
 
     test("inputType multiChoice", async () => {
