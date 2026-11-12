@@ -140,6 +140,7 @@
             tooltip={translate("Experiment settings")} 
             onclick={(evt) => show.settingsDlg = true}
             disabled={!current.experiment.settings}
+            data-testid="experiment-settings-btn"
             ghost
             tight
         />

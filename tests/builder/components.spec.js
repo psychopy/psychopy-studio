@@ -25,8 +25,8 @@ test.describe("Builder Components/Standalone Routines", () => {
         }))
         // iterate through elements
         for (let [cls, element] of Object.entries(profiles)) {
-            // skip elements not represented in the Components panel
-            if (["SettingsComponent", "RoutineSettingsComponent"].includes(cls)) {
+            // skip elements not represented by an always available button
+            if (["RoutineSettingsComponent"].includes(cls)) {
                 continue
             }
             // iterate through params
@@ -88,8 +88,13 @@ test.describe("Builder Components/Standalone Routines", () => {
     }
 
     async function getComponentNode(component, routine=undefined) {
+        // for Experiment Settings, return the ribbon button
+        if (component === "Experiment") {
+            let ribbon = await page.locator("#ribbon");
+            return ribbon.getByTestId("experiment-settings-btn")
+        }
+        // select the correct Routine
         if (routine) {
-            // select the correct Routine
             let tab = await getRoutineTab(routine)
             await tab.click()
         }
@@ -114,19 +119,19 @@ test.describe("Builder Components/Standalone Routines", () => {
             // click it to open Component dialog
             await node.click()
             // get the resulting dialog
-            dlg = await page.getByTestId(`${element}-parameters`)
+            dlg = page.locator(`dialog[data-testid="${element}-parameters"][open]`)
             // check it exists
-            expect(dlg, `No dialog appeared when clicking on ${element} (Routine ${routine})`).toBeAttached()
+            await expect(dlg, `No dialog appeared when clicking on ${element} (Routine ${routine})`).toBeAttached()
             // navigate to categ tab
             if (categ) {
                 // get tab
-                let tab = dlg.locator(`.notebook-tabs button[data-testid=${categ}]`).first()
+                let tab = await dlg.locator(`.notebook-tabs button[data-testid="${categ}"]`).first()
                 await expect(tab, `Component ${element} has no tab for category ${categ}`).toBeAttached()
                 // click it
                 await tab.click()
             }
             // get param ctrl
-            ctrl = await dlg.locator(`.param-ctrl #${param}`).first()
+            ctrl = await dlg.locator(`.param-ctrl [id="${param}"]`).first()
             // check that it exists
             await expect(ctrl, `No control from param ${param} (category ${categ}) in Component ${element} (Routine ${routine})`).toBeAttached()
         } else {
@@ -134,7 +139,7 @@ test.describe("Builder Components/Standalone Routines", () => {
             let tab = await getRoutineTab(element)
             await tab.click()
             // get param ctrl
-            ctrl = page.locator(`.params-panel .param-ctrl #${param}`).first()
+            ctrl = page.locator(`.params-panel .param-ctrl [id="${param}"]`).first()
             // check that it exists
             await expect(ctrl, `No control from param ${param} (category ${categ}) in Routine ${element}`).toBeAttached()
         }
@@ -143,8 +148,12 @@ test.describe("Builder Components/Standalone Routines", () => {
     }
 
     async function newElement(cls, routine=undefined) {
+        // for experiment settings, it already exists
+        if (cls === "SettingsComponent") {
+            return ["Experiment", "settings"]
+        }
+        // make sure routine is selected
         if (routine) {
-            // make sure routine is selected
             let tab = await getRoutineTab(routine)
             await tab.click()
         }
@@ -182,6 +191,10 @@ test.describe("Builder Components/Standalone Routines", () => {
     }
 
     async function deleteElement(element, routine=undefined) {
+        // don't delete experiment settings
+        if (element === "Experiment") {
+            return
+        }
         if (routine) {
             // get the corresponding node in the Routine canvas (checks that it exists)
             let node = await getComponentNode(element, "trial")
@@ -445,25 +458,19 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType version", async () => {
-        // not yet tested as it appears only in experiment settings
-        /**
         // setup for test
         let context = await setupInputTypeTest("version", "trial")
         // TODO: check version options (fetched from GitHub, so needs network access)
         // teardown after test
         await teardownInputTypeTest(context)
-         */
     })
 
     test("inputType dict", async () => {
-        // can't setup at present, because it needs to have at least one value for there to be a ctrl with the ID
-        /**
         // setup for test
         let context = await setupInputTypeTest("dict", "trial")
         // TODO: check adding, renaming and removing keys
         // teardown after test
         await teardownInputTypeTest(context)
-        */
     })
 
     test("inputType screen", async () => {
