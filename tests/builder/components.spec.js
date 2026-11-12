@@ -7,8 +7,6 @@ test.describe("Builder Components/Standalone Routines", () => {
     let page
     // Component profiles fetched from Python
     let profiles
-    // example params of each input Type ([element class, category, param])
-    let inputTypes = {}
 
     test.beforeAll(async ({ app, builder }) => {
         // start listening for a new window
@@ -23,24 +21,6 @@ test.describe("Builder Components/Standalone Routines", () => {
             command: "run",
             args: ["psychopy.experiment:getElementProfiles"]
         }))
-        // iterate through elements
-        for (let [cls, element] of Object.entries(profiles)) {
-            // skip elements not represented by an always available button
-            if (["RoutineSettingsComponent"].includes(cls)) {
-                continue
-            }
-            // iterate through params
-            for (let [paramName, param] of Object.entries(element.params)) {
-                // skip start/stop params as they don't follow the param-ctrl > param-value structure
-                if (["startVal", "startType", "startEstim", "stopVal", "stopType", "durationEstim"].includes(paramName)) {
-                    continue
-                }
-                // if we don't have an example param for this inputType yet, add it
-                if (!(param.inputType in inputTypes)) {
-                    inputTypes[param.inputType] = [cls, param.categ, paramName]
-                }
-            }
-        }
         // wait for Components to load in from Python
         let collapsed = page.locator("#components .components:not([data-fallback=true]) button[data-testclass=component-category]:not(.active)")
         await expect(collapsed.first()).toBeVisible({ timeout: 60_000 })
@@ -248,9 +228,8 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     /** Tests for each inputType */
 
-    async function setupInputTypeTest(inputType, routine) {
-        // get example param
-        let [cls, categ, param] = inputTypes[inputType]
+    async function setupInputTypeTest(cls, categ, param) {
+        let routine = cls.endsWith("omponent") ? "trial" : undefined
         // create element
         let element
         [element, routine] = await newElement(cls, routine)
@@ -258,7 +237,6 @@ test.describe("Builder Components/Standalone Routines", () => {
         let [ctrl, dlg] = await getParamCtrl(element, categ, param, routine)
 
         return {
-            inputType: inputType,
             cls: cls,
             categ: categ,
             param: param,
@@ -306,7 +284,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType name", async () => {
         // setup for test
-        let context = await setupInputTypeTest("name", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", null, "name")
         // check that its value is the element name
         await expect(context.ctrl, "Name param should match element's name").toHaveValue(context.element)
         // teardown after test
@@ -315,7 +293,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType single", async () => {
         // setup for test
-        let context = await setupInputTypeTest("single", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", "Layout", "size")
         // check that typed values are held
         await checkTextCtrl(context, "test value")
         // check that a $ marks the value as code
@@ -327,7 +305,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType choice", async () => {
         // setup for test
-        let context = await setupInputTypeTest("choice", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", "Layout", "units")
         // check that a different option can be selected
         await checkSelectCtrl(context)
         // teardown after test
@@ -336,7 +314,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType spin", async () => {
         // setup for test
-        let context = await setupInputTypeTest("spin", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", "Layout", "ori")
         // spin falls back to a single line ctrl, so check that typed values are held
         await checkTextCtrl(context, "45")
         // teardown after test
@@ -345,7 +323,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType bool", async () => {
         // setup for test
-        let context = await setupInputTypeTest("bool", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", "Data", "saveStartStop")
         // toggle the checkbox
         let was = await context.ctrl.isChecked()
         await context.ctrl.setChecked(!was)
@@ -359,7 +337,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType validator", async () => {
         // setup for test
-        let context = await setupInputTypeTest("validator", "trial")
+        let context = await setupInputTypeTest("ApertureComponent", "Testing", "validator")
         // TODO: add a validator to the Routine and check that it's offered as an option
         // teardown after test
         await teardownInputTypeTest(context)
@@ -367,7 +345,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType color", async () => {
         // setup for test
-        let context = await setupInputTypeTest("color", "trial")
+        let context = await setupInputTypeTest("PolygonComponent", "Appearance", "fillColor")
         // check that typed values are held
         await checkTextCtrl(context, "red")
         // TODO: check that the color picker dialog sets the value
@@ -377,7 +355,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType code", async () => {
         // setup for test
-        let context = await setupInputTypeTest("code", "trial")
+        let context = await setupInputTypeTest("ButtonComponent", "Basic", "callback")
         // click into the Monaco editor and type at the end
         await context.ctrl.locator(".monaco-editor").first().click()
         await page.keyboard.press("ControlOrMeta+End")
@@ -392,7 +370,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType font", async () => {
         // setup for test
-        let context = await setupInputTypeTest("font", "trial")
+        let context = await setupInputTypeTest("TextboxComponent", "Formatting", "font")
         // check that typed values are held
         await checkTextCtrl(context, "Arial")
         // TODO: check that the font manager dialog sets the value
@@ -402,7 +380,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType device", async () => {
         // setup for test
-        let context = await setupInputTypeTest("device", "trial")
+        let context = await setupInputTypeTest("ButtonBoxComponent", "Device", "deviceLabel")
         // TODO: add a device in the Device Manager and check that it's offered as an option
         // teardown after test
         await teardownInputTypeTest(context)
@@ -410,7 +388,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType table", async () => {
         // setup for test
-        let context = await setupInputTypeTest("table", "trial")
+        let context = await setupInputTypeTest("FormComponent", "Basic", "Items")
         // check that typed values are held
         await checkTextCtrl(context, "conditions.xlsx")
         // TODO: check the open/create table button
@@ -420,7 +398,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType file", async () => {
         // setup for test
-        let context = await setupInputTypeTest("file", "trial")
+        let context = await setupInputTypeTest("GratingComponent", "Texture", "tex")
         // check that typed values are held
         await checkTextCtrl(context, "image.png")
         // TODO: check the browse button (opens a native file dialog)
@@ -430,7 +408,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType int", async () => {
         // setup for test
-        let context = await setupInputTypeTest("int", "trial")
+        let context = await setupInputTypeTest("JoyButtonsComponent", "Device", "deviceNumber")
         // int falls back to a single line ctrl, so check that typed values are held
         await checkTextCtrl(context, "2")
         // teardown after test
@@ -441,7 +419,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         // can't setup at present, because it needs to have at least one value for there to be a ctrl with the ID
         /**
         // setup for test
-        let context = await setupInputTypeTest("fileList", "trial")
+        let context = await setupInputTypeTest("ResourceManagerComponent", "Basic", "resources")
         // TODO: check that "Add item" adds a file ctrl and that the delete button removes it
         // teardown after test
         await teardownInputTypeTest(context)
@@ -450,7 +428,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType multi", async () => {
         // setup for test
-        let context = await setupInputTypeTest("multi", "trial")
+        let context = await setupInputTypeTest("TextboxComponent", "Basic", "text")
         // check that typed values (including newlines) are held
         await checkTextCtrl(context, "line one\nline two")
         // teardown after test
@@ -459,7 +437,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType version", async () => {
         // setup for test
-        let context = await setupInputTypeTest("version", "trial")
+        let context = await setupInputTypeTest("SettingsComponent", "Basic", "Use version")
         // TODO: check version options (fetched from GitHub, so needs network access)
         // teardown after test
         await teardownInputTypeTest(context)
@@ -469,7 +447,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         // not yet tested because there's no ID's input
         /**
         // setup for test
-        let context = await setupInputTypeTest("dict", "trial")
+        let context = await setupInputTypeTest("SettingsComponent", "Basic", "Experiment info")
         // TODO: check adding, renaming and removing keys
         // teardown after test
         await teardownInputTypeTest(context)
@@ -478,7 +456,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType screen", async () => {
         // setup for test
-        let context = await setupInputTypeTest("screen", "trial")
+        let context = await setupInputTypeTest("SettingsComponent", "Screen", "Screen")
         // check that typed values are held
         await checkTextCtrl(context, "2")
         // teardown after test
@@ -487,7 +465,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType multiChoice", async () => {
         // setup for test
-        let context = await setupInputTypeTest("multiChoice", "trial")
+        let context = await setupInputTypeTest("SliderComponent", "Appearance", "styleTweaks")
         // get the first option's checkbox (once options have loaded)
         let checkbox = context.ctrl.locator("input[type=checkbox]").first()
         await expect(checkbox, "MultiChoice ctrl should have options").toBeAttached()
@@ -501,7 +479,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType soundFile", async () => {
         // setup for test
-        let context = await setupInputTypeTest("soundFile", "trial")
+        let context = await setupInputTypeTest("SoundComponent", "Basic", "sound")
         // check that typed values are held (sound accepts note names as well as files)
         await checkTextCtrl(context, "A")
         // teardown after test
@@ -512,7 +490,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         // can't setup at present, because it needs to have at least one value for there to be a ctrl with the ID
         /**
         // setup for test
-        let context = await setupInputTypeTest("richChoice")
+        let context = await setupInputTypeTest("PavloviaSurveyRoutine", "Basic", "surveyType")
         // TODO: check that clicking an option marks it as selected
         // teardown after test
         await teardownInputTypeTest(context)
@@ -521,7 +499,7 @@ test.describe("Builder Components/Standalone Routines", () => {
 
     test("inputType survey", async () => {
         // setup for test
-        let context = await setupInputTypeTest("survey")
+        let context = await setupInputTypeTest("PavloviaSurveyRoutine", "Basic", "surveyId")
         // check that typed values are held
         await checkTextCtrl(context, "test-survey-id")
         // TODO: check the browse surveys dialog (needs a Pavlovia login)
