@@ -471,14 +471,33 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType dict", async () => {
-        // not yet tested because there's no ID's input
-        /**
         // setup for test
         let context = await setupInputTypeTest("SettingsComponent", "Basic", "Experiment info")
-        // TODO: check adding, renaming and removing keys
+        // each entry has a key input, a value input and a delete button
+        let keyInputs = context.ctrl.getByRole("textbox", { name: /^Name of .* key$/ })
+        let deleteBtns = context.ctrl.getByRole("button", { name: "Remove item", exact: true })
+        let addBtn = context.ctrl.getByRole("button", { name: "Add item", exact: true })
+        // count entries to start with
+        let n = await keyInputs.count()
+        // click "Add item"
+        await addBtn.click()
+        // check that a new entry was added with a default key
+        await expect(keyInputs, "Add item should add a key").toHaveCount(n + 1)
+        await expect(deleteBtns, "Add item should add a delete button").toHaveCount(n + 1)
+        await expect(keyInputs.last(), "New key should have a default name").toHaveValue(/^field/)
+        // rename the new key
+        await keyInputs.last().fill("renamedKey")
+        await expect(keyInputs.last(), "Key input should hold typed name").toHaveValue("renamedKey")
+        // check that its value input now refers to the new key
+        let valueInput = context.ctrl.getByRole("textbox", { name: /^Starting value of renamedKey in / })
+        await expect(valueInput, "Renaming a key should rename its entry").toBeAttached()
+        // remove the new entry
+        await deleteBtns.last().click()
+        // check that it's gone
+        await expect(keyInputs, "Delete button should remove its key").toHaveCount(n)
+        await expect(valueInput, "Delete button should remove its value").not.toBeAttached()
         // teardown after test
         await teardownInputTypeTest(context)
-         */
     })
 
     test("inputType screen", async () => {

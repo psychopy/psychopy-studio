@@ -68,6 +68,7 @@
 
 <div 
     class=dict-ctrl-layout
+    id={param.name}
     {@attach element => param.registerValidator("dict", validateDict, 0)}
     {...attachments}
 >
