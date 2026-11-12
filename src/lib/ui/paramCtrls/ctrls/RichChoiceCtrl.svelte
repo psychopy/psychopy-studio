@@ -15,6 +15,7 @@
 
 <div 
     class=param-rich-choice-ctrl
+    id={param.name}
     {@attach element => param.registerValidator("richChoice", validateRichChoice, 0)}
     {...attachments}
 >

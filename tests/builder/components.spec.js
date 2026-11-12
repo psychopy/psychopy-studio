@@ -502,14 +502,24 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType richChoice", async () => {
-        // can't setup at present, because it needs to have at least one value for there to be a ctrl with the ID
-        /**
         // setup for test
         let context = await setupInputTypeTest("PavloviaSurveyRoutine", "Basic", "surveyType")
-        // TODO: check that clicking an option marks it as selected
+        // wait for options to load
+        let options = context.ctrl.locator("button.rich-ctrl-item")
+        await expect(options.first(), "RichChoice ctrl should have options").toBeAttached()
+        // find an option which isn't currently selected
+        let target = context.ctrl.locator("button.rich-ctrl-item:not(.selected)").first()
+        await expect(target, "RichChoice ctrl should have more than one option").toBeAttached()
+        let label = await target.getAttribute("aria-label")
+        // click its first non-link child, so we don't land on the "more info" link
+        await target.locator("*:not(a, a *)").first().click()
+        // check that it's now selected
+        let clicked = context.ctrl.getByRole("button", { name: label, exact: true })
+        await expect(clicked, "RichChoice option should be selected when clicked").toHaveClass(/\bselected\b/)
+        // check that it's the only selected option
+        await expect(context.ctrl.locator("button.rich-ctrl-item.selected"), "Only one RichChoice option should be selected").toHaveCount(1)
         // teardown after test
         await teardownInputTypeTest(context)
-        */
     })
 
     test("inputType survey", async () => {
