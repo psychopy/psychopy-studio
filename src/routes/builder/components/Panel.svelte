@@ -128,7 +128,10 @@
             bind:shown={showFilterDlg}
         />
     </div>
-    <div class=components>
+    <div 
+        class=components
+        data-fallback={allProfiles.components.isFallback}
+    >
         {#await python?.ready then ready}
             {#await allProfiles.components.pending.promise}
                 <div class=message>

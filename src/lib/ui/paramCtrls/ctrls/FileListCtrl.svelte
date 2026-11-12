@@ -65,6 +65,7 @@
 
 <div 
     class=list-ctrl-layout
+    id={param.name}
     {@attach element => param.registerValidator("fileList", validateFileList, -5)}
     {...attachments}
 >
@@ -80,6 +81,7 @@
             }}
             disabled={disabled}
             tooltip={translate("Remove item")}
+            data-testid=remove-item
             small
         />
     {/each}
@@ -114,6 +116,7 @@
             param.val.push("");
         }}
         tooltip={translate("Add item")}
+        data-testid=add-item
         disabled={disabled}
         small
     />

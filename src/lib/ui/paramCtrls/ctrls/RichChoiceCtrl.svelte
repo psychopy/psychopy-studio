@@ -15,6 +15,7 @@
 
 <div 
     class=param-rich-choice-ctrl
+    id={param.name}
     {@attach element => param.registerValidator("richChoice", validateRichChoice, 0)}
     {...attachments}
 >
@@ -25,6 +26,7 @@
             <button
                 class=rich-ctrl-item
                 aria-label="{param.label} option: {details.label}"
+                data-testid={val}
                 class:selected={param.val === val}
                 onclick={(evt) => param.val = val}
             >

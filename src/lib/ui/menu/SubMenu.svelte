@@ -12,7 +12,10 @@
         data={},
         /** @prop @type {boolean} Is this item able to be clicked on? */
         disabled=$bindable(),
-        children
+        /** @prop {Snippet} children Child elements are rendered inside the submenu */
+        children,
+        /** @prop {ComponentProperties} props Other props are passed through to the Item */
+        ...props
     } = $props()
 
     let shown = $state()
@@ -29,6 +32,7 @@
     data={data}
     close={false}
     disabled={disabled}
+    {...props}
 >
 
     {#snippet submenu()}

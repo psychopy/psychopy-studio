@@ -74,6 +74,7 @@
     disabled={element instanceof Component && !(current.routine instanceof Routine)}
     onclick={element instanceof Component ? newComponent : newRoutine}
     data-testclass={element instanceof Component ? "component" : "routine"}
+    data-tag={element.tag}
     vertical
     large
 />
