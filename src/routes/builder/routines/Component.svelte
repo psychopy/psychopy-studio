@@ -153,6 +153,7 @@
         icon="/icons/btn-edit.svg"
         label={translate("Edit Component")}
         onclick={(evt) => showDialog = true}
+        data-testid=edit-component
     />
     <MenuItem
         icon="/icons/sym-dot-{component.disabled ? "blue" : "light"}.svg"
@@ -163,25 +164,30 @@
             // disable Component
             component.params.disabled.val = !component.disabled;
         }}
+        data-testid=toggle-disable-component
     />
     <MenuItem 
         icon="/icons/btn-copy.svg"
         label={translate("Copy Component")}
         onclick={evt => callbacks.copyComponent.fcn(component)}
+        data-testid=copy-component
     />
     <SubMenu
         icon="/icons/btn-paste.svg"
         label={translate("Paste Component")}
+        data-testid=paste-component
     >
         <MenuItem
             icon="/icons/sym-arrow-up.svg"
             label={translate("Above")}
             onclick={evt => callbacks.pasteComponent.fcn(current.routine, component.index)}
+            data-testid=paste-component-above
         />
         <MenuItem
             icon="/icons/sym-arrow-down.svg"
             label={translate("Below")}
             onclick={evt => callbacks.pasteComponent.fcn(current.routine, component.index + 1)}
+            data-testid=paste-component-below
         />
     </SubMenu>
     <MenuItem 
@@ -193,6 +199,7 @@
             // remove from Routine
             component.routine.removeComponent(component);
         }}
+        data-testid=delete-component
     />
 </Menu>
 

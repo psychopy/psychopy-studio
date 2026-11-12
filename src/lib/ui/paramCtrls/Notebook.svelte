@@ -75,6 +75,7 @@
                             () => {return pageIndex === categ},
                             (value) => {pageIndex = categ}
                         }
+                        data-testid={categ}
                     >
                         <div class=params-panel>
                             <!-- start ctrl, if needed -->

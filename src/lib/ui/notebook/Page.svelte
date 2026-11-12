@@ -20,10 +20,12 @@
         closeTooltip=undefined,
         /** @prop @type {any} Arbitrary data relating to this page */
         data={},
-        /** @interface @type {Array<HTMLElement>} Contents of this page */
+        /** @prop {Snippet} contextMenu Menu with which to replace the default context menu on this tab */
+        contextMenu=undefined,
+        /** @prop {Snippet} children Child elements make up the contents of this page */
         children=undefined,
-        /** @interface @type {Array<HTMLElement>} Menu with which to replace the default context menu on this tab */
-        contextMenu=undefined
+        /** @prop {ComponentProps} props Other props are passed to the tab button */
+        ...props
     } = $props()
 
     // get context
@@ -106,6 +108,7 @@
     ondragover={() => selected = true}
     bind:this={handle}
     role=tab
+    {...props}
 >
     {#if icon}
         <Icon 

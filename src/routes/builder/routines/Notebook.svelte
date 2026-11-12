@@ -49,6 +49,8 @@
                 }}
                 closeTooltip={translate("Delete {}").replace("{}", name)}
                 data={routine}
+                data-testid={routine.name}
+                data-testclass={routine instanceof Routine ? "routine" : "standalone-routine"}
             >
                 {#if routine instanceof Routine}
                     <RoutineCanvas routine={routine} />
