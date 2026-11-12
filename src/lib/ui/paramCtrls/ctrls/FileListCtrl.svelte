@@ -65,6 +65,7 @@
 
 <div 
     class=list-ctrl-layout
+    id={param.name}
     {@attach element => param.registerValidator("fileList", validateFileList, -5)}
     {...attachments}
 >

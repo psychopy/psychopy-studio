@@ -431,14 +431,26 @@ test.describe("Builder Components/Standalone Routines", () => {
     })
 
     test("inputType fileList", async () => {
-        // can't setup at present, because it needs to have at least one value for there to be a ctrl with the ID
-        /**
         // setup for test
         let context = await setupInputTypeTest("ResourceManagerComponent", "Basic", "resources")
-        // TODO: check that "Add item" adds a file ctrl and that the delete button removes it
+        // each item has a file ctrl (with a browse button) and a delete button
+        let browseBtns = context.ctrl.getByRole("button", { name: "Browse for file...", exact: true })
+        let deleteBtns = context.ctrl.getByRole("button", { name: "Remove item", exact: true })
+        let addBtn = context.ctrl.getByRole("button", { name: "Add item", exact: true })
+        // count items to start with
+        let n = await deleteBtns.count()
+        // click "Add item"
+        await addBtn.click()
+        // check that a file ctrl and delete button were added
+        await expect(browseBtns, "Add item should add a file ctrl").toHaveCount(n + 1)
+        await expect(deleteBtns, "Add item should add a delete button").toHaveCount(n + 1)
+        // click the new item's delete button
+        await deleteBtns.last().click()
+        // check that the file ctrl and delete button were removed
+        await expect(browseBtns, "Delete button should remove its file ctrl").toHaveCount(n)
+        await expect(deleteBtns, "Delete button should remove itself").toHaveCount(n)
         // teardown after test
         await teardownInputTypeTest(context)
-         */
     })
 
     test("inputType multi", async () => {
