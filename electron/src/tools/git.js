@@ -340,6 +340,13 @@ export async function loadUsers() {
     } catch {
         data = {}
     }
+    // until each user is loaded, keep their stored info as-is, so that saving the users file 
+    // part way through loading (e.g. when a token is refreshed) doesn't drop them from it
+    unloadedUsers = Object.fromEntries(
+        Object.entries(data).map(
+            ([username, { token, profile }]) => [username, { token, profile }]
+        )
+    )
     // create a User object for each entry
     for (let [username, { token, profile }] of Object.entries(data)) {
         try {
@@ -355,10 +362,10 @@ export async function loadUsers() {
             users[username] = user
             delete unloadedUsers[username]
         } catch (err) {
+            // if it failed, user is left in unloadedUsers so they aren't forgotten (we can try 
+            // again next time)
             console.error(`Failed to load user ${username} from file`)
             console.error(err)
-            // keep stored info so the user isn't forgotten (we can try again next time)
-            unloadedUsers[username] = { token, profile }
         }
     }
     // refreshing tokens will have invalidated old ones, so save over stored data
