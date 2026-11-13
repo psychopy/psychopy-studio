@@ -138,7 +138,11 @@ export const git = {
   listGroups: (username) => {},
   listSurveys: (username) => {},
   getUserInfo: (username) => {},
-  authenticateURL: (url, username) => {},
+  authenticate: {
+    url: (url, username) => {},
+    fetch: (url, username, options={}, param="access_token") => {},
+    user: (username) => {},
+  },
   getRemote: (folder, user) => {},
   getProjectInfo: (details, username) => {},
   clone: (details, username) => {},

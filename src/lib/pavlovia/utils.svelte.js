@@ -96,7 +96,7 @@ export async function downloadProject(project, user) {
         return
     }
     // create authenticated url
-    let url = await git.authenticateURL(
+    let url = await git.authenticate.url(
         `https://gitlab.pavlovia.org/api/v4/projects/${encodeURIComponent(project)}/repository/archive.zip`,
         user
     )

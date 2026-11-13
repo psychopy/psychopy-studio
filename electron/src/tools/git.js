@@ -481,27 +481,88 @@ export function linkProject(key, folder) {
 
 
 /**
- * Add a user's access token to a URL, so it can be used to make authenticated requests to Pavlovia
- * 
- * @param {string|URL} url URL to authenticate (if given as a URL object, it will be modified in place)
- * @param {string} username Username to authenticate as, if not given (or not logged in) URL is left unchanged
- * 
- * @returns {URL} The authenticated URL
+ * Functions for making authenticated requests to Pavlovia as a given user
  */
-export async function authenticateURL(url, username) {
-    // make sure we have a URL object
-    if (!(url instanceof URL)) {
-        url = new URL(url)
-    }
-    // apply auth
-    if (username && username in users) {
-        url.searchParams.set(
-            "access_token", 
-            await users[username].getToken()
-        )
-    }
+export const authenticate = {
+    /**
+     * Add a user's access token to a URL, so it can be used to make authenticated requests to 
+     * Pavlovia
+     * 
+     * @param {string|URL} url URL to authenticate (if given as a URL object, it will be modified 
+     * in place)
+     * @param {string} username Username to authenticate as, if not given (or not logged in) URL 
+     * is left unchanged
+     * 
+     * @returns {URL} The authenticated URL
+     */
+    async url(url, username) {
+        // make sure we have a URL object
+        if (!(url instanceof URL)) {
+            url = new URL(url)
+        }
+        // apply auth
+        if (username && username in users) {
+            url.searchParams.set(
+                "access_token", 
+                await users[username].getToken()
+            )
+        }
 
-    return url
+        return url
+    },
+
+    /**
+     * Fetch a URL, authenticated as the given user if they're logged in. If the server rejects 
+     * the token, it will be refreshed and the request retried (once).
+     * 
+     * @param {string|URL} url URL to fetch
+     * @param {string} username Username to authenticate as, if not given (or not logged in) the 
+     * request is made without authentication
+     * @param {object} [options] Options to pass to `fetch`
+     * @param {string} [param] Name of the URL parameter to put the token in
+     * 
+     * @returns {Promise<Response>} Response from the server
+     */
+    async fetch(url, username, options={}, param="access_token") {
+        if (username && username in users) {
+            return await users[username].fetch(url, options, param)
+        }
+        return await fetch(url.toString(), options)
+    },
+
+    /**
+     * Get callbacks to authenticate isomorphic-git requests as the given user. If the server 
+     * rejects the token, it will be refreshed and the request retried (once).
+     * 
+     * @param {string|User} user User to authenticate as, either as a username or a User object. 
+     * If not given (or not logged in), requests are made without authentication
+     * 
+     * @returns {object} Object with `onAuth` and `onAuthFailure` callbacks (empty if there's no 
+     * user), to spread into the options of an isomorphic-git function
+     */
+    user(user) {
+        // get User object from username
+        if (!(user instanceof User)) {
+            user = users[user]
+        }
+        // if there's no user, don't authenticate
+        if (!user) {
+            return {}
+        }
+        let retried = false
+        return {
+            onAuth: async () => ({ username: "oauth2", password: await user.getToken() }),
+            onAuthFailure: async () => {
+                // only retry once, otherwise isomorphic-git will keep asking
+                if (retried) {
+                    return
+                }
+                retried = true
+                await user.refreshToken()
+                return { username: "oauth2", password: user.token.access }
+            }
+        }
+    },
 }
 
 
@@ -516,12 +577,8 @@ export async function authenticateURL(url, username) {
 export async function getGroup(group, username) {
     // create URL
     let url = new URL(`${server}/api/v4/groups/${group}`)
-    // apply auth
-    await authenticateURL(url, username)
     // get groups
-    let resp = await fetch(
-        url.toString()
-    )
+    let resp = await authenticate.fetch(url, username)
     // if we got one, return its info
     if (resp.ok) {
         return await resp.json()
@@ -532,12 +589,8 @@ export async function getGroup(group, username) {
 export async function listGroups(username) {
     // create URL
     let url = new URL(`${server}/api/v4/groups`)
-    // apply auth
-    await authenticateURL(url, username)
     // get groups
-    return await fetch(
-        url.toString()
-    ).then(
+    return await authenticate.fetch(url, username).then(
         resp => resp.json()
     )
 }
@@ -549,17 +602,8 @@ export async function listGroups(username) {
 export async function listSurveys(username) {
     // create URL
     let url = new URL(`https://pavlovia.org/api/v2/surveys`)
-    // apply auth
-    if (username && username in users) {
-        url.searchParams.set(
-            "oauthToken", 
-            await users[username].getToken()
-        )
-    }
     // get surveys
-    return await fetch(
-        url.toString()
-    ).then(
+    return await authenticate.fetch(url, username, {}, "oauthToken").then(
         resp => resp.json()
     )
 }
@@ -574,12 +618,8 @@ export async function listSurveys(username) {
 export async function listProjectForks(project, username) {
     // create URL
     let url = new URL(`${server}/api/v4/projects/${encodeURIComponent(`${project}`)}/forks`)
-    // apply auth
-    await authenticateURL(url, username)
     // get forks
-    return await fetch(
-        url.toString()
-    ).then(
+    return await authenticate.fetch(url, username).then(
         resp => resp.json()
     )
 }
@@ -732,12 +772,8 @@ export async function getProjectInfo({
     let isGroup = await getGroup(group, username)
     // create search url
     let url = new URL(`https://gitlab.pavlovia.org/api/v4/${isGroup ? "groups" : "users"}/${group}/projects?search=${name}`)    
-    // apply auth
-    await authenticateURL(url, username)
     // search for project
-    return await fetch(
-        url.toString()
-    ).then(
+    return await authenticate.fetch(url, username).then(
         resp => resp.json()
     ).then(
         resp => {
@@ -772,8 +808,6 @@ export async function getHeads(folder, fetch=true, username=undefined) {
     })
     // fetch (update tracking branch) changes for the current branch, if requested
     if (fetch) {
-        // get auth token
-        let token = await users[username].getToken()
         // fetch
         await git.fetch({
             fs,
@@ -781,9 +815,7 @@ export async function getHeads(folder, fetch=true, username=undefined) {
             dir: folder,
             remote: "origin",
             singleBranch: true,
-            onAuth: evt => {
-                return { username: "oauth2", password: token }
-            },
+            ...authenticate.user(username),
             onMessage: output
         }).catch(
             // if there's no remote, this is fine, it'll just be null
@@ -865,17 +897,13 @@ export async function clone({
 }, username) {
     // log
     output(`Cloning repo ${group}/${name} to ${folder}...`)
-    // get auth token
-    let token = await users[username].getToken()
     // clone to folder
     await git.clone({
         fs,
         http,
         dir: folder,
         url: `${server}/${group}/${name}.git`,
-        onAuth: evt => { 
-            return { username: "oauth2", password: token } 
-        },
+        ...authenticate.user(username),
         onMessage: output
     })
     // store reference in known projects list
@@ -892,15 +920,10 @@ export async function fork({
 }, username) {
     // log
     output(`Creating fork of repo ${groupFrom}/${name} on ${groupTo}...`)
-    // get auth token
-    let token = await users[username].getToken()
     // construct url to check whether fork exists
     let statusUrl = new URL(`${server}/api/v4/projects/${encodeURIComponent(`${groupTo}/${name}`)}`)
-    statusUrl.searchParams.set("access_token", token)
     // handle if fork name already exists
-    let exists = await fetch(
-        statusUrl.toString()
-    ).then(
+    let exists = await authenticate.fetch(statusUrl, username).then(
         resp => resp.json()
     ).then(
         // 404 error doesn't have an id, just message
@@ -915,9 +938,8 @@ export async function fork({
     }
     // create URL (project id can be a URL-encoded path)
     let url = new URL(`${server}/api/v4/projects/${encodeURIComponent(`${groupFrom}/${name}`)}/fork`)
-    url.searchParams.set("access_token", token)
     // request fork
-    let resp = await fetch(url.toString(), {
+    let resp = await authenticate.fetch(url, username, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -943,9 +965,7 @@ export async function fork({
                 }
                 busy = true
                 // make query
-                let status = await fetch(
-                    statusUrl.toString()
-                ).then(
+                let status = await authenticate.fetch(statusUrl, username).then(
                     resp => resp.json()
                 ).then(
                     // is it complete?
@@ -1220,8 +1240,6 @@ export async function commit(message, folder, username) {
 export async function push(folder, username, create=false) {
     // log
     output(`Sending changes to Pavlovia...`)
-    // get auth token
-    let token = await users[username].getToken()
     // check that there's actually something to push
     // (if creating the project, there always is)
     if (!create) {
@@ -1252,9 +1270,7 @@ export async function push(folder, username, create=false) {
         http,
         dir: folder,
         remote: "origin",
-        onAuth: evt => { 
-            return {username: "oauth2", password: token} 
-        },
+        ...authenticate.user(username),
         onMessage: output
     })
 }
@@ -1284,7 +1300,22 @@ export const handlers = {
     listGroups: ipcMain.handle("git.listGroups", (evt, username) => listGroups(username)),
     listSurveys: ipcMain.handle("git.listSurveys", (evt, username) => listSurveys(username)),
     getUserInfo: ipcMain.handle("git.getUserInfo", (evt, username) => users[username]?.profile),
-    authenticateURL: ipcMain.handle("git.authenticateURL", async (evt, url, username) => (await authenticateURL(url, username)).toString()),
+    authenticate: {
+        url: ipcMain.handle("git.authenticate.url", async (evt, url, username) => (await authenticate.url(url, username)).toString()),
+        // a Response can't be sent over IPC, so send its contents for the preload to reconstruct
+        fetch: ipcMain.handle("git.authenticate.fetch", async (evt, url, username, options, param) => {
+            let resp = await authenticate.fetch(url, username, options, param)
+            return {
+                ok: resp.ok,
+                status: resp.status,
+                statusText: resp.statusText,
+                headers: Object.fromEntries(resp.headers.entries()),
+                body: await resp.text()
+            }
+        }),
+        // callbacks can't be sent over IPC, so send the credentials they would give
+        user: ipcMain.handle("git.authenticate.user", async (evt, username) => await authenticate.user(username).onAuth?.()),
+    },
     getRemote: ipcMain.handle("git.getRemote", (evt, folder, user) => getRemote(folder, user)),
     getProjectInfo: ipcMain.handle("git.getProjectInfo", (evt, details, username) => getProjectInfo(details, username)),
     clone: ipcMain.handle("git.clone", (evt, details, username) => clone(details, username)),

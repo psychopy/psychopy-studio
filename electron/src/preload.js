@@ -143,7 +143,21 @@ const git = {
   listGroups: (username) => ipcRenderer.invoke("git.listGroups", username).then(resp => resp),
   listSurveys: (username) => ipcRenderer.invoke("git.listSurveys", username).then(resp => resp),
   getUserInfo: (username) => ipcRenderer.invoke("git.getUserInfo", username).then(resp => resp),
-  authenticateURL: (url, username) => ipcRenderer.invoke("git.authenticateURL", url, username).then(resp => resp),
+  authenticate: {
+    url: (url, username) => ipcRenderer.invoke("git.authenticate.url", url, username).then(resp => resp),
+    // rebuild a Response-like object from the contents sent over IPC
+    fetch: (url, username, options={}, param="access_token") => ipcRenderer.invoke(
+      "git.authenticate.fetch", url, username, options, param
+    ).then(resp => ({
+      ok: resp.ok,
+      status: resp.status,
+      statusText: resp.statusText,
+      headers: resp.headers,
+      text: async () => resp.body,
+      json: async () => JSON.parse(resp.body),
+    })),
+    user: (username) => ipcRenderer.invoke("git.authenticate.user", username).then(resp => resp),
+  },
   getRemote: (folder, user) => ipcRenderer.invoke("git.getRemote", folder, user).then(resp => resp),
   getProjectInfo: (details, username) => ipcRenderer.invoke("git.getProjectInfo", details, username).then(resp => resp),
   clone: (details, username) => ipcRenderer.invoke("git.clone", details, username).then(resp => resp),
