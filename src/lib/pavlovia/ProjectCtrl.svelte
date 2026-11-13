@@ -1,5 +1,5 @@
 <script>
-    import { DropdownButton } from "$lib/ui/button";
+    import { Button } from "$lib/ui/button";
     import { getContext } from "svelte";
     import { MenuItem, MenuSeparator } from "$lib/ui/menu";
     import { git } from "$lib/globals.svelte";
@@ -49,7 +49,7 @@
     })
 </script>
 
-<DropdownButton
+<Button
     label={label}
     onclick={(evt) => {
         if (current.project) {
@@ -58,33 +58,35 @@
     }}
     disabled={!current.project}
 >
-    {#if !current.project}
+    {#snippet menu(shown)}
+        {#if !current.project}
+            <MenuItem
+                label={translate("New project")}
+                icon="/icons/btn-add.svg"
+                onclick={evt => show.newProjectDlg = true}
+                disabled={!current.user || !current.experiment?.file?.file}
+            />
+        {/if}
         <MenuItem
-            label={translate("New project")}
-            icon="/icons/btn-add.svg"
-            onclick={evt => show.newProjectDlg = true}
-            disabled={!current.user || !current.experiment?.file?.file}
+            label={translate("Edit project")}
+            icon="/icons/btn-edit.svg"
+            onclick={evt => window.open(`${current.project.web_url}/edit`, "_blank")}
+            disabled={!current.project}
         />
-    {/if}
-    <MenuItem
-        label={translate("Edit project")}
-        icon="/icons/btn-edit.svg"
-        onclick={evt => window.open(`${current.project.web_url}/edit`, "_blank")}
-        disabled={!current.project}
-    />
-    <MenuSeparator/>
-    <MenuItem 
-        label={translate("Browse demos")}
-        icon="/icons/btn-demos.svg" 
-        onclick={evt => show.browseDemosDlg = true}
-        borderless
-    />
-    <MenuItem
-        label={translate("Search projects")}
-        icon="/icons/btn-find.svg"
-        onclick={(evt) => show.searchProjectsDlg = true}
-    />
-</DropdownButton>
+        <MenuSeparator/>
+        <MenuItem 
+            label={translate("Browse demos")}
+            icon="/icons/btn-demos.svg" 
+            onclick={evt => show.browseDemosDlg = true}
+            borderless
+        />
+        <MenuItem
+            label={translate("Search projects")}
+            icon="/icons/btn-find.svg"
+            onclick={(evt) => show.searchProjectsDlg = true}
+        />
+    {/snippet}
+</Button>
 
 <ManageProjectsDlg 
     bind:shown={show.manageProjectsDlg}

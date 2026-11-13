@@ -1,6 +1,7 @@
 <script>
     import Icon from "$lib/ui/icon/Icon.svelte";
     import Tooltip from "$lib/ui/tooltip/Tooltip.svelte";
+    import { Menu } from "$lib/ui/menu";
     import { MessageArray, Message } from "$lib/ui/message";
     import { MessageDialog, DialogButton } from "$lib/ui/dialog";
     import { getContext } from "svelte";
@@ -11,6 +12,8 @@
         label=undefined,
         /** @prop @type {string|import("svelte").Snippet|undefined} Path to icon for this button, or a snippet to render in its place, if any */
         icon=undefined,
+        /** @prop {Snippet|undefined} menu Snippet defining a menu - if defined, gives this button a dropdown arrow which opens the menu */
+        menu=undefined,
         /**
          * @prop @type {String|undefined} Name of the action (e.g. save, undo, etc.) this button
          * performs. Clicking runs the view's callback for this action (if any) as well as `onclick`.
@@ -48,8 +51,6 @@
         opaque=false,
         /** @prop @type {boolean} Style this button as though it's pressed in (mostly just for ToggleButton) */
         depressed=false,
-        /** @prop @type {"left"|"right"|"top"|"bottom"|undefined} Side(s) of this button which are flush against another element, to remove the rounded corners on that side */
-        flush=undefined,
         /** @prop @type {boolean} Are we awaiting execution of this button? */
         awaiting=$bindable(),
         /** @prop @type {function|undefined} If action is cancellable, supply a function to cancel it */
@@ -62,7 +63,9 @@
 
     let show = $state({
         tooltip: false,
-        error: false
+        error: false,
+        menu: false,
+        menuTooltip: false
     })
 
     // get the callback (if any) for this button's action
@@ -106,7 +109,6 @@
         vert: "vertical",
         vertical: "vertical"
     }[orientation])
-
 </script>
 
 {#snippet button(status)}
@@ -134,10 +136,7 @@
         class:primary
         class:affirmative
         class:negative
-        class:flush-left={flush == "left"}
-        class:flush-right={flush == "right"}
-        class:flush-top={flush == "top"}
-        class:flush-bottom={flush == "bottom"}
+        class:has-dropdown={menu !== undefined}
         onmouseenter={() => {if (tooltip) {show.tooltip = true}}}
         onmouseleave={() => {if (tooltip) {show.tooltip = false}}}
         onfocusin={() => {if (tooltip) {show.tooltip = true}}}
@@ -192,39 +191,78 @@
     </button>
 {/snippet}
 
-{#await awaiting}
-    {@render button("awaiting")}
-{:then}
-    {@render button("ready")}
-{:catch err}
-    {@render button("error")}
-    <!-- error message -->
-    <MessageArray>
-        <Message
-            message={translate("Error, click to show")}
-            icon="/icons/sym-error.svg"
-            onclick={evt => show.error = true}
-            ondismiss={evt => awaiting = Promise.resolve(false)}
-        />
-    </MessageArray>
-    <!-- error dialog -->
-    <MessageDialog
-        bind:shown={show.error}
-        title={name ? translate("Error in '{}'").replace("{}", name) : translate("Error")}
-    >
-        {err.message}
-        {#snippet buttons()}
-            <DialogButton
-                action=OK
-                onclick={evt => awaiting = Promise.resolve(false)}
-            />
-        {/snippet}
-    </MessageDialog>
 
-{/await}
+<div 
+    class=button-container
+    class:stretch
+>
+    {#await awaiting}
+        {@render button("awaiting")}
+    {:then}
+        {@render button("ready")}
+    {:catch err}
+        {@render button("error")}
+        <!-- error message -->
+        <MessageArray>
+            <Message
+                message={translate("Error, click to show")}
+                icon="/icons/sym-error.svg"
+                onclick={evt => show.error = true}
+                ondismiss={evt => awaiting = Promise.resolve(false)}
+            />
+        </MessageArray>
+        <!-- error dialog -->
+        <MessageDialog
+            bind:shown={show.error}
+            title={name ? translate("Error in '{}'").replace("{}", name) : translate("Error")}
+        >
+            {err.message}
+            {#snippet buttons()}
+                <DialogButton
+                    action=OK
+                    onclick={evt => awaiting = Promise.resolve(false)}
+                />
+            {/snippet}
+        </MessageDialog>
+    {/await}
+    {#if menu}
+        <button
+            onclick={evt => show.menu = !show.menu}
+            class=dropdown
+            class:small={size === "small"}
+            class:large={size === "large"}
+            class:tight
+            class:ghost
+            class:opaque
+            class:depressed
+            class:primary
+            class:affirmative
+            class:negative
+            onmouseenter={() => {if (tooltip) {show.menuTooltip = true}}}
+            onmouseleave={() => {if (tooltip) {show.menuTooltip = false}}}
+            onfocusin={() => {if (tooltip) {show.menuTooltip = true}}}
+            onfocusout={() => {if (tooltip) {show.menuTooltip = false}}}
+            aria-label={translate("Expand")}
+        >
+            <Icon 
+                src="/icons/sym-arrow-down.svg"
+                size=.5rem
+            />
+        </button>
+        <Menu
+            bind:shown={show.menu}
+        >
+            {@render menu(show.menu)}
+        </Menu>
+    {/if}
+</div>
 
 <style>
     /* Core button styling */
+    .button-container {
+        display: flex;
+        flex-direction: row;
+    }
     button {
         display: flex;
         position: relative;
@@ -260,6 +298,17 @@
     }
     button .label {
         hyphens: auto;
+    }
+
+    /* Dropdown button */
+    button.has-dropdown {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    button.dropdown {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
     }
 
     /* Horizontal */
@@ -304,10 +353,14 @@
     /* Stretch */
     button.stretch {
         width: auto;
+        flex: 1;
     }
     button.stretch .label {
         flex-shrink: 1;
         text-align: left;
+    }
+    .button-container.stretch { 
+        flex: 1; 
     }
 
     /* Ghost */
@@ -344,24 +397,6 @@
         box-shadow:
             inset 1px 1px 5px rgba(0, 0, 0, 0.15)
         ;
-    }
-
-    /* Flush */
-    button.flush-left {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    button.flush-right {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-    button.flush-top {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-    button.flush-bottom {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
     }
 
     /* Primary */
