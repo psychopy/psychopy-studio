@@ -6,8 +6,7 @@
     import { sanitizeJSON } from "$lib/utils/transpiler"
     import FileCtrl from "./FileCtrl.svelte";
     import { mimeTypesFromParam } from "./utils.svelte";
-    import { browseFileOpen } from "$lib/utils/files.js";
-    import path from "path-browserify";
+    import { browseFileOpen, relativeIfInside } from "$lib/utils/files.js";
     import { translate } from "$lib/translation";
     import { getContext, untrack } from "svelte";
 
@@ -122,17 +121,8 @@
         }
         // apply to param
         for (let file of files) {
-            // make relative
-            let rel = file.file
-            if (current.experiment?.file?.parent) {
-                rel = path.relative(current.experiment?.file?.parent, file.file)
-            }
-            // use absolute if in a different folder
-            if (rel.startsWith("..")) {
-                param.val.push(file.file)
-            } else {
-                param.val.push(rel)
-            }
+            // make relative to experiment folder if inside it
+            param.val.push(relativeIfInside(file.file, current.experiment?.file?.parent))
         }
     }
 
