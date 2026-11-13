@@ -66,9 +66,7 @@
     let projectsPromise = $derived.by(() => {
         if (params.searchTerm || params.meMode || hasFilters) {
             // do a search if we have any search term or params
-            return git.authenticateURL(query.toString(), current.user).then(
-                url => fetch(url)
-            ).then(
+            return git.authenticate.fetch(query.toString(), current.user).then(
                 resp => resp.json()
             ).then(
                 resp => resp.experiments

@@ -1,5 +1,5 @@
 <script>
-    import { Button, DropdownButton } from "$lib/ui/button";
+    import { Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
     import { MenuItem } from "$lib/ui/menu";
     import semver from "semver";
@@ -100,18 +100,20 @@
     ).toReversed()
 ) then versions}
     {#if installed}
-        <DropdownButton
+        <Button
             label="{translate("Version")} {installed}"
             disabled={venv === undefined}
         >
-            {#each versions as version}
-                <MenuItem
-                    label={version}
-                    icon={version === installed ? "/icons/sym-dot-blue.svg" : undefined}
-                    onclick={evt => install(version)}
-                />
-            {/each}
-        </DropdownButton>
+            {#snippet menu(shown)}
+                {#each versions as version}
+                    <MenuItem
+                        label={version}
+                        icon={version === installed ? "/icons/sym-dot-blue.svg" : undefined}
+                        onclick={evt => install(version)}
+                    />
+                {/each}
+            {/snippet}
+        </Button>
 
         {#if semver.parse(versions[0]) > installed}
             <Button
@@ -129,19 +131,21 @@
             horizontal
         />
     {:else}
-        <DropdownButton
+        <Button
             label={translate("Install")}
             icon="/icons/btn-download.svg"
             onclick={evt => install()}
             disabled={venv === undefined}
         >
-            {#each versions as version}
-                <MenuItem
-                    label="Version {version}"
-                    onclick={evt => install(version)}
-                />
-            {/each}
-        </DropdownButton>
+            {#snippet menu(shown)}
+                {#each versions as version}
+                    <MenuItem
+                        label="Version {version}"
+                        onclick={evt => install(version)}
+                    />
+                {/each}
+            {/snippet}
+        </Button>
     {/if}
 {/await}
 

@@ -1,5 +1,5 @@
 <script>
-    import { DropdownButton } from "$lib/ui/button";
+    import { Button } from "$lib/ui/button";
     import { MessageDialog } from "$lib/ui/dialog"
     import { marked } from "marked";
     import { getContext, onMount } from "svelte";
@@ -40,7 +40,7 @@
 
 {#key current.user}
     {#await git.getUserInfo($state.snapshot(current.user)) then profile}
-        <DropdownButton
+        <Button
             label={profile?.username || translate("No user")}
             onclick={(evt) => {
                 if (profile) {
@@ -49,62 +49,64 @@
             }}
             disabled={!profile}
         >
-            <MenuItem
-                label={translate("Edit user...")}
-                icon="/icons/btn-edit.svg"
-                onclick={evt => window.open("https://gitlab.pavlovia.org/-/user_settings/profile", "_blank")}
-            />
-            <SubMenu 
-                label={translate("Switch user...")}
-            >
-                {#await git.listUsers() then users}
-                    {#each users as username}
-                        <MenuItem
-                            label={username}
-                            onclick={evt => current.user = username}
-                        />
-                    {/each}
-                    <MenuSeparator />
-                {/await}
+            {#snippet menu(shown)}
                 <MenuItem
-                    label={translate("New user...")}
-                    onclick={async evt => {
-                        // do login
-                        let user = await git.login()
-                        // if successful...
-                        if (user) {
-                            // update current user info
-                            current.user = user
-                            // confirm that username is okay
-                            validateUsername(user)
-                        }
-                        
-                    }}
+                    label={translate("Edit user...")}
+                    icon="/icons/btn-edit.svg"
+                    onclick={evt => window.open("https://gitlab.pavlovia.org/-/user_settings/profile", "_blank")}
                 />
-            </SubMenu>
-            <MenuSeparator />
-            {#if current.user}
-                <MenuItem
-                    label={translate("Logout")}
-                    onclick={evt => {
-                        current.user = undefined;
-                        git.clearUsers();
-                    }}
-                />
-            {:else}
-                <MenuItem
-                    label={translate("Login")}
-                    onclick={async evt => {
-                        let users = await git.listUsers();
-                        if (users.length) {
-                            current.user = users[0]
-                        } else {
-                            current.user = await git.login()
-                        }
-                    }}
-                />
-            {/if}
-        </DropdownButton>
+                <SubMenu 
+                    label={translate("Switch user...")}
+                >
+                    {#await git.listUsers() then users}
+                        {#each users as username}
+                            <MenuItem
+                                label={username}
+                                onclick={evt => current.user = username}
+                            />
+                        {/each}
+                        <MenuSeparator />
+                    {/await}
+                    <MenuItem
+                        label={translate("New user...")}
+                        onclick={async evt => {
+                            // do login
+                            let user = await git.login()
+                            // if successful...
+                            if (user) {
+                                // update current user info
+                                current.user = user
+                                // confirm that username is okay
+                                validateUsername(user)
+                            }
+                            
+                        }}
+                    />
+                </SubMenu>
+                <MenuSeparator />
+                {#if current.user}
+                    <MenuItem
+                        label={translate("Logout")}
+                        onclick={evt => {
+                            current.user = undefined;
+                            git.clearUsers();
+                        }}
+                    />
+                {:else}
+                    <MenuItem
+                        label={translate("Login")}
+                        onclick={async evt => {
+                            let users = await git.listUsers();
+                            if (users.length) {
+                                current.user = users[0]
+                            } else {
+                                current.user = await git.login()
+                            }
+                        }}
+                    />
+                {/if}
+            {/snippet}
+        </Button>
     {/await}
 
     <MessageDialog
