@@ -9,7 +9,7 @@
     import { browseFileOpen } from "$lib/utils/files.js";
     import path from "path-browserify";
     import { translate } from "$lib/translation";
-    import { getContext } from "svelte";
+    import { getContext, untrack } from "svelte";
 
     let {
         param=$bindable(),
@@ -56,6 +56,20 @@
         }
         
         return items
+    })
+
+    // if items are removed from elsewhere (e.g. undo), drop selection/editing indices which no longer exist
+    $effect(() => {
+        let n = items.length
+        // only depend on items, as writing to selected/editing would otherwise retrigger this
+        untrack(() => {
+            if (selected.some(i => i >= n)) {
+                selected = selected.filter(i => i < n)
+            }
+            if (editing >= n) {
+                editing = undefined
+            }
+        })
     })
 
     /**
