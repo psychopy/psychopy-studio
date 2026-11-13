@@ -26,7 +26,6 @@
     let editing = $state();
     // stores a restore point while editing an item
     let restore = $state.raw("");
-    let placeholder = $state([]);
     
     // make sure param val is always a list rather than a string
     $effect(() => {
@@ -164,6 +163,7 @@
                 selected = []
             }
         }}
+        disabled={disabled}
         multiple
     >
         {#each Object.entries(items) as [i, item]}
@@ -184,6 +184,7 @@
                 label={translate("Delete")}
                 icon="/icons/btn-delete.svg"
                 onclick={deleteSelected}
+                disabled={disabled}
                 small
             />
         {/if}
@@ -192,6 +193,7 @@
                 label={translate("Edit")}
                 icon="/icons/btn-edit.svg"
                 onclick={editSelected}
+                disabled={disabled}
                 small
             />
         {/if}
@@ -199,6 +201,7 @@
             label={translate("Add files...")}
             icon="/icons/btn-add.svg"
             onclick={addFiles}
+            disabled={disabled}
             small
         >
             {#snippet menu(shown)}
