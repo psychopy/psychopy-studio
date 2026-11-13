@@ -102,6 +102,10 @@
         let types = mimeTypesFromParam(param)
         // open file browser
         let files = await browseFileOpen(types, current.experiment?.file?.parent, true)
+        // abort if no files
+        if (!files) {
+            return
+        }
         // apply to param
         for (let file of files) {
             // make relative
