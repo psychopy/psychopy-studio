@@ -83,6 +83,14 @@ class User {
     }
 
     /**
+     * Whether the access token is (or is about to be) expired. Calculated from the clock rather
+     * than a timer, so that it stays accurate if the computer sleeps.
+     */
+    get expired() {
+        return !this.token.expiresAt || Date.now() >= this.token.expiresAt
+    }
+
+    /**
      * Refresh the authentication token for this user. If a refresh is already in progress, waits
      * for that one rather than starting another (as each refresh token can only be used once).
      */
@@ -115,17 +123,12 @@ class User {
         if (data.access_token && data.refresh_token) {
             this.token.access = data.access_token;
             this.token.refresh = data.refresh_token;
-            this.token.expired = false
+            this.token.expiresAt = getExpiry(data.expires_in)
         } else {
             throw new Error(data.message || 'Token refresh failed');
         }
         // save users JSON
         saveUsers()
-        // mark token as expired after timeout
-        setTimeout(
-            evt => this.token.expired = true, 
-            data.expires_in * 1000
-        )
 
         return data;
     }
@@ -137,8 +140,8 @@ class User {
      */
     async getToken() {
         // if expired, refresh
-        if (this.token.expired) {
-            await this.refreshToken(username)
+        if (this.expired) {
+            await this.refreshToken()
         }
 
         return this.token.access
@@ -171,8 +174,27 @@ class User {
 }
 
 
+/**
+ * Get the time at which a token which expires in a given number of seconds should be considered
+ * expired, leaving a margin so we don't use a token which expires mid-request.
+ *
+ * @param {number} expiresIn Seconds until the token expires, as given by the server
+ *
+ * @returns {number|undefined} Timestamp (ms) at which to treat the token as expired, or undefined
+ * if not known
+ */
+function getExpiry(expiresIn) {
+    if (!expiresIn) {
+        return undefined
+    }
+    return Date.now() + (expiresIn - tokenExpiryMargin) * 1000
+}
+
+
 // object storing authentication info for users against their username
 var users = {};
+// how long (in s) before a token's actual expiry to consider it expired
+const tokenExpiryMargin = 60;
 // object storing file paths of known projects on this machine
 var projects = {};
 
@@ -264,14 +286,10 @@ async function login() {
         token: {
             access: data.access_token,
             refresh: data.refresh_token,
-            verifier: verifier
+            verifier: verifier,
+            expiresAt: getExpiry(data.expires_in)
         }
     })
-    // mark token as expired after timeout
-    setTimeout(
-        evt => user.token.expired = true, 
-        data.expires_in * 1000
-    )
     // get username
     await user.refreshProfile()
     // store user
