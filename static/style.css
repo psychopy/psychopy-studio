@@ -105,12 +105,11 @@ input:focus {
 }
 
 select {
-    transition: border-color .2s, box-shadow .2s;
-    
+    transition: border-color .2s, box-shadow .2s;   
 }
 select[multiple] {
     padding: .5em 1em 4em 1em;
-    overflow-block: auto;
+    overflow-y: auto;
 }
 
 select:enabled:active,
@@ -124,13 +123,13 @@ select:focus {
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.05);
 }
 
-select[multiple] option {
+select option {
     font-family: var(--body);
     padding: .25rem 1rem;
-    padding-right: 1rem;
+}
+select[multiple] option {
     border-bottom: 1px solid var(--overlay);
 }
-
 
 option img {
     display: inline;
