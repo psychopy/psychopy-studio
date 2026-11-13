@@ -125,7 +125,7 @@ class User {
             this.token.refresh = data.refresh_token;
             this.token.expiresAt = getExpiry(data.expires_in)
         } else {
-            throw new Error(data.message || 'Token refresh failed');
+            throw new Error(data.message || data.error_description || 'Token refresh failed');
         }
         // save users JSON
         saveUsers()
@@ -135,7 +135,7 @@ class User {
 
     /**
      * Get the access token for this user, will refresh if needed
-     * 
+     *
      * @returns {string} Access token
      */
     async getToken() {
@@ -193,6 +193,9 @@ function getExpiry(expiresIn) {
 
 // object storing authentication info for users against their username
 var users = {};
+// stored info for users who couldn't be loaded (e.g. because offline), kept so that they're not
+// deleted from the users file when it's next saved
+var unloadedUsers = {};
 // how long (in s) before a token's actual expiry to consider it expired
 const tokenExpiryMargin = 60;
 // object storing file paths of known projects on this machine
@@ -294,6 +297,7 @@ async function login() {
     await user.refreshProfile()
     // store user
     users[user.profile.username] = user
+    delete unloadedUsers[user.profile.username]
     // save users JSON
     saveUsers()
 
@@ -349,9 +353,12 @@ export async function loadUsers() {
             await user.refreshProfile()
             // store user if this worked
             users[username] = user
+            delete unloadedUsers[username]
         } catch (err) {
             console.error(`Failed to load user ${username} from file`)
             console.error(err)
+            // keep stored info so the user isn't forgotten (we can try again next time)
+            unloadedUsers[username] = { token, profile }
         }
     }
     // refreshing tokens will have invalidated old ones, so save over stored data
@@ -363,8 +370,8 @@ export async function loadUsers() {
  * Save users to the JSON file in the user folder
  */
 export function saveUsers() {
-    // create basic object for output
-    let output = {}
+    // create basic object for output (keeping any users we couldn't load)
+    let output = { ...unloadedUsers }
     // iterate through all users
     for (let [username, user] of Object.entries(users)) {
         // create output for each
@@ -399,6 +406,7 @@ export function saveUsers() {
 export function clearUsers() {
     // clear users dict
     users = {}
+    unloadedUsers = {}
     // save
     saveUsers()
 }
