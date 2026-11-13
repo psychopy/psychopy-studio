@@ -73,8 +73,8 @@ class User {
      */
     async refreshProfile() {
         // fetch profile from Pavlovia
-        this.profile = await fetch(
-            `${server}/api/v4/user?access_token=${await this.getToken()}`
+        this.profile = await this.fetch(
+            `${server}/api/v4/user`
         ).then(
             resp => resp.json()
         );
@@ -142,6 +142,31 @@ class User {
         }
 
         return this.token.access
+    }
+
+    /**
+     * Fetch a URL authenticated as this user. If the server rejects the token, it will be
+     * refreshed and the request retried (once).
+     *
+     * @param {string|URL} url URL to fetch
+     * @param {object} [options] Options to pass to `fetch`
+     * @param {string} [param] Name of the URL parameter to put the token in
+     *
+     * @returns {Promise<Response>} Response from the server
+     */
+    async fetch(url, options={}, param="access_token") {
+        url = new URL(url)
+        // make request with current token
+        url.searchParams.set(param, await this.getToken())
+        let resp = await fetch(url.toString(), options)
+        // if rejected, refresh token and try again
+        if (resp.status === 401) {
+            await this.refreshToken()
+            url.searchParams.set(param, this.token.access)
+            resp = await fetch(url.toString(), options)
+        }
+
+        return resp
     }
 }
 
