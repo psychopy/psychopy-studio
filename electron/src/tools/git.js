@@ -83,9 +83,21 @@ class User {
     }
 
     /**
-     * Refresh the authentication token for this user
+     * Refresh the authentication token for this user. If a refresh is already in progress, waits
+     * for that one rather than starting another (as each refresh token can only be used once).
      */
     async refreshToken() {
+        // if already refreshing, wait for that refresh
+        if (!this._refreshing) {
+            this._refreshing = this._doRefreshToken().finally(
+                () => this._refreshing = undefined
+            )
+        }
+
+        return await this._refreshing
+    }
+
+    async _doRefreshToken() {
         // send refresh request
         let data = await fetch(`${server}/oauth/token`, {
             method: "POST",
