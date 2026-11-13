@@ -189,6 +189,7 @@
                 icon="/icons/btn-delete.svg"
                 onclick={deleteSelected}
                 disabled={disabled}
+                data-testid=remove-item
                 small
             />
         {/if}
@@ -198,6 +199,7 @@
                 icon="/icons/btn-edit.svg"
                 onclick={editSelected}
                 disabled={disabled}
+                data-testid=edit-item
                 small
             />
         {/if}
@@ -206,6 +208,7 @@
             icon="/icons/btn-add.svg"
             onclick={addFiles}
             disabled={disabled}
+            data-testid=add-files
             small
         >
             {#snippet menu(shown)}
@@ -213,6 +216,7 @@
                     label={translate("Add as text")}
                     icon="/icons/btn-edit.svg"
                     onclick={addText}
+                    data-testid=add-text
                 />
             {/snippet}
         </Button>
@@ -227,6 +231,7 @@
     }
     onopen={evt => restore = $state.snapshot(items[editing].val)}
     shrink
+    data-testid=edit-list-item
 >
     <div
         class=edit-dlg-content
