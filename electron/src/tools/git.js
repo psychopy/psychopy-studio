@@ -125,7 +125,10 @@ class User {
             this.token.refresh = data.refresh_token;
             this.token.expiresAt = getExpiry(data.expires_in)
         } else {
-            throw new Error(data.message || data.error_description || 'Token refresh failed');
+            let err = new Error(data.message || data.error_description || 'Token refresh failed');
+            // pass the OAuth error code (e.g. "invalid_grant")
+            err.code = data.error
+            throw err
         }
         // save users JSON
         saveUsers()
@@ -362,10 +365,12 @@ export async function loadUsers() {
             users[username] = user
             delete unloadedUsers[username]
         } catch (err) {
-            // if it failed, user is left in unloadedUsers so they aren't forgotten (we can try 
-            // again next time)
             console.error(`Failed to load user ${username} from file`)
             console.error(err)
+            // delete users who have an invalid refresh token
+            if (err.code === "invalid_grant") {
+                delete unloadedUsers[username]
+            }
         }
     }
     // refreshing tokens will have invalidated old ones, so save over stored data
