@@ -128,7 +128,7 @@
 		"build": "npm run svelte:build && electron-builder build",
 		"dev": "npm run electron:start",
 		"test": "playwright test",
-		"test:ui": "playwright test --ui"
+		"test:ui": "playwright test --ui",
 		"test:web": "node --test"
 	},
 	"devDependencies": {
