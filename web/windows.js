@@ -5,7 +5,9 @@ export function createWindows(
     const listeners = new Map();
     return {
         new: async (target) => {
-            const url = new URL(target.replace(/^\//, ""), documentObject.baseURI);
+            const base = new URL(documentObject.baseURI);
+            base.pathname = base.pathname.replace(/\/?(?:builder|coder|runner)\/?$/, "/");
+            const url = new URL(target.replace(/^\/+/, ""), base);
             if (windowObject.self !== windowObject.top) {
                 windowObject.location.assign(url);
                 return windowObject;
