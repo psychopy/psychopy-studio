@@ -1,12 +1,3 @@
 {
-    "About PsychoPy": "Tentang PsychoPy",
-    "Click Cancel to stay in PsychoPy.": "Klik Cancel untuk tinggal di PsychoPy.",
-    "Experiment was built in a future version of PsychoPy ({version}), we recommend either updating PsychoPy or changing the \"Use Version\" setting in Experiment Settings to this version.": "Eksperimen anda dibina menggunakan versi kelak PsychoPy ({version}), kami mencadang anda mengemaskinikan PsychoPy atau mengubah \"Use Version\" di Experiment Settings dalam versi ini.",
-    "Experiment was built in a past version of PsychoPy ({version}), saving it in this version may add parameters which cannot be parsed.": "Eksperimen anda dibina menggunakan versi lama PsychoPy ({version}), menyimpan fail dalam versi mungkin akan menambah parameter baru yang tidak boleh dihuraikan.",
-    "Terminate PsychoPy": "Tamatkan PsychoPy",
-    "Welcome to PsychoPy3!": "Selamat datang ke PsychoPy3!",
-    "Your stimulus position exceeds the {dimension} dimension of your window.": "Posisi stimulus anda melebihi {dimension} dimensi tetingkap anda.",
-    "Your stimulus size exceeds the {dimension} dimension of your window.": "Saiz stimulus anda melebihi {dimension} dimensi tetingkap anda.",
-    "Your stimulus size is smaller than 1 pixel ({dimension} dimension).": "Saiz stimulus anda lebih kecil daripada 1 pixel ({dimension} dimensi).",
-    "[Warning] Could not activate plugin. PsychoPy may need to restart for plugin to take effect.": "[Amaran] Tidak boleh mengaktifkan plugin. PsychoPy mungkin memerlukan restart untuk plugin berkuat kasa."
+    "Welcome to PsychoPy!": "Selamat datang ke PsychoPy!"
 }

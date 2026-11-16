@@ -1,15 +1,3 @@
 {
-    "Cannot calculate parameter.": "Parameetri arvutamine eba\u00f5nnestus.",
-    "Component {component} has stop time set as a duration, but doesn't have a start time": "Komponendi {component} ajastus on defineeritud kestusena, kuid algusaega on m\u00e4\u00e4ramata j\u00e4\u00e4nud.",
-    "Experiment was built in a future version of PsychoPy ({version}), we recommend either updating PsychoPy or changing the \"Use Version\" setting in Experiment Settings to this version.": "Katse loodi PsychoPy tulevases versioonis ({version}). Soovitame PsychoPy uuendada v\u00f5i muuta \"Kasuta versiooni\" s\u00e4tted Katse Seadetes sellele versioonile vastavaks.",
-    "Favorites": "Lemmikud",
-    "JavaScript Syntax Error in '{codeTab}' tab. See '{lineNumber}' in the '{codeTab}' tab.": "JavaScripti s\u00fcntaksi viga vahekaardil '{codeTab}'. Vaata rida number '{lineNumber}' vahekaardil '{codeTab}'.",
-    "Python Syntax Error in '{codeTab}' tab. See '{code}' on line number {lineNumber} of the '{codeTab}' tab.": "Pythoni s\u00fcntaksi viga vahekaardil '{codeTab}'. Vaata '{code}' rida number {lineNumber} vahekaardil '{codeTab}'.",
-    "The component {name} is currently disabled and will not be written to your experiment script.": "Komponent {name} on praegu keelatud ja seda ei kirjutata teie katsekoodi.",
-    "Your stimulus position exceeds the {dimension} dimension of your window.": "Teie stiimuli suurus \u00fcletab ekraani {dimension} dimensiooni m\u00f5\u00f5tmed.",
-    "Your stimulus size exceeds the {dimension} dimension of your window.": "Teie stiimuli suurus \u00fcletab ekraani {dimension} m\u00f5\u00f5tmed.",
-    "Your stimulus size is smaller than 1 pixel ({dimension} dimension).": "Teie stiimuli suurus on v\u00e4iksem kui 1 piksel ({dimension} m\u00f5\u00f5de).",
-    "Your stimulus {type} time of {time} is less than a screen refresh for a {Hz}Hz monitor.": "Teie stiimuli {type} aeg {time} on l\u00fchem kui \u00fche ekraaniv\u00e4rskenduse aeg {Hz}Hz monitoril.",
-    "Your stimulus {type} time of {time} seconds cannot be accurately presented for {time} on a {Hz}Hz monitor.": "Teie stiimuli {type} aeg {time} sekundit ei saa t\u00e4pselt kuvada {time} sekundiks {Hz}Hz ekraanil.",
-    "Your stimulus {type} type {frameType} must be expressed as a whole number.": "Teie stiimuli {type} t\u00fc\u00fcp {frameType} peaks olema v\u00e4ljendatud t\u00e4isarvuna."
+    "Welcome to PsychoPy!": "Tere tulemast PsychoPy-sse!"
 }
