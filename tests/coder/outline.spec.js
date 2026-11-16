@@ -42,7 +42,7 @@ test.describe("Coder outline panel", () => {
         // get the editor notebook
         let notebook = coder.locator("#editor-notebook")
         // confirm that it has a page for the newly opened file
-        let page = notebook.locator(`.notebook-tab[data-file="${file}"]`)
+        let page = notebook.locator(`.notebook-tab[data-file="${file.replaceAll("\\", "/")}"]`)
         await expect(page, `No page found after opening file "${file}"`).toBeAttached()
     }
 
