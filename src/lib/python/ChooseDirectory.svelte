@@ -1,6 +1,7 @@
 <script>
     import { translate } from "$lib/translation";
     import { Dialog, DialogButton } from "$lib/ui/dialog";
+    import { ProItem, ConItem } from "$lib/ui/list";
     import { prefs } from "$lib/preferences.svelte.js";
 
     let selected = $state.raw("user")
@@ -24,9 +25,13 @@
             >
                 <h4>{translate("User folder (recommended for most users)")}</h4>
 
-                <ul class=procon>
-                    <li class=pro>{translate("Each user on this computer gets control of their own PsychoPy version and plugins")}</li>
-                    <li class=con>{translate("This can use a lot of space on machines with lots of users")}</li>
+                <ul>
+                    <ProItem>
+                        {translate("Each user on this computer gets control of their own PsychoPy version and plugins")}
+                    </ProItem>
+                    <ConItem>
+                        {translate("This can use a lot of space on machines with lots of users")}
+                    </ConItem>
                 </ul>
                 {#if selected === "user"}
                     <p>{translate("Python environments will be created in:")}</p>
@@ -44,10 +49,16 @@
                 onclick={(evt) => selected = "global"}
             >
                 <h4>{translate("Shared folder (recommended for classrooms)")}</h4>
-                <ul class=procon>
-                    <li class=pro>{translate("Python is only setup once per version of PsychoPy")}</li>
-                    <li class=pro>{translate("System admins can control who is allowed to install PsychoPy versions and plugins")}</li>
-                    <li class=con>{translate("Installing/removing a PsychoPy version or plugin installs/removes it for everyone")}</li>
+                <ul>
+                    <ProItem>
+                        {translate("Python is only setup once per version of PsychoPy")}
+                    </ProItem>
+                    <ProItem>
+                        {translate("System admins can control who is allowed to install PsychoPy versions and plugins")}
+                    </ProItem>
+                    <ConItem>
+                        {translate("Installing/removing a PsychoPy version or plugin installs/removes it for everyone")}
+                    </ConItem>
                 </ul>
                 {#if selected === "global"}
                     <p>{translate("Python environments will be created in:")}</p>
