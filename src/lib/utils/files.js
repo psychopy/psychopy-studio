@@ -148,6 +148,10 @@ export async function browseFileOpen(
         if (files === undefined) {
             return
         }
+        // convert if array has been objectified (bug in electron-playwright-helpers==3.1.2 causes this in tests)
+        if (typeof files === "object" && !Array.isArray(files)) {
+            files = Object.values(files)
+        }
         // parse
         output = files.map(
             file => parsePath(file)

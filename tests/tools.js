@@ -1,4 +1,5 @@
 import { expect as _expect } from '@playwright/test';
+import path from "node:path";
 
 
 /**
@@ -31,14 +32,25 @@ export async function openView(app, target) {
  * 
  * @returns {import('@playwright/test').Locator} Locator corresponding to the button
  */
-export function getButtonByAction(parent, action) {
-	return parent.locator(`button[data-action="${action}"]`)
+export async function getButtonByAction(parent, action) {
+	// get button
+	let btn = parent.locator(`button[data-action="${action}"]`);
+	// confirm it exists
+	await expect(btn, `Could not find button with action "${action}"`).toBeAttached()
+
+	return btn
 }
+
+
+// get the path of the assets folder
+export const assetsDir = path.join(
+	import.meta.dirname,
+	"assets"
+)
 
 
 // extensions to playwright's expect...
 let expect = _expect
-
 
 /**
  * Confirm that a given window is a given view

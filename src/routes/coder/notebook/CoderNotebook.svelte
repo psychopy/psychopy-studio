@@ -18,10 +18,13 @@
     let current = getContext("current")
 </script>
 
-<Notebook>
+<Notebook
+    id="editor-notebook"
+>
     {#each Object.entries(current.pages) as [i, page]}
         <NotebookPage
             label={page.file.name}
+            data-file={page.file.file}
             close={(evt) => current.pages.splice(i, 1)}
             bind:selected={
                 () => current.tab === parseInt(i),

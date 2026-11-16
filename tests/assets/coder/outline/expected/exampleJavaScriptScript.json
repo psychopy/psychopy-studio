@@ -1,0 +1,60 @@
+{
+    "exampleJavaScriptScript.js": {
+        "testClass": "Script.js",
+        "children": {
+            "GRAVITY": {
+                "testClass": "VariableDeclaration"
+            },
+            "uninitialised": {
+                "testClass": "VariableDeclaration"
+            },
+            "{ firstKey, secondKey }": {
+                "testClass": "VariableDeclaration"
+            },
+            "topLevelFunction": {
+                "testClass": "FunctionDeclaration",
+                "children": {
+                    "localVariable": {
+                        "testClass": "VariableDeclaration"
+                    },
+                    "nestedHelper": {
+                        "testClass": "FunctionDeclaration",
+                        "children": {
+                            "deeplyNestedHelper": {
+                                "testClass": "FunctionDeclaration"
+                            }
+                        }
+                    }
+                }
+            },
+            "asyncFunction": {
+                "testClass": "FunctionDeclaration"
+            },
+            "arrowFunction": {
+                "testClass": "VariableDeclaration"
+            },
+            "SomeParentClass": {
+                "testClass": "ClassDeclaration",
+                "children": {
+                    "constructor": {
+                        "testClass": "MethodDeclaration"
+                    },
+                    "someMethod": {
+                        "testClass": "MethodDeclaration"
+                    }
+                }
+            },
+            "SomeChildClass": {
+                "testClass": "ClassDeclaration",
+                "children": {
+                    "constructor": {
+                        "testClass": "MethodDeclaration"
+                    }
+                }
+            },
+            "conditionallyDefinedFunction": {
+                "testClass": "FunctionDeclaration"
+            }
+        }
+    }
+}

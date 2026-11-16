@@ -35,7 +35,7 @@ export const test = base.extend({
 				)
 				// close the Python setup dialog by clicking the OK button
 				let pythonDlg = window.getByTestId("setup-python-dlg")
-				await getButtonByAction(pythonDlg, "OK").click()
+				await (await getButtonByAction(pythonDlg, "OK")).click()
 				await expect(pythonDlg).toBeHidden();
 			}
 			// run tests

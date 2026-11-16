@@ -4,8 +4,10 @@
     let {
         /** Make this control sit flush (e.g. in a panel) */
         flush=false,
-        /** @interface */
-        children
+        /** @prop {Snippet} children Child elements are rendered inside div */
+        children,
+        /** @prop {ComponentProps} props Other props are passed to div element */
+        ...props
     } = $props()
 
     let nodes = $state({
@@ -18,6 +20,7 @@
 <div 
     class=tree-root
     class:flush
+    {...props}
 >
     {@render children?.()}
 </div>

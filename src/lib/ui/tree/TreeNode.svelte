@@ -10,8 +10,10 @@
         onactivate=(evt, data) => {},
         oncontextmenu=(evt, data) => {},
         disabled=false,
-        /** @interface */
-        chevron
+        /** @prop {Snippet} chevron Arrow showing open state */
+        chevron,
+        /** @prop {ComponentProps} props Other props are passed to the button element */
+        ...props
     } = $props()
 
     let handle = $state.raw();
@@ -39,9 +41,10 @@
     oncontextmenu={evt => oncontextmenu(evt, data)}
     class:selected={siblings.selected === handle}
     disabled={disabled}
+    {...props}
 >
     <!-- arrow showing open state -->
-        {@render chevron?.()}
+    {@render chevron?.()}
     <!-- optional icon -->
     {#if icon}
         <Icon 

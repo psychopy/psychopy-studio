@@ -18,7 +18,7 @@ test.describe("Builder ribbon", () => {
      */
     async function clickBtn(action) {
         // get the ribbon button
-        let btn = getButtonByAction(ribbon, action);
+        let btn = await getButtonByAction(ribbon, action);
         // make sure it exists
         expect(btn).toBeAttached();
         // click it
@@ -40,10 +40,10 @@ test.describe("Builder ribbon", () => {
 
     test("Undo/redo", async () => {
         // get the undo and redo buttons
-        let undoBtn = getButtonByAction(ribbon, "undo");
-        let redoBtn = getButtonByAction(ribbon, "redo");
+        let undoBtn = await getButtonByAction(ribbon, "undo");
+        let redoBtn = await getButtonByAction(ribbon, "redo");
         // get the indicator on the piloting toggle
-        let indicator = getButtonByAction(ribbon, "togglePiloting").locator(".indicator");
+        let indicator = (await getButtonByAction(ribbon, "togglePiloting")).locator(".indicator");
         // click the piloting toggle so that the experiment has a change
         await clickBtn("togglePiloting");
         // undo should be enabled, and redo disabled
@@ -76,7 +76,7 @@ test.describe("Builder ribbon", () => {
 
     test("Toggle piloting", async () => {
         // get the indicator on the switch button
-        let indicator = getButtonByAction(ribbon, "togglePiloting").locator(".indicator");
+        let indicator = (await getButtonByAction(ribbon, "togglePiloting")).locator(".indicator");
         // get the value of the toggle button
         let startedLeft = await indicator.evaluate(el => el.classList.contains("left"));
         // click the piloting toggle

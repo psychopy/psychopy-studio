@@ -18,7 +18,10 @@
         bind:value={current.directory}
     />
 
-    <TreeRoot flush>
+    <TreeRoot
+        id="file-explorer-tree"
+        flush
+    >
         <FolderNode
             bind:value={current.directory}
             top

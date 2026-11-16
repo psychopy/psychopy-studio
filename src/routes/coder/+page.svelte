@@ -67,6 +67,7 @@
             <Pane defaultSize={1/6}>
                 <Panel 
                     title={translate("Navigation")}
+                    id="navigation-panel"
                 >
                     <Notebook>
                         <NotebookPage
@@ -79,6 +80,7 @@
                                     }
                                 }
                             }
+                            id="file-explorer-page"
                         >
                             <FileExplorer />
                         </NotebookPage>
@@ -92,6 +94,7 @@
                                     }
                                 }
                             }
+                            id="outline-page"
                         >
                             <OutlinePanel />
                         </NotebookPage>
@@ -108,6 +111,7 @@
                 <Pane defaultSize={3/4}>
                     <Panel 
                         title={translate("Editor")}
+                        id="editor-panel"
                     >
                         <CoderNotebook />
                     </Panel>
@@ -119,6 +123,7 @@
                     <Pane defaultSize={1/4}>
                         <Panel 
                             title={translate("Console")}
+                            id="console-panel"
                         >
                             <ShellNotebook />
                         </Panel>

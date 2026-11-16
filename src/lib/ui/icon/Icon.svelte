@@ -74,3 +74,9 @@
         {/await}
     </svg>
 {/if}
+
+<style>
+    .icon {
+        flex-shrink: 0;
+    }
+</style>

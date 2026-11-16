@@ -12,7 +12,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         // start listening for a new window
         let prom = app.waitForEvent("window")
         // click the ribbon button to create a new window
-        let newBtn = getButtonByAction(builder.locator("#ribbon"), "new");
+        let newBtn = await getButtonByAction(builder.locator("#ribbon"), "new");
         await newBtn.click();
         // assign it to `page` when one appears
         page = await prom
@@ -155,7 +155,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         if (await btn.getAttribute("data-testclass") === "component") {
             // get the resulting dialog and its OK button
             let dlg = page.getByTestId("new-component")
-            let okBtn = getButtonByAction(dlg, "OK")
+            let okBtn = await getButtonByAction(dlg, "OK")
             // the OK button should always start off enabled
             await expect(okBtn, `${cls} Component shouldn't start off invalid`).not.toBeDisabled()
             // get the name
@@ -250,7 +250,7 @@ test.describe("Builder Components/Standalone Routines", () => {
     async function teardownInputTypeTest(context) {
         // close dialog
         if (context.dlg) {
-            let closeBtn = getButtonByAction(context.dlg, "CANCEL")
+            let closeBtn = await getButtonByAction(context.dlg, "CANCEL")
             await closeBtn.click()
         }
         // delete element
@@ -346,7 +346,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         // does the control include the validator?
         await expect(context.ctrl.locator(`option[value="${validator}"]`)).toBeAttached()
         // close element dialog
-        let closeBtn = getButtonByAction(context.dlg, "CANCEL")
+        let closeBtn = await getButtonByAction(context.dlg, "CANCEL")
         await closeBtn.click()
         // delete validator
         await deleteElement(validator)
@@ -447,7 +447,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         await expect(editDlg, "Add as text should open the edit dialog").toBeVisible()
         // type a value and confirm
         await editDlg.locator("input").first().fill("image.png")
-        await getButtonByAction(editDlg, "OK").click()
+        await (await getButtonByAction(editDlg, "OK")).click()
         await expect(editDlg, "OK should close the edit dialog").toHaveCount(0)
         // check that the item was added with the typed value
         await expect(items, "Add as text should add an item").toHaveCount(n + 1)
@@ -457,7 +457,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         await layout.getByTestId("edit-item").click()
         await expect(editDlg, "Edit button should open the edit dialog").toBeVisible()
         await editDlg.locator("input").first().fill("sound.wav")
-        await getButtonByAction(editDlg, "OK").click()
+        await (await getButtonByAction(editDlg, "OK")).click()
         await expect(editDlg, "OK should close the edit dialog").toHaveCount(0)
         await expect(items.last(), "Edited item should hold the new value").toHaveText("sound.wav")
         // select the new item and delete it

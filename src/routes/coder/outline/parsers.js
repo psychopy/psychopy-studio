@@ -32,24 +32,54 @@ export function parsePython(content, index=1) {
 }
 
 
-export function parseJavaScript(content, index=1) {
+/**
+ * Parse JavaScript content into a flat list of the definitions it contains
+ *
+ * @param {string} content JavaScript code to parse
+ * @param {number} index Character index of this content in the file
+ * @param {string} parentType Type of the node this content is the body of, if any (class bodies
+ * aren't valid JavaScript on their own, so need to be parsed in the context of a class)
+ */
+export function parseJavaScript(content, index=1, parentType=undefined) {
     let subnodes = [];
+    // class bodies only parse correctly inside a class, so wrap them in a dummy one
+    let wrapper = parentType === "ClassDeclaration" ? "class _ " : ""
+    let src = wrapper + content
     // parse JavaScript
-    let node = jsParser.parse(content)
+    let node = jsParser.parse(src)
     // iterate through subnodes
     node.iterate({
         enter: subnode => {
+            // skip the dummy class wrapper (but not its body)
+            if (subnode.from < wrapper.length) {
+                return true
+            }
             // for function and class defs...
             if (["FunctionDeclaration", "ClassDeclaration"].includes(subnode.type.name)) {
                 // get name and content
                 let namenode = subnode.node.getChild("VariableDefinition")
+                let bodynode = subnode.node.getChild("Block") || subnode.node.getChild("ClassBody")
+                // append details
+                subnodes.push({
+                    content: src.slice(bodynode.from, bodynode.to),
+                    index: index + subnode.from - wrapper.length,
+                    type: subnode.type.name,
+                    name: src.slice(namenode.from, namenode.to),
+                })
+                // stop iteration
+                return false
+            }
+            // for class methods...
+            if (subnode.type.name === "MethodDeclaration") {
+                // get name and content
+                let namenode = subnode.node.getChild("PropertyDefinition") || subnode.node.getChild("PrivatePropertyDefinition")
                 let bodynode = subnode.node.getChild("Block")
                 // append details
                 subnodes.push({
-                    content: content.slice(bodynode.from, bodynode.to),
-                    index: index + subnode.from,
+                    content: src.slice(bodynode.from, bodynode.to),
+                    index: index + subnode.from - wrapper.length,
                     type: subnode.type.name,
-                    name: content.slice(namenode.from, namenode.to),
+                    name: src.slice(namenode.from, namenode.to),
                 })
                 // stop iteration
                 return false
@@ -62,10 +92,10 @@ export function parseJavaScript(content, index=1) {
 
                 // append details
                 subnodes.push({
-                    content: bodynode ? content.slice(bodynode.from, bodynode.to) : "undefined",
-                    index: 1 + index + subnode.from,
+                    content: bodynode ? src.slice(bodynode.from, bodynode.to) : "undefined",
+                    index: 1 + index + subnode.from - wrapper.length,
                     type: subnode.type.name,
-                    name: content.slice(namenode.from, namenode.to),
+                    name: src.slice(namenode.from, namenode.to),
                 })
                 // stop iteration
                 return false
@@ -88,7 +118,7 @@ export function parseMarkdown(content, index=1) {
     node.iterate({
         enter: subnode => {
             // are we skipping to a given node?
-            if (skipTo && subnode.to < skipTo.to) {
+            if (skipTo !== undefined && subnode.from < skipTo) {
                 return false
             }
             // get coords of this node
@@ -112,26 +142,23 @@ export function parseMarkdown(content, index=1) {
                 }
                 // get heading level
                 let level = parseInt(subnode.type.name.at(-1))
-                // get extent of headed content
-                let next = subnode.node.nextSibling
-                while (
-                    next 
-                    && next.nextSibling
-                    && !(
-                        next.type.name.match(/Heading\d$/) && parseInt(next.type.name.at(-1)) <= level
-                    )
-                ) {
-                    next = next.nextSibling
+                // get extent of headed content (up to the next heading of the same or higher level, or the end)
+                let end = content.length
+                for (let next = subnode.node.nextSibling; next; next = next.nextSibling) {
+                    if (next.type.name.match(/Heading\d$/) && parseInt(next.type.name.at(-1)) <= level) {
+                        end = next.from
+                        break
+                    }
                 }
                 // append details
                 subnodes.push({
-                    content: content.slice(subnode.to, next.node.from),
+                    content: content.slice(subnode.to, end),
                     index: index + subnode.to,
                     type: subnode.type.name,
-                    name: content.slice(...i),
+                    name: content.slice(...i).trim(),
                 })
-                // skip to end of next heading (inner content is already handled)
-                skipTo = next
+                // skip the headed content (it's handled by the recursion)
+                skipTo = end
                 // stop iteration
                 return false
             }
