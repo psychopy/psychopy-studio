@@ -173,23 +173,3 @@ ul {
 ul li {
     margin: .5rem 0;
 }
-
-ul.procon {
-  list-style: none;
-}
-
-ul.procon li:before {
-    font-weight: bold;
-    font-family: var(--emoji);
-    padding-right: .5em;
-}
-
-ul.procon li.pro:before {
-  content: '✓';
-  color: var(--green);
-}
-
-ul.procon li.con:before {
-  content: '✗';
-  color: var(--red);
-}
