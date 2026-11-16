@@ -29,7 +29,7 @@
             }
             // parse JS file
             if ([".js", ".cjs", ".ts"].includes(current.pages[current.tab].file.ext)) {
-                return parseJavaScript(content, index + 1)
+                return parseJavaScript(content, index + 1, type)
             }
             // parse Markdown file
             if ([".md"].includes(current.pages[current.tab].file.ext)) {
@@ -58,6 +58,8 @@
     <TreeBranch
         label={name}
         icon={icons?.[type]}
+        data-testid={name}
+        data-testclass={type}
         onselect={navigateTo}
         open={top}
     >
@@ -74,11 +76,15 @@
     <TreeNode 
         label={name}
         icon={icons?.[type]}
+        data-testid={name}
+        data-testclass={type}
     />
 {:else}
     <TreeNode 
         label={name}
         icon={icons?.[type]}
         onselect={navigateTo}
+        data-testid={name}
+        data-testclass={type}
     />
 {/if}

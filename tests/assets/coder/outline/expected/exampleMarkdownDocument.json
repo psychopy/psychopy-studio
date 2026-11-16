@@ -1,0 +1,42 @@
+{
+    "exampleMarkdownDocument.md": {
+        "testClass": "Script.md",
+        "children": {
+            "Example Markdown document": {
+                "testClass": "ATXHeading1",
+                "children": {
+                    "First section": {
+                        "testClass": "ATXHeading2",
+                        "children": {
+                            "First subsection": {
+                                "testClass": "ATXHeading3",
+                                "children": {
+                                    "Deeply nested heading": {
+                                        "testClass": "ATXHeading4"
+                                    }
+                                }
+                            },
+                            "Second subsection": {
+                                "testClass": "ATXHeading3"
+                            }
+                        }
+                    },
+                    "Second section": {
+                        "testClass": "ATXHeading2"
+                    },
+                    "Setext section": {
+                        "testClass": "SetextHeading2"
+                    }
+                }
+            },
+            "Second top-level heading": {
+                "testClass": "ATXHeading1",
+                "children": {
+                    "Final section": {
+                        "testClass": "ATXHeading2"
+                    }
+                }
+            }
+        }
+    }
+}

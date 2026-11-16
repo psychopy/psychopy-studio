@@ -10,13 +10,16 @@
         onactivate=(evt, data) => {},
         oncontextmenu=(evt, data) => {},
         open=$bindable(false),
-        /** @interface */
-        children
+        /** @prop {Snippet} children Child elements are rendered in the div that's shown when open */
+        children,
+        /** @prop {ComponentProps} props Other props are passed to the container div */
+        ...props
     } = $props()
 </script>
 
 <div 
     class=tree-branch
+    {...props}
 >
     <TreeNode
         label={label}

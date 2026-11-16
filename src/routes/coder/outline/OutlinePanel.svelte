@@ -9,7 +9,10 @@
 </script>
 <div class=panel>
     {#if current.pages?.[current.tab]}
-        <TreeRoot flush>
+        <TreeRoot 
+            id="outline-tree"
+            flush
+        >
             <OutlineNode 
                 content={current.pages[current.tab].content}
                 index={1}

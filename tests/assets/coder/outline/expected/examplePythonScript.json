@@ -1,0 +1,67 @@
+{
+    "examplePythonScript.py": {
+        "testClass": "Script.py",
+        "children": {
+            "topLevelFunction": {
+                "testClass": "FunctionDefinition",
+                "children": {
+                    "nestedHelper": {
+                        "testClass": "FunctionDefinition",
+                        "children": {
+                            "deeplyNestedHelper": {
+                                "testClass": "FunctionDefinition"
+                            }
+                        }
+                    }
+                }
+            },
+            "asyncFunction": {
+                "testClass": "FunctionDefinition"
+            },
+            "decoratedFunction": {
+                "testClass": "FunctionDefinition"
+            },
+            "EmptyClass": {
+                "testClass": "ClassDefinition"
+            },
+            "SomeParentClass": {
+                "testClass": "ClassDefinition",
+                "children": {
+                    "__init__": {
+                        "testClass": "FunctionDefinition"
+                    },
+                    "someProperty": {
+                        "testClass": "FunctionDefinition"
+                    },
+                    "NestedClass": {
+                        "testClass": "ClassDefinition",
+                        "children": {
+                            "nestedClassMethod": {
+                                "testClass": "FunctionDefinition"
+                            }
+                        }
+                    }
+                }
+            },
+            "SomeChildClass": {
+                "testClass": "ClassDefinition",
+                "children": {
+                    "__init__": {
+                        "testClass": "FunctionDefinition"
+                    },
+                    "methodWithInnerFunction": {
+                        "testClass": "FunctionDefinition",
+                        "children": {
+                            "innerFunction": {
+                                "testClass": "FunctionDefinition"
+                            }
+                        }
+                    }
+                }
+            },
+            "conditionallyDefinedFunction": {
+                "testClass": "FunctionDefinition"
+            }
+        }
+    }
+}
