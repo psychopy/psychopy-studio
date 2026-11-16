@@ -1,11 +1,12 @@
 <script>
     import { fly } from "svelte/transition";
+    import { untrack } from "svelte";
 
     let {
         /** State to use to show/hide the tooltip */
         shown=$bindable(false),
         /** @prop @type {number} Delay (s) before showing this tooltip */
-        delay = 0.1,
+        delay = 0.2,
         /** @prop @type {number} Width (px) at which to start wrapping text */
         maxWidth = 400,
         /** @prop @type {string} Where to show the tooltip, relative to its parent */
@@ -36,10 +37,20 @@
     let visible = $state.raw(false);
 
     $effect(() => {
-        // show right away
-        if (shown || held) {
+        // if the mouse is on the tooltip, keep it open
+        if (held) {
             visible = true
             return
+        }
+        if (shown) {
+            // already showing, so nothing to wait for
+            if (untrack(() => visible)) {
+                return
+            }
+            // wait before showing, so the tooltip doesn't flash up when the mouse just passes over
+            let timeout = setTimeout(() => visible = true, delay * 1000)
+            // cancel the show if the mouse leaves before it fires
+            return () => clearTimeout(timeout)
         }
         // wait before hiding, to give the mouse time to cross the gap onto the tooltip
         let timeout = setTimeout(() => visible = false, grace * 1000)
@@ -74,8 +85,7 @@
         style:margin={placements[position].margin}
         style:max-width="{maxWidth}px"
         transition:fly={{
-            ...placements[position].fly, 
-            delay: delay * 1000, 
+            ...placements[position].fly,
             duration: 200
         }}
         onmouseenter={evt => held = true}
