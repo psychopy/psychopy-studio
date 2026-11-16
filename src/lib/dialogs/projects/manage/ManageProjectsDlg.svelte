@@ -13,7 +13,7 @@
         // get file handle from system dialog
         let handle = await window.showOpenFilePicker({
             types: [{
-                description: "PsychoPy Projects",
+                description: translate("PsychoPy Projects"),
                 accept: {
                     "application/json": [".json"]
                 }
@@ -60,7 +60,7 @@
         {/each}
 
         <Button
-            label="Import projects"
+            label={translate("Import projects")}
             onclick={openProjectsFile}
         />
     </div>

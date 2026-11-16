@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import { asset } from '$app/paths';
 
     let {
@@ -39,7 +40,7 @@
             style:width={size}
             style:height={size}
             src={asset("/icons/sym-pending.svg")} 
-            alt="Loading..."
+            alt={translate("Loading...")}
         />
     {:then}
         <img 
@@ -55,7 +56,7 @@
             style:width={size}
             style:height={size}
             src={asset("/icons/sym-error.svg")} 
-            alt="Error"
+            alt={translate("Error")}
         />
     {/await}
 {:else}

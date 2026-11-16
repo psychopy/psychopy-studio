@@ -55,7 +55,7 @@
                 "gammaGrid": "[[0. 1. 1.]\n [0. 1. 1.]\n [0. 1. 1.]\n [0. 1. 1.]]"
             })
         }}
-        label="+ New calibration"
+        label={translate("+ New calibration")}
         tooltip={translate("Add a new monitor configuration")}
     />
 </Listbook>

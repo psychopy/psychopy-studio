@@ -13,7 +13,7 @@
     <div class=alerts-array>
         {#each current.output.alerts as message}
             <div class=alert transition:fly>
-                <h3>{message.cat} Alert</h3>
+                <h3>{translate("{} Alert").replace("{}", message.cat)}</h3>
                 <code class=alert-code>
                     #{message.code}
                 </code>
@@ -24,7 +24,7 @@
                     href="https://docs.psychopy.org/alerts/{message.code}.html"
                     style:grid-column-start=content
                     target="_blank"
-                >More info</a>
+                >{translate("More info")}</a>
             </div>
         {/each}
     </div>

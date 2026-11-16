@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     let {
         value=$bindable()
     } = $props()
@@ -9,14 +10,14 @@
     {#await python.venv.executable("app") then appExecutable}
         {#await python.uv.getEnvironments()}
             <option>
-                Scanning Python environments...
+                {translate("Scanning Python environments...")}
             </option>
         {:then environments}
             {#each environments as env}
                 <option value={env.executable === appExecutable ? "app" : env.psychopyVersion}>
                     {env.psychopyVersion}
                     {#if env.executable === appExecutable}
-                        (default)
+                        {translate("(default)")}
                     {/if}
                 </option>
             {/each}

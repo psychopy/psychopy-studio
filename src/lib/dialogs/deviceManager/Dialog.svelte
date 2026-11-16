@@ -111,7 +111,7 @@
         // get file handle from system dialog
         let handle = await window.showOpenFilePicker({
             types: [{
-                description: "PsychoPy Devices",
+                description: translate("PsychoPy Devices"),
                 accept: {
                     "application/json": [".json"]
                 }
@@ -139,7 +139,7 @@
         // open a file picker
         let handle = await window.showSaveFilePicker({
             types: [{
-                description: "PsychoPy Devices",
+                description: translate("PsychoPy Devices"),
                 accept: {
                     "application/json": [".json"]
                 }

@@ -55,7 +55,7 @@
             class=label
             style:margin-bottom="-.5rem"
         >
-            <span style:flex-grow={1}>Available devices</span>
+            <span style:flex-grow={1}>{translate("Available devices")}</span>
             <Button
                 icon="/icons/btn-refresh.svg"
                 tooltip={translate("Refresh")}

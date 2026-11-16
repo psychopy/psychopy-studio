@@ -154,7 +154,7 @@
         {/await}
         <SwitchButton 
             labels={[translate("Pilot"), translate("Run")]} 
-            tooltip={current.experiment?.pilotMode ? "Experiment will run in pilot mode" : "Experiment will run in run mode"}
+            tooltip={current.experiment?.pilotMode ? translate("Experiment will run in pilot mode") : translate("Experiment will run in run mode")}
             action="togglePiloting"
             value={!current.experiment.pilotMode}
         />  
@@ -238,7 +238,7 @@
 
     <RibbonGap></RibbonGap>
 
-    <RibbonSection label=Views icon="/icons/rbn-windows.svg">
+    <RibbonSection label={translate("Views")} icon="/icons/rbn-windows.svg">
         <Button
             icon="/icons/btn-builder.svg" 
             tooltip={translate("Builder view")} 

@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import { python } from "$lib/globals.svelte";
     import VenvChooser from "./VenvChooser.svelte"
     import ProgressDlg from "./ProgressDlg.svelte";
@@ -19,7 +20,7 @@
 
 <Dialog
     data-testid=plugin-mgr
-    title="Install PsychoPy from Git"
+    title={translate("Install PsychoPy from Git")}
     bind:shown={shown}
     shrink
 >
@@ -33,18 +34,18 @@
             </p>
         </div>
 
-        Python environment:
+        {translate("Python environment:")}
         <VenvChooser 
             bind:value={details.venv}
         />
-        Git repository:
+        {translate("Git repository:")}
         <input bind:value={details.repo} />
-        Branch:
+        {translate("Branch:")}
         <input bind:value={details.branch} />
 
         <hr />
 
-        This will run the following command on OK:
+        {translate("This will run the following command on OK:")}
         <code class=preview>
             uv pip install git+{details.repo}@{details.branch} --python 
             {#await python.venv.executable(details.venv) then executable}

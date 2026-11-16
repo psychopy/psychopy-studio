@@ -50,7 +50,7 @@
         {/await}
     {:catch err}
         <div class=message>
-            Failed setup: {err}
+            {translate("Failed setup: {}").replace("{}", err)}
             <Button
                 label={translate("Try again?")}
                 icon="/icons/btn-refresh.svg"
@@ -97,7 +97,7 @@
         </div>
         
         <Button
-            label="Try again?"
+            label={translate("Try again?")}
             icon="/icons/btn-refresh.svg"
             onclick={evt => setupPython()}
             horizontal

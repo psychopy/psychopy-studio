@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import { optionsFromParam } from "./utils.svelte.js";
 
     let {
@@ -46,7 +47,7 @@
     {...attachments}
 >
     {#await optionsFromParam(param)}
-        <option>Loading...</option>
+        <option>{translate("Loading...")}</option>
     {:then options}
         {#each options as [val, label]}
             {#if Array.isArray(val)}

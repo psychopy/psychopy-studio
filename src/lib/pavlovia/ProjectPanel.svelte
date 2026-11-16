@@ -33,7 +33,7 @@
     ).replace("{}", name)}
     <div class=button-array>
         <Button
-            label="Clone"
+            label={translate("Clone")}
             icon="/icons/btn-download.svg"
             onclick={async evt => {
                 if (current.user === info.namespace.name) {
@@ -74,7 +74,7 @@
             {/snippet}
         </MessageDialog>
         <Button
-            label="Find"
+            label={translate("Find")}
             tooltip={translate("Point to a local clone of this project")}
             icon="/icons/btn-open.svg"
             onclick={async evt => {
@@ -156,7 +156,7 @@
                     <img 
                         style:height=8rem
                         src={info.avatar_url} 
-                        alt="Project avatar"
+                        alt={translate("Project avatar")}
                     />
                 {/if}
                 <div>
@@ -205,7 +205,7 @@
             )
         ) then forks}
             {#if forks.length}
-                <h3>Your forks</h3>
+                <h3>{translate("Your forks")}</h3>
                 {translate("There are forks (copies) of this project on Pavlovia which you have access to:")}
                 {#each forks as fork}
                     <Button 

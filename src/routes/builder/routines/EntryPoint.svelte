@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import { Component } from "$lib/experiment";
     import { getContext } from "svelte";
     import { Icon } from "$lib/ui/icon";
@@ -71,7 +72,7 @@
         onfocusout={(evt) => {hovered = false}} 
         ondrop={insertHere} 
         onclick={insertHere}
-        aria-label="Entry point"
+        aria-label={translate("Entry point")}
         tabindex={moving || inserting ? 0 : -1}
     >
     </button>

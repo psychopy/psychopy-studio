@@ -106,7 +106,7 @@
         onfocusout={(evt) => {hovered = false}} 
         ondrop={insertHere} 
         onclick={insertHere}
-        aria-label="Entry point"
+        aria-label={translate("Entry point")}
         tabindex={moving || inserting ? 0 : -1}
         oncontextmenu={(evt) => {
             evt.preventDefault();

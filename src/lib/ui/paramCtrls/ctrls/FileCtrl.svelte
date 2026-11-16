@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
     import { mimeTypesFromParam } from "./utils.svelte";
@@ -53,7 +54,7 @@
 />
 <Button
     icon="/icons/btn-open.svg"
-    tooltip="Browse for file..."
+    tooltip={translate("Browse for file...")}
     data-testid=browse-file
     onclick={getFile}
     disabled={disabled}
