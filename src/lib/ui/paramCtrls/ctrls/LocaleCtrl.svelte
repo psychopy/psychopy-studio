@@ -1,5 +1,5 @@
 <script>
-    import { locales, getLocale, setLocale } from "$lib/translation";
+    import { locales, getLocale, setLocale, translate } from "$lib/translation";
     import { getByTag } from "locale-codes";
 
     let {
@@ -30,7 +30,7 @@
         value="system locale"
         selected={param.val === ""}
     >
-        System language
+        {translate("System language")}
     </option>
     {#each locales as option}
         {@const language = getByTag(option.replace("_", "-"))}

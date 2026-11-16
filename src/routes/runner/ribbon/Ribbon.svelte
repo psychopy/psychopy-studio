@@ -28,7 +28,7 @@
         bind:shown={show.menu} 
     />
     
-    <RibbonSection label=File icon="/icons/rbn-file.svg">
+    <RibbonSection label={translate("File")} icon="/icons/rbn-file.svg">
         <Button
             icon="/icons/btn-new.svg" 
             tooltip={translate("New configuration")} 
@@ -60,7 +60,7 @@
         />
     </RibbonSection>
 
-    <RibbonSection label=Selection icon="/icons/rbn-experiment.svg">
+    <RibbonSection label={translate("Selection")} icon="/icons/rbn-experiment.svg">
         <SwitchButton 
             labels={["Pilot", "Run"]} 
             tooltip={current.runlist[current.selection]?.pilotMode ? translate("Experiment will run in pilot mode") : translate("Experiment will run in run mode")}
@@ -80,7 +80,7 @@
     </RibbonSection>
 
     {#if python?.ready}
-        <RibbonSection label=Run icon="/icons/btn-runpy.svg">
+        <RibbonSection label={translate("Run")} icon="/icons/btn-runpy.svg">
             <Button
                 icon="/icons/btn-{current.runlist[current.selection]?.pilotMode ? "pilot" : "run"}py.svg" 
                 tooltip={current.runlist[current.selection]?.pilotMode ? translate("Pilot experiment locally") : translate("Run experiment locally")}
@@ -101,7 +101,7 @@
         </RibbonSection>
     {/if}
 
-    <RibbonSection label=Pavlovia icon="/icons/rbn-pavlovia.svg">
+    <RibbonSection label={translate("Pavlovia")} icon="/icons/rbn-pavlovia.svg">
         <div class=padded>
             <UserCtrl />
         </div>
@@ -109,7 +109,7 @@
 
     <RibbonGap></RibbonGap>
 
-    <RibbonSection label=Views icon="/icons/rbn-windows.svg">
+    <RibbonSection label={translate("Views")} icon="/icons/rbn-windows.svg">
         <Button
             icon="/icons/btn-builder.svg" 
             tooltip={translate("Builder view")} 

@@ -32,7 +32,7 @@
 
 <Dialog
     data-testid=component-filter
-    title="Filter Components"
+    title={translate("Filter Components")}
     bind:shown={shown}
     shrink
 >

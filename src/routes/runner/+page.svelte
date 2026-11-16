@@ -115,7 +115,7 @@
     <PaneGroup direction="horizontal">
         <Pane defaultSize={1/3}>
             <Panel
-                title=Files
+                title={translate("Files")}
             >
                 <FilesPanel />
             </Panel>
@@ -125,11 +125,11 @@
 
         <Pane defaultSize={2/3}>
             <Panel
-                title=Output 
+                title={translate("Output")}
             >
                 <Notebook>
                     <NotebookPage
-                        label=Alerts
+                        label={translate("Alerts")}
                         bind:selected={
                             () => current.tab === "alerts",
                             (val) => {
@@ -142,7 +142,7 @@
                         <AlertsOutput />
                     </NotebookPage>
                     <NotebookPage
-                        label=Stdout
+                        label={translate("Stdout")}
                         bind:selected={
                             () => current.tab === "stdout",
                             (val) => {
@@ -155,7 +155,7 @@
                         <StdoutOutput />
                     </NotebookPage>
                     <NotebookPage
-                        label=Pavlovia
+                        label={translate("Pavlovia")}
                         bind:selected={
                             () => current.tab === "pavlovia",
                             (val) => {

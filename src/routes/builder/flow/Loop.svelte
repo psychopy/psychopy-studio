@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import Dialog from '$lib/ui/dialog/Dialog.svelte';
     import { DialogButton } from '$lib/ui/dialog';
     import { Menu, MenuItem } from "$lib/ui/menu"
@@ -116,7 +117,7 @@
 >
     <MenuItem 
         icon="/icons/btn-delete.svg"
-        label="Delete Loop"
+        label={translate("Delete Loop")}
         onclick={removeLoop}
     />
 </Menu>

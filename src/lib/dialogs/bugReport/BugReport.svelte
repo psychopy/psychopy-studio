@@ -133,11 +133,11 @@
     <pre>{err.ECODE}: {err.message}</pre>
     <p>{translate("Click below to download the report so you can send it manually:")}</p>
     <Button 
-        label="Download"
+        label={translate("Download")}
         icon="/icons/btn-download.svg"
         onclick={evt => browseFileSave(
             [
-                { description: "JSON file", accept: {"text/json": [".json"]} }
+                { description: translate("JSON file"), accept: {"text/json": [".json"]} }
             ],
             "./bug_report.json"
         ).then(

@@ -74,7 +74,7 @@
                 }
             }}
             style:color={param.val.length ? "inherit" : "var(--outline)" }
-            value={param.val.length ? param.val.join?.(" + ") : "Press keys, then click the tick to accept"}
+            value={param.val.length ? param.val.join?.(" + ") : translate("Press keys, then click the tick to accept")}
         />
         <Button
             onclick={evt => param.val.length = 0}

@@ -160,7 +160,7 @@
                 disabled={!python?.ready}
             />
             <MenuItem
-                label="Install PsychoPy from Git..."
+                label={translate("Install PsychoPy from Git...")}
                 onclick={evt => show.psychopyBranchDlg = true}
             />
         {/if}

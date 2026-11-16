@@ -79,7 +79,7 @@
 {#if current.inserting instanceof Routine}
     <Dialog 
         data-testid=new-routine
-        title="New Routine" 
+        title={translate("New Routine")} 
         bind:shown={showNewRoutineDialog} 
         onopen={() => current.inserting.settings.restore.set()}
     >

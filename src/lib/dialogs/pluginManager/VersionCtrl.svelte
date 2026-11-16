@@ -140,7 +140,7 @@
             {#snippet menu(shown)}
                 {#each versions as version}
                     <MenuItem
-                        label="Version {version}"
+                        label={translate("Version {}").replace("{}", version)}
                         onclick={evt => install(version)}
                     />
                 {/each}

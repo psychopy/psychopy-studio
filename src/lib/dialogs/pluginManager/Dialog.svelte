@@ -27,7 +27,7 @@
 >
     <div class=container>
         <div class=environment-ctrl>
-            Python environment:
+            {translate("Python environment:")}
             <VenvChooser 
                 bind:value={venv}
             />
@@ -36,7 +36,7 @@
         <Notebook>
 
             <NotebookPage
-                label="Plugins"
+                label={translate("Plugins")}
                 bind:selected={
                     () => pages.current === "plugins",
                     value => pages.current = "plugins"
@@ -45,7 +45,7 @@
                 <PluginsPanel bind:venv={venv} />
             </NotebookPage>
             <NotebookPage
-                label="Packages"
+                label={translate("Packages")}
                 bind:selected={
                     () => pages.current === "packages",
                     value => pages.current = "packages"

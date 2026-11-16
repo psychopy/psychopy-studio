@@ -15,7 +15,7 @@
     <nav>
         <button 
             class=view
-            aria-label="builder"
+            aria-label={translate("Builder")}
             onclick={evt => newWindow("builder")}
         >
             <h3>{translate("Builder")}</h3>
@@ -27,7 +27,7 @@
         </button>
         <button 
             class=view
-            aria-label="coder"
+            aria-label={translate("Coder")}
             onclick={evt => newWindow("coder")}
         >
             <h3>{translate("Coder")}</h3>
@@ -40,7 +40,7 @@
         {#if electron}
             <button 
                 class=view
-                aria-label="runner"
+                aria-label={translate("Runner")}
                 onclick={evt => newWindow("runner")}
             >
                 <h3>{translate("Runner")}</h3>

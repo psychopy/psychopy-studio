@@ -82,7 +82,7 @@
     <RibbonSection label={translate("Experiment")} icon="/icons/rbn-experiment.svg">
         <SwitchButton 
             labels={["Pilot", "Run"]} 
-            tooltip={current.pages[current.tab]?.pilotMode ? "Experiment will run in pilot mode" : "Experiment will run in run mode"}
+            tooltip={current.pages[current.tab]?.pilotMode ? translate("Experiment will run in pilot mode") : translate("Experiment will run in run mode")}
             bind:value={
                 () => !current.pages[current.tab]?.pilotMode,
                 (value) => current.pages[current.tab].setPilotMode(!value)

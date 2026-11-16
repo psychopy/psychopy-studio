@@ -247,7 +247,7 @@
                 action="compileJS"
             />
             <MenuItem 
-                label={current.experiment.pilotMode ? "Pilot in browser" : "Run in browser"}
+                label={current.experiment.pilotMode ? translate("Pilot in browser") : translate("Run in browser")}
                 icon="/icons/btn-{current.experiment.pilotMode ? "pilot" : "run"}js.svg" 
                 action="runJS"
             />
@@ -329,7 +329,7 @@
                 action="reinstallPython"
             />
             <MenuItem
-                label="Install PsychoPy from Git..."
+                label={translate("Install PsychoPy from Git...")}
                 onclick={evt => show.psychopyBranchDlg = true}
             />
         {/if}

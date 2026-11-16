@@ -1,3 +1,6 @@
 {
-    "Welcome to PsychoPy!": "PsychoPy hoşgeldiniz!"
+    "About PsychoPy": "PsychoPy2 ho\u015fgeldiniz!",
+    "Terminate PsychoPy": "PsychoPy2 ho\u015fgeldiniz!",
+    "Welcome to PsychoPy3!": "PsychoPy2 ho\u015fgeldiniz!",
+    "Your stimulus size exceeds the {dimension} dimension of your window.": "Uyaran boyutunuz Monit\u00f6r boyutunu {dimension} ge\u00e7iyor."
 }

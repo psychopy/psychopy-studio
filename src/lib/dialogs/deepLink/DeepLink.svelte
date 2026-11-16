@@ -1,4 +1,5 @@
 <script>
+    import { translate } from "$lib/translation";
     import { Dialog } from "$lib/ui/dialog";
     import { getContext } from "svelte";
     import ProjectPanel from "$lib/pavlovia/ProjectPanel.svelte";
@@ -12,7 +13,7 @@
 </script>
 
 <Dialog
-    title="Opening {project}..."
+    title={translate("Opening {}...").replace("{}", project)}
     bind:shown={shown}
     shrink
 >

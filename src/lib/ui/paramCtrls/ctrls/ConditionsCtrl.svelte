@@ -41,10 +41,10 @@
                     returnFieldNames: true
                 }
             })}
-                Loading...
+                {translate("Loading...")}
             {:then resp}
                 {#if resp.success}
-                    {resp.result[0].length} conditions, with {resp.result[1].length} parameters 
+                    {translate("{} conditions, with {} parameters").replace("{}", resp.result[0].length).replace("{}", resp.result[1].length)} 
                     <Info>
                         <div 
                             class=more-info
