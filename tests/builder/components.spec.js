@@ -447,7 +447,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         await expect(editDlg, "Add as text should open the edit dialog").toBeVisible()
         // type a value and confirm
         await editDlg.locator("input").first().fill("image.png")
-        await getButtonByAction(editDlg, "OK").click()
+        await (await getButtonByAction(editDlg, "OK")).click()
         await expect(editDlg, "OK should close the edit dialog").toHaveCount(0)
         // check that the item was added with the typed value
         await expect(items, "Add as text should add an item").toHaveCount(n + 1)
@@ -457,7 +457,7 @@ test.describe("Builder Components/Standalone Routines", () => {
         await layout.getByTestId("edit-item").click()
         await expect(editDlg, "Edit button should open the edit dialog").toBeVisible()
         await editDlg.locator("input").first().fill("sound.wav")
-        await getButtonByAction(editDlg, "OK").click()
+        await (await getButtonByAction(editDlg, "OK")).click()
         await expect(editDlg, "OK should close the edit dialog").toHaveCount(0)
         await expect(items.last(), "Edited item should hold the new value").toHaveText("sound.wav")
         // select the new item and delete it
