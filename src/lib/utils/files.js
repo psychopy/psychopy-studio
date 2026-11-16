@@ -35,6 +35,32 @@ export function parsePath(file) {
 
 
 /**
+ * Get a file path relative to a folder, if the file is inside that folder.
+ *
+ * @param {string} file Absolute path to the file
+ * @param {string|undefined} folder Folder to make the path relative to (e.g. the experiment's folder)
+ * @returns {string} Path relative to `folder` if the file is inside it, otherwise `file` unchanged
+ */
+export function relativeIfInside(file, folder) {
+    // nothing to be relative to
+    if (!folder) {
+        return file
+    }
+    // handle Windows-style separators
+    let posixFile = file.replaceAll("\\", "/")
+    let posixFolder = folder.replaceAll("\\", "/")
+    // get relative path
+    let rel = path.relative(posixFolder, posixFile)
+    // if outside the folder (or on another drive), keep it absolute
+    if (rel === ".." || rel.startsWith("../") || path.isAbsolute(rel)) {
+        return file
+    }
+
+    return rel
+}
+
+
+/**
  * Convert a flat list of file paths into a nested tree reflecting the folder structure. Folders
  * are represented as `{name, children}` objects and files as strings, e.g.
  *

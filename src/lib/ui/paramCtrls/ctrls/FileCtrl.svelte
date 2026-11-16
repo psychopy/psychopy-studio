@@ -2,7 +2,7 @@
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
     import { mimeTypesFromParam } from "./utils.svelte";
-    import { browseFileOpen } from "$lib/utils/files.js";
+    import { browseFileOpen, relativeIfInside } from "$lib/utils/files.js";
     import { getContext } from "svelte";
 
     let {
@@ -38,13 +38,8 @@
         let file = await browseFileOpen(types, current.experiment?.file?.parent);
         // if one was selected, use it
         if (file) {
-            if (current.experiment?.file?.parent) {
-                // make relative to experiment path if possible
-                param.val = file.file.replace(current.experiment.file.parent, "").replace(/^\//, "")
-            } else {
-                // otherwise use as absolute
-                param.val = file.file
-            }
+            // make relative to experiment folder if inside it
+            param.val = relativeIfInside(file.file, current.experiment?.file?.parent)
         }
     }
 </script>
