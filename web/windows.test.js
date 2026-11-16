@@ -48,6 +48,27 @@ test("opens a target inside the current iframe", async () => {
     ]);
 });
 
+for (const currentPath of ["builder/", "coder/", "runner/"]) {
+    test(`resolves views from the app root when on ${currentPath}`, async () => {
+        const calls = [];
+        const windowObject = {
+            location: { assign: (url) => calls.push(url.href) },
+        };
+        windowObject.self = windowObject;
+        windowObject.top = {};
+        const windows = createWindows(windowObject, {
+            baseURI: `https://example.com/proxy/5000/${currentPath}?old=1`
+        });
+
+        await windows.new("builder/");
+        await windows.new("coder/");
+        assert.deepEqual(calls, [
+            "https://example.com/proxy/5000/builder/",
+            "https://example.com/proxy/5000/coder/"
+        ]);
+    });
+}
+
 test("emits data using the Electron listener signature", () => {
     const windows = createWindows();
     const received = [];
