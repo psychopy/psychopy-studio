@@ -5,6 +5,7 @@
     import { getContext } from "svelte";
     import Dialog from "$lib/ui/dialog/Dialog.svelte";
     import { DialogButton } from "$lib/ui/dialog";
+    import { Icon } from "$lib/ui/icon";
     import { ChooseSurvey, getSurveys } from "$lib/pavlovia/surveys"
     import { translate } from "$lib/translation";
 
@@ -47,7 +48,16 @@
         {:then surveys}
             {#each surveys.surveys.filter(survey => survey.surveyId === param.val) as survey}
                 <div class=survey-name>
-                    <h4>{survey.surveyName}</h4>
+                    <h4>
+                        {survey.surveyName}
+                    </h4>
+                    <div class=status>
+                        <Icon 
+                            src="/icons/sym-dot-{survey.status === "RUNNING" ? "green" : survey.status === "PILOTING" ? "orange" : "light"}.svg"
+                            size=.8rem
+                        />
+                        <code>{survey.status}</code>
+                    </div>
                     <span>
                         <a href="https://gitlab.pavlovia.org/{survey.creatorUsername}">
                             {survey.creatorName}
@@ -103,6 +113,8 @@
     }
 
     .survey-name {
+        display: grid;
+        grid-template-columns: 1fr min-content;
         border: 1px solid var(--overlay);
         border-radius: .5rem;
         grid-column-start: start;
@@ -111,6 +123,14 @@
     }
     .survey-name h4 {
         margin-top: 0;
+    }
+
+    .status {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: .5rem;
     }
 
 </style>
