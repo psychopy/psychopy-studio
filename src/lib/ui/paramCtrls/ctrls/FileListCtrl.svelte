@@ -131,7 +131,7 @@
 
 <div 
     class=list-ctrl-layout
-    {@attach element => param.registerValidator("fileList", (param, valid) => validateFileList(param, valid, items), -5)}
+    {@attach element => param.registerValidator("fileList", (param, valid) => validateFileList(param, valid, current.experiment.file?.parent, items), -5)}
     {...attachments}
 >
     <select 

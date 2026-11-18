@@ -11,6 +11,7 @@ import { profiles } from "$lib/experiment";
 import Namespace from "$lib/experiment/namespace.json";
 import { prefs } from "$lib/preferences.svelte";
 import { notes } from "./utils.svelte.js";
+import path from "path-browserify";
 
 
 /**
@@ -98,14 +99,38 @@ export function validateVersion(param, valid) {
 }
 
 
-export function validateFile(param, valid) {
+export function validateFile(param, valid, expDir) {
     // check file extension
-    if (this.allowedVals) {
+    if (param.allowedVals) {
         if (!param.allowedVals.some(
-            val => String(this.val).endsWith(val)
+            val => String(param.val).endsWith(val)
         )) {
             valid.value = false
-            valid.warning = `Did not match allowed filetypes: ${this.allowedVals}`
+            valid.warning = `Did not match allowed filetypes: ${param.allowedVals}`
+        }
+    }
+    // warn if there's no experiment dir
+    if (!expDir) {
+        valid.warning = translate(
+            "Experiment is not yet saved, so paths will be absolute and may not be found when the experiment is run elsewhere (e.g. online)."
+        )
+    }
+    // warn if file is outside of experiment path
+    if (param.val && !param.val.isCode && expDir) {
+        // handle Windows-style separators
+        let file = String(param.val).replaceAll("\\", "/")
+        let folder = String(expDir).replaceAll("\\", "/")
+        // resolve relative paths against the experiment folder
+        if (!(path.isAbsolute(file) || /^[a-zA-Z]:\//.test(file))) {
+            file = path.join(folder, file)
+        }
+        // get path relative to experiment folder
+        let rel = path.relative(folder, file)
+        // if it goes up a level (or is on another drive), it's outside
+        if (rel === ".." || rel.startsWith("../") || path.isAbsolute(rel)) {
+            valid.warning = translate(
+                "File {} is outside of the experiment folder, so may not be found when the experiment is run elsewhere (e.g. online)."
+            ).replace("{}", param.val)
         }
     }
     // todo: Check if file exists
@@ -177,7 +202,7 @@ export function validateName(param, valid, current) {
 
 
 export function validateMultiText(param, valid) {
-    if (this.isCode) {
+    if (param.isCode) {
         valid.value = true
         valid.warning = undefined
     }
@@ -211,15 +236,11 @@ export function validateSurvey(param, valid) {}
 /**
  * @param items Param objects for each item in the list
  */
-export function validateFileList(param, valid, items) {
+export function validateFileList(param, valid, expDir, items) {
     // combine valid on all child items
-    valid.value = items.every(
-        item => item.valid.value
-    )
-    // combine warnings from child items
-    valid.warning = items.map(
-        item => item.valid.warning
-    ).join("\n")
+    for (let item of items) {
+        validateFile(item, valid, expDir)
+    }
 }
 
 

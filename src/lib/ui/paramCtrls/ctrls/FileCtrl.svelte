@@ -37,7 +37,7 @@
     bind:param={param} 
     bind:valid={valid}
     disabled={disabled}
-    {@attach element => param.registerValidator("file", validateFile, 5)}
+    {@attach element => param.registerValidator("file", (param, valid) => validateFile(param, valid, current.experiment.file?.parent), 5)}
     {...attachments}
 />
 <Button
