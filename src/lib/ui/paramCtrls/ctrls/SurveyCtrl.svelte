@@ -34,7 +34,7 @@
 
     <Button
         icon="/icons/btn-find.svg"
-        tooltip={translate("Browse your projects on Pavlovia")}
+        tooltip={translate("Search your surveys on Pavlovia")}
         onclick={(evt) => showSurveysDlg = true}
         disabled={disabled || current.user === undefined}
 
