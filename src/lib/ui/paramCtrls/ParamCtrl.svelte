@@ -156,6 +156,7 @@
         </div>
         <div 
             class=warning
+            style:color={param.valid.value ? "var(--orange)" : "var(--red)"}
         >
             {#if param.valid.warning}
                 {@html marked( param.valid.warning || "")}
@@ -198,7 +199,6 @@
     }
 
     .warning {
-        color: var(--red);
         grid-row-start: warning;
         grid-column-start: label;
         grid-column-end: end;

@@ -101,12 +101,14 @@ export function validateVersion(param, valid) {
 
 export function validateFile(param, valid, expDir) {
     // check file extension
-    if (param.allowedVals) {
+    if (param.allowedVals?.length) {
         if (!param.allowedVals.some(
             val => String(param.val).endsWith(val)
         )) {
             valid.value = false
-            valid.warning = `Did not match allowed filetypes: ${param.allowedVals}`
+            valid.warning = translate(
+                "Did not match allowed filetypes: {}"
+            ).replaceAll("{}", param.allowedVals)
         }
     }
     // warn if there's no experiment dir
@@ -128,6 +130,9 @@ export function validateFile(param, valid, expDir) {
         let rel = path.relative(folder, file)
         // if it goes up a level (or is on another drive), it's outside
         if (rel === ".." || rel.startsWith("../") || path.isAbsolute(rel)) {
+            // store warned about file path
+            valid.data.externalFile = param.val
+            // issue warning
             valid.warning = translate(
                 "File {} is outside of the experiment folder, so may not be found when the experiment is run elsewhere (e.g. online)."
             ).replace("{}", param.val)
@@ -237,9 +242,21 @@ export function validateSurvey(param, valid) {}
  * @param items Param objects for each item in the list
  */
 export function validateFileList(param, valid, expDir, items) {
-    // combine valid on all child items
-    for (let item of items) {
-        validateFile(item, valid, expDir)
+    // combine child item validation
+    valid.value = items.every(item => item.valid.value)
+    // if we have an experiment directory...
+    if (expDir) {
+        // ...warn if any files fall outside of it
+        if (items.some(item => item.valid.data.externalFile)) {
+            valid.warning = translate(
+                "Some files (highlighted) are outside of the experiment folder, so may not be found when the experiment is run elsewhere (e.g. online)."
+            )
+        }
+    } else {
+        // ...otherwise, warn that experiment is unsaved
+        valid.warning = translate(
+            "Experiment is not yet saved, so paths will be absolute and may not be found when the experiment is run elsewhere (e.g. online)."
+        )
     }
 }
 

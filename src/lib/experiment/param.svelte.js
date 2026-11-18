@@ -31,6 +31,7 @@ export class Param {
         // start off true with no warning
         let output = {
             value: true,
+            data: {},
             warning: undefined
         };
         // iterate through validators
