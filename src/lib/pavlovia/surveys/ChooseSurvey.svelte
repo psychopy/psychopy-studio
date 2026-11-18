@@ -29,7 +29,7 @@
             )}
         {:then resp}
             {#each resp.surveys.filter(
-                survey => survey.surveyName.includes(searchTerm || "")
+                survey => survey.surveyName.toLowerCase().includes(searchTerm?.toLowerCase() || "")
             ) as survey}
                 <RadioButton 
                     bind:selection={selection}
