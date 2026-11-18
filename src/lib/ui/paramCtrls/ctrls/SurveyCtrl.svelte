@@ -131,6 +131,7 @@
         flex-wrap: nowrap;
         align-items: center;
         gap: .5rem;
+        align-self: start;
     }
 
 </style>
