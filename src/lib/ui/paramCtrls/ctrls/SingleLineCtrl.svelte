@@ -1,4 +1,5 @@
 <script>
+    import { validateText } from "./validators.svelte.js";
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
         param=$bindable(),
@@ -9,13 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateText(param, valid) {
-        if (param.isCode) {
-            valid.value = true
-            valid.warning = undefined
-        }
-    }
 </script>
 
 {#if codeIndicator}

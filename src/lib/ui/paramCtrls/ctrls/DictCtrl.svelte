@@ -1,4 +1,5 @@
 <script>
+    import { validateDict } from "./validators.svelte.js";
     import { translate } from "$lib/translation";
     import { Button } from "$lib/ui/button";
     import { iterateName } from "./utils.svelte.js";
@@ -12,44 +13,6 @@
         ...attachments
     } = $props()
 
-    function validateDict(param, valid) {
-        // skip if param.val is still as a string
-        if (typeof param.val === "string") {
-            return
-        }
-        // create array of validation objects for each entry
-        let validation = []
-        // iterate through keys and values
-        for (let [key, val] of Object.entries(param.val)) {
-            // create validation object for key and value
-            let valid = {
-                key: {
-                    value: true,
-                    warning: undefined
-                },
-                value: {
-                    value: true,
-                    warning: undefined
-                }
-            }
-            // if key is duplicate, mark invalid
-            if (Object.keys(param.val).filter(item => item === key).length > 1) {
-                valid.key.value = false
-                valid.key.warning = translate("Duplicate field name: {}").replace("{}", key)
-            }
-            // append validation object
-            validation.push(valid)
-        }
-        // combine valid on all child items
-        valid.value = validation.every(
-            valid => valid.key.value && valid.value.value
-        ) 
-        // combine warnings from child items
-        valid.warning = validation.flatMap(
-            valid => [valid.key.warning, valid.value.warning]
-        ).join("\n")
-    }
-    
     // make sure param val is always an object rather than a string
     $effect(() => {
         if (typeof param.val === "string") {

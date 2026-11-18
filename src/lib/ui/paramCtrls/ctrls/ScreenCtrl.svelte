@@ -1,4 +1,5 @@
 <script>
+    import { validateScreen } from "./validators.svelte.js";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
     import { python } from "$lib/globals.svelte";
@@ -24,21 +25,12 @@
         resp => numScreens = resp
     )
 
-
-    async function validateScreen(param, valid) {
-        // check that screen number is within number of screens on this system
-        if (parseInt(param.val) > numScreens) {
-            valid.warning = translate(
-                "Could only detect {numScreens} screen(s), so will display on screen {target}"
-            ).replaceAll("{numScreens}", numScreens).replaceAll("{target}", parseInt(param.val) % numScreens + 1)
-        }
-    }
 </script>
 
 <SingleLineCtrl
     bind:param={param}
     disabled={disabled}
-    {@attach element => param.registerValidator("screen", validateScreen, 5)}
+    {@attach element => param.registerValidator("screen", (param, valid) => validateScreen(param, valid, numScreens), 5)}
     {...attachments}
 />
 

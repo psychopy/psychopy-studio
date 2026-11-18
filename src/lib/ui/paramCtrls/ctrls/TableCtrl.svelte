@@ -1,4 +1,5 @@
 <script>
+    import { validateTable } from "./validators.svelte.js";
     import { getContext } from "svelte";
     import { Button } from "$lib/ui/button";
     import FileCtrl from "./FileCtrl.svelte";
@@ -18,8 +19,6 @@
     let current = getContext("current")
 
     let showPrompt = $state.raw(false)
-
-    function validateTable(param, valid) {}
 
     function openTable() {
         electron.files.openPath(current.experiment.relativePath(param.val))

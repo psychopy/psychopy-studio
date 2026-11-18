@@ -1,4 +1,5 @@
 <script>
+    import { validateFont } from "./validators.svelte.js";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { python } from "$lib/globals.svelte";
     import path from "path-browserify";
@@ -41,28 +42,12 @@
 
         return found
     })
-
-    function validateFont(param, valid) {
-        // allow no font
-        if (!param.val) {
-            return
-        }
-        // vary the warning according to whether we're on local
-        if (!installed) {
-            if (python?.ready) {
-                valid.warning = `Font '${param.val}' is not installed. Try installing it via the Font Manager.`
-            } else {
-                valid.warning = `Font '${param.val}' is not web safe.`
-            }
-        }
-        
-    }
 </script>
 
 <SingleLineCtrl
     bind:param={param}
     disabled={disabled}
-    {@attach element => param.registerValidator("font", validateFont, 5)}
+    {@attach element => param.registerValidator("font", (param, valid) => validateFont(param, valid, installed), 5)}
     {...attachments}
 />
 {#if python?.ready}

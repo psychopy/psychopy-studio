@@ -1,4 +1,5 @@
 <script>
+    import { validateColor } from "./validators.svelte.js";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
     import { ColorPickerDialog } from "$lib/dialogs/colorPicker";
@@ -16,10 +17,6 @@
     let show = $state({
         dialog: false
     })
-
-    function validateColor(param, valid) {
-
-    }
 
 </script>
 

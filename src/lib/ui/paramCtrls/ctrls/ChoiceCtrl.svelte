@@ -1,4 +1,5 @@
 <script>
+    import { validateChoice } from "./validators.svelte.js";
     import { translate } from "$lib/translation";
     import { optionsFromParam } from "./utils.svelte.js";
 
@@ -18,21 +19,6 @@
             }
         }
     })
-
-    function validateChoice(param, valid) {
-        // skip if no allowed vals
-        if (!Array.isArray(param.allowedVals)) {
-            return
-        }
-        // stringify allowed values for comparison
-        let allowedVals = param.allowedVals.map(
-            val => String(val)
-        )
-        // if not allowed, issue warning
-        if (!allowedVals.includes(String(param.val))) {
-            valid.warning = `${param.val} not in list of allowed values`
-        }
-    }
 </script>
 
 

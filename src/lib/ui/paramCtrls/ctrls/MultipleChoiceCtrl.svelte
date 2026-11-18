@@ -1,4 +1,5 @@
 <script>
+    import { validateMultiChoice } from "./validators.svelte.js";
     import { optionsFromParam } from "./utils.svelte.js";
     import { translate } from "$lib/translation";
 
@@ -9,10 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateMultiChoice(param, valid) {
-        valid.value = !Array.isArray(param.allowedVals) || !Array.isArray(param.val) || param.val.every((val) => param.allowedVals.includes(val))
-    }
 </script>
 
 <div

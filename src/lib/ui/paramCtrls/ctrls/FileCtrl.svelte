@@ -1,4 +1,5 @@
 <script>
+    import { validateFile } from "./validators.svelte.js";
     import { translate } from "$lib/translation";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
@@ -19,19 +20,6 @@
 
     let current = getContext("current");
 
-    function validateFile(param, valid) {
-        // check file extension
-        if (this.allowedVals) {
-            if (!param.allowedVals.some(
-                val => String(this.val).endsWith(val)
-            )) {
-                valid.value = false
-                valid.warning = `Did not match allowed filetypes: ${this.allowedVals}`
-            }
-        }
-        // todo: Check if file exists
-    }
-
     async function getFile(evt) {
         // do we have mime types from the param?
         let types = mimeTypesFromParam(param)
@@ -49,7 +37,7 @@
     bind:param={param} 
     bind:valid={valid}
     disabled={disabled}
-    {@attach element => param.registerValidator("file", validateFile, 5)}
+    {@attach element => param.registerValidator("file", (param, valid) => validateFile(param, valid, current.experiment.file?.parent), 5)}
     {...attachments}
 />
 <Button

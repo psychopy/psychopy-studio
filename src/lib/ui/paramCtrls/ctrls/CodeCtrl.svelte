@@ -1,4 +1,5 @@
 <script>
+    import { validateCode } from "./validators.svelte.js";
     import { CodeEditor } from "$lib/ui/code";
 
     let {
@@ -9,10 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateCode(param, valid) {
-        return
-    }
 
     let language = $derived(
         param.allowedVals ? param.allowedVals : "python"

@@ -1,4 +1,5 @@
 <script>
+    import { validateRichChoice } from "./validators.svelte.js";
     import { optionsFromParam } from "./utils.svelte.js";
     import { translate } from "$lib/translation";
 
@@ -9,8 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateRichChoice(param, valid) {}
 </script>
 
 <div 

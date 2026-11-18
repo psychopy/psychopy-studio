@@ -1,9 +1,9 @@
 <script>
+    import { validateDevice } from "./validators.svelte.js";
     import { devices, python } from "$lib/globals.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager"
     import { Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
-    import { profiles } from "$lib/experiment";
 
     let {
         param=$bindable(),
@@ -12,39 +12,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateDevice(param, valid) {
-        if (options.length) {
-            valid.value = options.includes(param.val) || param.val === ""
-        } else {
-            valid.value = true
-            // get allowed device types
-            let deviceTypes = []
-            for (let target of param.allowedVals) {
-                deviceTypes.push(
-                    ...Object.values(profiles.devices.value).filter(
-                        profile => target.endsWith(profile.__class__)
-                    ).map(
-                        profile => profile.label || profile.__name__
-                    )
-                )
-            }
-            // construct string from allowed device types
-            if (deviceTypes.length == 0) {
-                valid.warning = translate(
-                    "No relevant devices added, use device manager to add devices."
-                )
-            } else if (deviceTypes.length == 1) {
-                valid.warning = translate(
-                    "No {} devices added, use device manager to add {} devices.\n"
-                ).replaceAll("{}", deviceTypes[0])
-            } else {
-                valid.warning = translate(
-                    "No relevant devices added, use device manager to add devices.\n\nRelevant devices are: "
-                ) + deviceTypes.join(", ")
-            }
-        }
-    }
 
     let options = $derived.by(() => {
         let output = [];
@@ -77,7 +44,7 @@
     bind:value={param.val}
     style:color={param.valid.value ? "inherit" : "var(--red)"}
     aria-label={param.label}
-    {@attach element => param.registerValidator("device", validateDevice, 0)}
+    {@attach element => param.registerValidator("device", (param, valid) => validateDevice(param, valid, options), 0)}
     {...attachments}
 >
     <option

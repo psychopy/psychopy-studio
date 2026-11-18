@@ -1,4 +1,5 @@
 <script>
+    import { validateSurvey } from "./validators.svelte.js";
     import SingleLineCtrl from "./SingleLineCtrl.svelte"
     import { Button, RadioButton } from "$lib/ui/button"
     import { getContext } from "svelte";
@@ -17,8 +18,6 @@
     } = $props()
 
     let current = getContext("current")
-
-    function validateSurvey(param, valid) {}
 
     let showSurveysDlg = $state.raw();
 

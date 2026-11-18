@@ -1,4 +1,5 @@
 <script>
+    import { validateFile, validateFileList } from "./validators.svelte.js";
     import { Param } from "$lib/experiment";
     import { Button } from "$lib/ui/button";
     import { MenuItem } from "$lib/ui/menu";
@@ -46,7 +47,8 @@
         // make a param for each entry
         for (let [i, val] of Object.entries(param.val)) {
             let item = new Param(`${param.name}:${i}`)
-            item.val = val;
+            Object.assign(item, param)
+            item.val = val
             item.valType = "str"
             items.push(item)
             $effect(() => {
@@ -126,22 +128,11 @@
         }
     }
 
-    function validateFileList(param, valid) {
-        // combine valid on all child items
-        valid.value = items.every(
-            item => item.valid.value
-        )
-        // combine warnings from child items
-        valid.warning = items.map(
-            item => item.valid.warning
-        ).join("\n")
-    }
-
 </script>
 
 <div 
     class=list-ctrl-layout
-    {@attach element => param.registerValidator("fileList", validateFileList, -5)}
+    {@attach element => param.registerValidator("fileList", (param, valid) => validateFileList(param, valid, current.experiment.file?.parent, items), -5)}
     {...attachments}
 >
     <select 
@@ -178,8 +169,10 @@
             <option 
                 value={i}
                 ondblclick={evt => editing = i}
-                class:valid={item.valid.value} 
+                class:valid={item.valid.value}
+                class:warning={item.valid.warning}
                 class:code={item.isCode}
+                {@attach element => item.registerValidator("file", (param, valid) => validateFile(param, valid, current.experiment.file?.parent), 5)}
             >
                 {item.val}
             </option>
@@ -292,7 +285,12 @@
     }
 
     option:not(.valid) {
+        font-weight: bold;
         color: var(--red);
+    }
+    option.warning {
+        font-weight: bold;
+        color: var(--orange);
     }
     option.code {
         font-family: var(--mono);

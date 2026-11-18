@@ -1,5 +1,5 @@
 <script>
-    import { prefs } from "$lib/preferences.svelte";
+    import { validateKeypress } from "./validators.svelte.js";
     import { Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
 
@@ -22,31 +22,6 @@
             handle.focus();
         }
     })
-
-    function validateKeypress(param, valid) {
-        // if binding is blank, it's invalid
-        if (!param.val.length) {
-            valid.value = false
-            valid.warning = translate("No binding set")
-        }
-        // iterate through existing key bindings
-        for (let [name, prefParam] of Object.entries(prefs.shortcuts)) {
-            // ignore the current binding (it will always match itself, duh)
-            if (name === param.name) {
-                continue
-            }
-            // if this keybinding matches on already in use, it's invalid
-            if (prefParam.val.length && prefParam.val.every(val => param.val.includes(val.toUpperCase())) && param.val.every(val => prefParam.val.includes(val.toUpperCase()))) {
-                valid.value = false
-                valid.warning = translate(
-                    `Keybinding '{1}' for {2} is already in use by '{3}'`
-                )
-                .replace("{1}", param.val.join("+"))
-                .replace("{2}", param.name)
-                .replace("{3}", prefParam.label)
-            }
-        }
-    }
 </script>
 
 <div 

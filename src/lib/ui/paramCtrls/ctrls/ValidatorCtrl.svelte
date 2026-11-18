@@ -1,4 +1,5 @@
 <script>
+    import { validateValidator } from "./validators.svelte.js";
     import { getContext } from "svelte";
     import { translate } from "$lib/translation";
 
@@ -9,17 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateValidator(param, valid) {
-        if (options.length) {
-            valid.value = options.includes(param.val) || param.val === ""
-        } else {
-            valid.value = true
-            valid.warning = translate(
-                "No validators added, add one via the Validation section of the Components panel."
-            )
-        }
-    }
 
     let current = getContext("current")
 
@@ -44,7 +34,7 @@
     style:color={param.valid.value ? "inherit" : "var(--red)"}
     id={param.name}
     aria-label={param.label}
-    {@attach element => param.registerValidator("validator", validateValidator, 0)}
+    {@attach element => param.registerValidator("validator", (param, valid) => validateValidator(param, valid, options), 0)}
     {...attachments}
 >
     <option

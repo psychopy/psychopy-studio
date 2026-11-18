@@ -1,4 +1,5 @@
 <script>
+    import { validateVersion } from "./validators.svelte.js";
     import semver from "semver";
     import { translate } from "$lib/translation";
 
@@ -10,10 +11,6 @@
         ...attachments
     } = $props()
 
-    function validateVersion(param, valid) {
-        valid.value = true
-    }
-    
     // construct options live from the param's allowedVals and allowedLabels attributes
     let options = $derived.by(async () => {
         // use allowedVals to get versions from GitHub
