@@ -1,4 +1,5 @@
 <script>
+    import { validateConditions } from "./validators.svelte.js";
     import TableCtrl from "./TableCtrl.svelte";
     import { python } from "$lib/globals.svelte";
     import { current } from "../../../../routes/builder/globals.svelte";
@@ -15,10 +16,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateConditions(param, valid) {
-        return
-    }
 
 </script>
 

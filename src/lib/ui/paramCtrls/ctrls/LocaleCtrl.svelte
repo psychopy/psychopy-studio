@@ -1,4 +1,5 @@
 <script>
+    import { validateLocale } from "./validators.svelte.js";
     import { locales, getLocale, setLocale, translate } from "$lib/translation";
     import { getByTag } from "locale-codes";
 
@@ -9,10 +10,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateLocale(param, valid) {
-        valid.value = locales.includes(param.val) || param.val === "system locale"
-    }
 </script>
 
 

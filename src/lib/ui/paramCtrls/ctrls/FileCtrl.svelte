@@ -1,4 +1,5 @@
 <script>
+    import { validateFile } from "./validators.svelte.js";
     import { translate } from "$lib/translation";
     import SingleLineCtrl from "./SingleLineCtrl.svelte";
     import { Button } from "$lib/ui/button";
@@ -18,19 +19,6 @@
     } = $props()
 
     let current = getContext("current");
-
-    function validateFile(param, valid) {
-        // check file extension
-        if (this.allowedVals) {
-            if (!param.allowedVals.some(
-                val => String(this.val).endsWith(val)
-            )) {
-                valid.value = false
-                valid.warning = `Did not match allowed filetypes: ${this.allowedVals}`
-            }
-        }
-        // todo: Check if file exists
-    }
 
     async function getFile(evt) {
         // do we have mime types from the param?

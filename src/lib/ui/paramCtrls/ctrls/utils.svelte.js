@@ -4,6 +4,25 @@ import { translate} from "$lib/translation"
 
 
 /**
+ * Names of musical notes (including sharp/flat variants) which are valid values for a sound param
+ */
+export const notes = [
+    "C",
+    "Csh", "C#", "Dfl", "D♭",
+    "D",
+    "Dsh", "D#", "Efl", "E♭",
+    "E",
+    "F",
+    "Fsh", "F#", "Gfl", "G♭",
+    "G",
+    "Gsh", "G#", "Afl", "A♭",
+    "A",
+    "Ash", "A#", "Bfl", "B♭",
+    "B"
+]
+
+
+/**
  * Iterate a name by +1 (e.g. "field_1" becomes "field_2")
  * 
  * @param name Name to be iterated

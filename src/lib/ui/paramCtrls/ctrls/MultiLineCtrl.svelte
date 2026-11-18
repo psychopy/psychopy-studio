@@ -1,4 +1,5 @@
 <script>
+    import { validateMultiText } from "./validators.svelte.js";
     import { Button } from "$lib/ui/button";
     import { translate } from "$lib/translation";
 
@@ -12,13 +13,6 @@
         /** @interface */
         ...attachments
     } = $props()
-
-    function validateMultiText(param, valid) {
-        if (this.isCode) {
-            valid.value = true
-            valid.warning = undefined
-        }
-    }
 
     let selection = $state({
         start: undefined,

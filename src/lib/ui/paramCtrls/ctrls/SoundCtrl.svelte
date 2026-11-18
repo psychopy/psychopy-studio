@@ -1,20 +1,6 @@
 <script>
+    import { validateSound } from "./validators.svelte.js";
     import FileCtrl from "./FileCtrl.svelte";
-
-    let notes = [
-        "C", 
-        "Csh", "C#", "Dfl", "D♭", 
-        "D", 
-        "Dsh", "D#", "Efl", "E♭", 
-        "E",
-        "F", 
-        "Fsh", "F#", "Gfl", "G♭", 
-        "G", 
-        "Gsh", "G#", "Afl", "A♭", 
-        "A", 
-        "Ash", "A#", "Bfl", "B♭", 
-        "B"
-    ]
 
     let {
         /** @prop @type {import("$lib/experiment").Param} Param object to which this ctrl pertains */
@@ -27,14 +13,6 @@
         ...attachments
     } = $props()
     
-
-    function validateSound(param, valid) {
-        // allow musical notes
-        if (notes.includes(param.val)) {
-            valid.value = true
-            valid.warning = undefined
-        }
-    }
 </script>
 
 <FileCtrl 
