@@ -30,6 +30,12 @@
         caseSensitive: false
     })
 
+    // how many characters should surround each result?
+    let contextLength = {
+        surround: 32,
+        elipsis: 8
+    }
+
 </script>
 
 <Dialog
@@ -38,6 +44,7 @@
     onopen={(evt) => searchTerm = ""}
     bind:shown={shown}
     buttons={["OK"]}
+    width=65rem
 >
     <div class=container>  
         <SearchCtrl 
@@ -122,7 +129,9 @@
                         {result.breadcrumbs.param.name}
                     {/if}
                 </div>
-                <div class=item-content>{result.text.before}<b>{result.text.text}</b>{result.text.after}</div>
+                <pre class=item-content>
+<span class=elipsis-before>{result.text.before.slice(-contextLength.surround-contextLength.elipsis, -contextLength.surround)}</span>{result.text.before.slice(-contextLength.surround)}<b>{result.text.text}</b>{result.text.after.slice(0, contextLength.surround)}<span class=elipsis-after>{result.text.after.slice(contextLength.surround, contextLength.surround+contextLength.elipsis)}</span>
+                </pre>
             </div>
             {/each}
         </div>
@@ -184,5 +193,16 @@
     }
     .result-item .item-content b {
         font-family: var(--mono);
+    }
+
+    .elipsis-before {
+        background: linear-gradient(-90deg, var(--text-on-base), transparent);
+        background-clip: text;
+        color: transparent;
+    }
+    .elipsis-after {
+        background: linear-gradient(90deg, var(--text-on-base), transparent);
+        background-clip: text;
+        color: transparent;
     }
 </style>
