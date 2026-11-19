@@ -40,7 +40,18 @@
         "End Experiment": "End JS Experiment"
     }
     // keep track of which categories should be highlighted (for Code Component)
-    let highlightCategs = $state({})
+    let highlightCategs = $derived(Object.fromEntries(
+        Object.entries(element.sortedParams).map(([categ, params]) => [
+            categ,
+            Object.keys(params)
+                .filter(name => name in translatableParams)
+                .some(name => [
+                    element.params[name]?.val,
+                    element.params[translatableParams[name]]?.val
+                ].some(val => val !== undefined && val !== ""))
+        ])
+    ))
+
 </script>
 
 <div 
@@ -102,7 +113,6 @@
                                         bind:codeTypeParam={element.params["Code Type"]}
                                         bind:pyParam={element.params[name]}
                                         bind:jsParam={element.params[translatableParams[name]]}
-                                        bind:highlight={highlightCategs[categ]}
                                     />
                                 {:else if [
                                     "startVal", 
