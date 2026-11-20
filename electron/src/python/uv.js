@@ -223,10 +223,6 @@ export class UV {
         }
         // iterate through subfolders in the python folder
         for (let subfolder of fs.readdirSync(this.pyFolder)) {
-            // reinstate .* syntax
-            if (subfolder.match(/^\d+\.\d+$/)) {
-                subfolder += ".*"
-            }
             // look for an executable in this folder
             let executable = await this.findPython(subfolder)
             // skip this folder if it doesn't have one
@@ -295,10 +291,8 @@ export class UV {
     async makeExecutable(psychopyVersion=appVersion, pythonVersion="3.10") {
         // wait until folder has been specified
         await this.folderSpecified.promise
-        // strip * if present
-        if (psychopyVersion.match(/\d+\.\d+\.\*/)) {
-            psychopyVersion = psychopyVersion.match(/\d+\.\d+/)[0]
-        }
+        // resolve asterisks
+        psychopyVersion = await resolvePackageVersion(psychopyVersion, "psychopy")
         // get specific folder for this version
         let folder = path.join(
             this.pyFolder, psychopyVersion
