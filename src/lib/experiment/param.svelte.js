@@ -411,7 +411,7 @@ export class HasParams {
             this.params[name].siblings = this.params;
             // set attributes
             for (let [key, val] of Object.entries(profile)) {
-                this.params[name][key] = val;
+                this.params[name][key] = $state.snapshot(val);
             }
         }
     }
