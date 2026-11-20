@@ -21,6 +21,8 @@ export class Liaison {
         this.starting = undefined
         // token for the current start attempt, which `stop` cancels
         this.attempt = undefined
+        // interval which pings Liaison to keep the connection alive
+        this.pingpong = undefined
         this.open = Liaison.marker()
         this.ready = Liaison.marker()
         // messages awaiting a reply, by message ID
@@ -166,8 +168,9 @@ export class Liaison {
                 this.output(msg.tag, msg)
             }
         })
-        // start a ping pong to keep the connection alive
-        setInterval(
+        // start a ping pong to keep the connection alive (clearing any left over from a previous start)
+        clearInterval(this.pingpong)
+        this.pingpong = setInterval(
             () => this.send({
                 command: "ping"
             }, 30000, true).catch(
@@ -253,6 +256,9 @@ export class Liaison {
             this.attempt.cancelled = true
             this.attempt = undefined
         }
+        // stop pinging
+        clearInterval(this.pingpong)
+        this.pingpong = undefined
         // kill Python process
         if (this.process) {
             await this.process.kill()
