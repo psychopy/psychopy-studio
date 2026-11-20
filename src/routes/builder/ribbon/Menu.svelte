@@ -9,7 +9,7 @@
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { electron, python, git } from "$lib/globals.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
-    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
+    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/environmentManager";
     import { BrowseDemosDlg } from "$lib/pavlovia/demos";
     import { SearchProjectsDlg } from "$lib/pavlovia/search";
     import { projectsLoaded, openProject } from "$lib/pavlovia/utils.svelte";

@@ -4,7 +4,7 @@
     import { Menu, MenuItem, MenuSeparator, SubMenu } from '$lib/ui/menu/frameMenu';
     import PrefsDialog from '$lib/dialogs/preferences/PrefsDialog.svelte';
     import { electron, python } from "$lib/globals.svelte";
-    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
+    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/environmentManager";
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import semver from "semver";
     import Demos from "./Demos.svelte";
