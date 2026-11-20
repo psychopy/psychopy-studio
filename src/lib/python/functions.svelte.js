@@ -103,7 +103,7 @@ export async function installPython(version=undefined, forceReinstall=false) {
         // make sure we have a Version objects
         version = semver.parse(version)
         // oldest version we can do is 2022.1 as it's the first to use Python >3.8
-        if (version < "2022.1.0") {
+        if (semver.lt(version, "2022.1.0")) {
             console.warn(
                 `Version ${version.format()} of PsychoPy is not supported in PsychoPy Studio as it `
                 + `cannot run in Python >=3.8. Using the oldest compatible version (2022.1).`
@@ -115,8 +115,8 @@ export async function installPython(version=undefined, forceReinstall=false) {
         // on MacOS ARM, enforce an Intel executable for pre-2026.2 versions
         let systemInfo = await python.uv.systemInfo()
         if (
-            version < "2026.2.0"
-            && systemInfo.platform === "darwin" 
+            semver.lt(version, "2026.2.0")
+            && systemInfo.platform === "darwin"
             && systemInfo.arch === "arm64"
         ) {
             pyVersion = `cpython-${pyVersion}-macos-x86_64-none`

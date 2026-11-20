@@ -176,7 +176,9 @@ export class PythonVenv {
             } else {
                 // for released version, install from tag
                 let pkg = "psychopy"
-                if (semver.parse(this.psychopyVersion) < "2026.2.0") {
+                // compare with semver
+                let parsed = semver.coerce(this.psychopyVersion)
+                if (parsed && semver.lt(parsed, "2026.2.0")) {
                     // older versions need to use psychopy-lib rather than psychopy to avoid installing wx
                     pkg += "-lib"
                 }
