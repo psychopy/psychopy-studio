@@ -8,13 +8,7 @@
         codeTypeParam=$bindable(),
         pyParam=$bindable(),
         jsParam=$bindable(),
-        highlight=$bindable()
     } = $props()
-
-    // highlight category if we have content
-    $effect(() => highlight = [pyParam.val, jsParam.val].some(
-        val => val !== ""
-    ))
 
     // translate to JS if code type indicates as such
     $effect(() => {
