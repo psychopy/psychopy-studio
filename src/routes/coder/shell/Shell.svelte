@@ -37,7 +37,7 @@
     <CodeInput 
         bind:value={input.present}
         label={translate("Python shell input")}
-        onsubmit={evt => {
+        onsubmit={async evt => {
             // get command
             let cmd = $state.snapshot(input.present)
             // send message
@@ -48,7 +48,7 @@
             input.future = []
             input.present = ""
             // show resp
-            resp.then(
+            await resp.then(
                 resp => output.content += resp.join("\n") + "\n"
             ).catch(
                 err => console.log(err)

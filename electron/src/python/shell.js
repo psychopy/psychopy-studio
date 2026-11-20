@@ -69,7 +69,8 @@ export class PythonShell {
     // listen for returned values
     let promise = new Promise((resolve, reject) => {
       for (let src of ["stdout", "stderr"]) {
-        this.process[src].on("data", resp => {
+        // define a listener function for this source
+        let lsnr = resp => {
           // decode
           let value = decoder.decode(resp)
           // sanitize
@@ -84,18 +85,21 @@ export class PythonShell {
           // stop listening if end of input
           if (value.includes(this.tokens[src].stop)) {
             thusfar[src] = true
-            this.process[src].removeAllListeners()
+            this.process[src].removeListener("data", lsnr)
           }
           // if done, resolve
           if (thusfar.stdout && thusfar.stderr) {
             resolve(thusfar.message)
           }
-        })
+        }
+        // start listening
+        this.process[src].on("data", lsnr)
+        // stop listening on timeout
+        setTimeout(evt => {
+          resolve(thusfar.message)
+          this.process[src].removeListener("data", lsnr)
+        }, timeout)
       }
-
-      setTimeout(evt => {
-        resolve(thusfar.message)
-      }, timeout)
     })
     // store message for return
     for (let line of msg.split("\n").filter(line => line.length > 0)) {
