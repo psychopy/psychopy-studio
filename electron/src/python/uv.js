@@ -161,11 +161,10 @@ export class UV {
                 })
             }
         }
-        // map installers to system architectures
+        // map installers to system architectures 
         let installers = {
             win32: {
                 x64: "uv-x86_64-pc-windows-msvc.zip",
-                x86: "uv-i686-pc-windows-msvc.zip",
                 arm64: "uv-aarch64-pc-windows-msvc.zip",
             },
             darwin: {
@@ -174,13 +173,7 @@ export class UV {
             },
             linux: {
                 x64: "uv-x86_64-unknown-linux-gnu.tar.gz",
-                x86: "uv-i686-unknown-linux-gnu.tar.gz",
-                arm: "uv-armv7-unknown-linux-gnueabihf.tar.gz",
                 arm64: "uv-aarch64-unknown-linux-gnu.tar.gz",
-                ppc: "uv-powerpc64-unknown-linux-gnu.tar.gz",
-                s390x: "uv-s390x-unknown-linux-gnu.tar.gz",
-                ppc64: "uv-powerpc64le-unknown-linux-gnu.tar.gz",
-                ricsv: "uv-riscv64gc-unknown-linux-gnu.tar.gz",
             }
         }
         // Linux requires some further distinctions
@@ -189,17 +182,20 @@ export class UV {
             if (!process.report.getReport().header?.glibcVersionRuntime) {
                 installers.linux = {
                     x64: "uv-x86_64-unknown-linux-musl.tar.gz",
-                    x86: "uv-i686-unknown-linux-musl.tar.gz",
-                    arm: "uv-armv7-unknown-linux-musleabihf.tar.gz",
                     arm64: "uv-aarch64-unknown-linux-musl.tar.gz",
                 }
             }
         }
-        // get relevant executable 
+        // get relevant executable
+        let installer = installers[platform]?.[arch]
+        // error if there isn't one
+        if (!installer) {
+            throw new Error(`UV is not available for this system (${platform}, ${arch})`)
+        }
         this.output(`Downloading UV for ${platform} (${arch})...`)
         try {
             await downloadFolder(
-                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installers[platform][arch]}`,
+                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installer}`,
                 path.dirname(this.uvFolder),
                 path.basename(this.uvFolder),
                 true
