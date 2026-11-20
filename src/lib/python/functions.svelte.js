@@ -61,8 +61,18 @@ export async function installUV(forceReinstall=false) {
     )
     status.dlg.shown = true
     status.dlg.busy = true
+    // is there already a UV (i.e. is this an update rather than a fresh install)?
+    let hadUV = await python.uv.exists().catch(() => false)
     // do install
-    await python.uv.install().catch(handleError)
+    await python.uv.install().catch(err => {
+        if (hadUV) {
+            // a failed update isn't fatal, as the existing UV still works - so just warn
+            console.warn("Failed to update UV, continuing with the installed version.", err)
+        } else {
+            // a failed fresh install is fatal
+            handleError(err)
+        }
+    })
     status.dlg.busy = false
     // make sure install worked
     let hasUV = await python.uv.exists().catch(handleError)
@@ -93,7 +103,7 @@ export async function installPython(version=undefined, forceReinstall=false) {
         // make sure we have a Version objects
         version = semver.parse(version)
         // oldest version we can do is 2022.1 as it's the first to use Python >3.8
-        if (version < "2022.1.0") {
+        if (semver.lt(version, "2022.1.0")) {
             console.warn(
                 `Version ${version.format()} of PsychoPy is not supported in PsychoPy Studio as it `
                 + `cannot run in Python >=3.8. Using the oldest compatible version (2022.1).`
@@ -105,8 +115,8 @@ export async function installPython(version=undefined, forceReinstall=false) {
         // on MacOS ARM, enforce an Intel executable for pre-2026.2 versions
         let systemInfo = await python.uv.systemInfo()
         if (
-            version < "2026.2.0"
-            && systemInfo.platform === "darwin" 
+            semver.lt(version, "2026.2.0")
+            && systemInfo.platform === "darwin"
             && systemInfo.arch === "arm64"
         ) {
             pyVersion = `cpython-${pyVersion}-macos-x86_64-none`

@@ -56,7 +56,7 @@ export const handlers = {
 
             return shell.id
         }),
-        close: ipcMain.handle("python.shell.close", async (evt, venv, id) => (await getVenv(venv)).shells[id].close())
+        close: ipcMain.handle("python.shell.close", async (evt, venv, id) => (await getVenv(venv)).shells[id].stop())
     },
     scripts: {
         run: ipcMain.handle("python.scripts.run", async (evt, venv, file, ...args) => {
@@ -67,7 +67,7 @@ export const handlers = {
         stop: ipcMain.handle("python.scripts.stop", async (evt, venv, id) => (await getVenv(venv)).scripts[id]?.stop())
     },
     psychojs: {
-        run: ipcMain.handle("python.psychojs.run", async (evt, cwd, params={}) => await PsychoJSServer.run(cwd, params)),
+        run: ipcMain.handle("python.psychojs.run", async (evt, cwd, params={}, width, height, fullscreen) => await PsychoJSServer.run(cwd, params, width, height, fullscreen)),
         stop: ipcMain.handle("python.psychojs.stop", (evt, address) => getPsychoJSServer(address).stop()),
     }
 }

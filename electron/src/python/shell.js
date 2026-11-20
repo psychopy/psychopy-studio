@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { decoder } from "./utils.js";
+import { decoder, output } from "./utils.js";
 import logging from "../tools/logging.js";
 import proc from "child_process";
 
@@ -51,6 +51,11 @@ export class PythonShell {
     this.started.resolve()
     // map finished callback
     this.process.on("close", this.finished.resolve)
+    // handle failure to launch
+    this.process.on("error", err => {
+      logging.error(`Shell ${this.id} failed to launch: ${err.message}`)
+      output("stderr", `Python shell failed to launch: ${err.message}`)
+    })
     // import sys from start
     this.send("import sys")
   }
@@ -69,7 +74,8 @@ export class PythonShell {
     // listen for returned values
     let promise = new Promise((resolve, reject) => {
       for (let src of ["stdout", "stderr"]) {
-        this.process[src].on("data", resp => {
+        // define a listener function for this source
+        let lsnr = resp => {
           // decode
           let value = decoder.decode(resp)
           // sanitize
@@ -84,18 +90,21 @@ export class PythonShell {
           // stop listening if end of input
           if (value.includes(this.tokens[src].stop)) {
             thusfar[src] = true
-            this.process[src].removeAllListeners()
+            this.process[src].removeListener("data", lsnr)
           }
           // if done, resolve
           if (thusfar.stdout && thusfar.stderr) {
             resolve(thusfar.message)
           }
-        })
+        }
+        // start listening
+        this.process[src].on("data", lsnr)
+        // stop listening on timeout
+        setTimeout(evt => {
+          resolve(thusfar.message)
+          this.process[src].removeListener("data", lsnr)
+        }, timeout)
       }
-
-      setTimeout(evt => {
-        resolve(thusfar.message)
-      }, timeout)
     })
     // store message for return
     for (let line of msg.split("\n").filter(line => line.length > 0)) {
