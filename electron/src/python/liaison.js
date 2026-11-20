@@ -21,7 +21,8 @@ export class Liaison {
         this.starting = undefined
         this.open = Liaison.marker()
         this.ready = Liaison.marker()
-        this.pending = []
+        // messages awaiting a reply, by message ID
+        this.pending = {}
     }
 
     /**
@@ -45,10 +46,9 @@ export class Liaison {
      */
     start() {
         if (!this.starting) {
-            this.starting = this._start().catch(err => {
-                // allow a retry if starting failed
-                this.starting = undefined
-                this.started = false
+            this.starting = this._start().catch(async err => {
+                // fully tear down so we can retry clean
+                await this.stop()
                 throw err
             })
         }
@@ -118,7 +118,14 @@ export class Liaison {
         // log started
         logging.log("Liaison started")
         // listen for websocket closing
-        this.socket.onclose = evt => logging.error(`Closed websocket on ws://${this.address}`, evt.reason)
+        let socket = this.socket
+        this.socket.onclose = evt => {
+            logging.error(`Closed websocket on ws://${this.address}`, evt.reason)
+            // fail anything still waiting
+            if (this.socket === socket) {
+                this.rejectPending(`Websocket closed before Liaison replied`)
+            }
+        }
         // listen for websocket messages
         this.socket.addEventListener("message", evt => {
             // convert data to JSON
@@ -234,7 +241,21 @@ export class Liaison {
         if (this.ready.settled) {
             this.ready = Liaison.marker()
         }
-        this.pending = []
+        // fail any messages still awaiting a reply
+        this.rejectPending(`Liaison was stopped before it replied`)
+    }
+
+    /**
+     * Reject all messages which are still awaiting a reply
+     *
+     * @param {string} reason Error message to reject with
+     */
+    rejectPending(reason) {
+        for (let deferred of Object.values(this.pending)) {
+            deferred.reject({
+                error: [reason]
+            })
+        }
     }
 
     /**
@@ -254,30 +275,39 @@ export class Liaison {
             await this.ready.promise
         }
         // wait for other messages to finish (without inheriting their failures)
-        await Promise.allSettled(this.pending).catch(err => {})
+        await Promise.allSettled(
+            Object.values(this.pending).map(deferred => deferred.promise)
+        )
+        // if Liaison was stopped while we waited, there's nothing to send to
+        if (!this.socket) {
+            throw {
+                error: [`Liaison was stopped before message could be sent: ${JSON.stringify(msg, undefined, 4)}`]
+            }
+        }
+        // keep a ref to the socket we're sending on, in case it's replaced before we get a reply
+        let socket = this.socket
         // generate random ID
         let msgid = crypto.randomUUID()
         // start timer
         let startTime = performance.now()
-        // log message
-        logging.log(msg,`SENT\t${msgid}`, "liaison", false)
-        // send message with ident
-        this.socket.send(
-          JSON.stringify({
-            command: msg,
-            id: msgid
-          })
-        );
-        // create promise and store it in Liaison's array of pending
+        // create promise and store it in Liaison's object of pending messages
         let promise = Promise.withResolvers()
-        this.pending.push(promise.promise)
+        this.pending[msgid] = promise
         // setup timeout
+        let timer
         if (timeout) {
-            setTimeout(evt => promise.reject({
+            timer = setTimeout(evt => promise.reject({
                 error: [`Message timed out: ${JSON.stringify(msg, undefined, 4)}`],
                 evt: evt
             }), timeout)
         }
+        // clean up so nothing waits on this message
+        let cleanup = () => {
+            delete this.pending[msgid]
+            clearTimeout(timer)
+            socket.removeEventListener("message", lsnr)
+        }
+        promise.promise.then(cleanup, cleanup)
         // define listener to find reply then remove itself
         let lsnr = evt => {
             // parse reply
@@ -291,9 +321,7 @@ export class Liaison {
             if (data?.evt?.id !== msgid) {
                 return
             }
-            // if ID matches, store and stop listening
-            this.socket.removeEventListener("message", lsnr)
-            // resolve or reject
+            // resolve or reject (listener is removed by cleanup once settled)
             if ("response" in data) {
                 // log reply
                 logging.log(data.response, `RECEIVED\t${performance.now() - startTime}ms\t${msgid}`, "liaison", false)
@@ -307,8 +335,24 @@ export class Liaison {
             }
         }
         // listen for reply
-        this.socket.addEventListener("message", lsnr)
-        
+        socket.addEventListener("message", lsnr)
+        // log message
+        logging.log(msg,`SENT\t${msgid}`, "liaison", false)
+        // send message with ident
+        try {
+            socket.send(
+              JSON.stringify({
+                command: msg,
+                id: msgid
+              })
+            );
+        } catch (err) {
+            // if sending failed, no reply is coming
+            promise.reject({
+                error: [`Failed to send message: ${err?.message || err}`]
+            })
+        }
+
         return promise.promise
     }
 
