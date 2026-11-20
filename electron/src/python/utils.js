@@ -10,10 +10,10 @@ export const decoder = new TextDecoder();
 
 
 class ProcessError extends Error {
-    constructor(message, {code, signal, command}) {
+    constructor(message, {code, signal, command} = {}) {
         // substitute a default message
         if (message === undefined) {
-            `Python error`
+            message = "Process error"
         }
         // initialise superclass
         super(message)
