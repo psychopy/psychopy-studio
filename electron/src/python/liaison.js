@@ -19,6 +19,8 @@ export class Liaison {
         // ready markers
         this.started = false
         this.starting = undefined
+        // token for the current start attempt, which `stop` cancels
+        this.attempt = undefined
         this.open = Liaison.marker()
         this.ready = Liaison.marker()
         // messages awaiting a reply, by message ID
@@ -46,16 +48,37 @@ export class Liaison {
      */
     start() {
         if (!this.starting) {
-            this.starting = this._start().catch(async err => {
-                // fully tear down so we can retry clean
-                await this.stop()
+            let attempt = { cancelled: false }
+            this.attempt = attempt
+            this.starting = this._start(attempt).catch(async err => {
+                // fully tear down so we can retry clean (unless `stop` already has, in which case a
+                // new attempt may have begun since and we mustn't stop that one)
+                if (this.attempt === attempt) {
+                    await this.stop()
+                }
                 throw err
             })
         }
         return this.starting
     }
 
-    async _start() {
+    /**
+     * @param {{cancelled: boolean}} attempt Token for this start attempt, which `stop` will cancel
+     */
+    async _start(attempt) {
+        /**
+         * Await a step of setup, then bail out if `stop` was called in the meantime - otherwise setup
+         * would carry on against whatever socket/markers exist next, and could mark them ready too soon
+         *
+         * @param {Promise} promise Step to await
+         */
+        let checkpoint = async promise => {
+            let result = await promise
+            if (attempt.cancelled) {
+                throw new Error("Liaison was stopped while starting")
+            }
+            return result
+        }
         // mark started
         this.started = true
         // get liaison constants
@@ -72,7 +95,7 @@ export class Liaison {
                     "Launching Python was blocked by Windows Smart App Control. Recreating Python environment and trying again."
                 )
                 // recreate the environment
-                await this.venv.recreate()
+                await checkpoint(this.venv.recreate())
                 // try again (if this fails, let it error)
                 constants = this.venv.execSync([
                     "-m", "liaison.constants"
@@ -83,11 +106,11 @@ export class Liaison {
         }
         this.constants = JSON.parse(constants)
         // get a safe address
-        this.address = await getSafeAddress()
+        this.address = await checkpoint(getSafeAddress())
         // log start
         logging.log(`Starting Liaison at ${this.address}`)
         // spawn a python process
-        await new Promise((resolve, reject) => {
+        await checkpoint(new Promise((resolve, reject) => {
             this.process = this.venv.spawn(
                 [
                     "-m", "liaison.websocket", this.address
@@ -105,7 +128,7 @@ export class Liaison {
             )
             // timeout after 1s
             setTimeout(reject, 10000)
-        })
+        }))
         // create websocket connection
         this.socket = new WebSocket(`ws://${this.address}`);
         // resolve/reject on open/error
@@ -114,7 +137,7 @@ export class Liaison {
         // timeout after 1s
         setTimeout(this.open.reject, 1000)
         // wait for websocket open/error
-        await this.open.promise
+        await checkpoint(this.open.promise)
         // log started
         logging.log("Liaison started")
         // listen for websocket closing
@@ -153,67 +176,71 @@ export class Liaison {
         )
 
         // setup alerts
-        if (await this.send({
+        if (await checkpoint(this.send({
             command: "exists",
             args: ["psychopy.alerts.liaison:LiaisonAlertHandler"]
-        }, 10000, true)) {
-            await this.send({
+        }, 10000, true))) {
+            await checkpoint(this.send({
                 command: "init",
                 args: ["alerts", "psychopy.alerts.liaison:LiaisonAlertHandler"],
                 kwargs: {
                     liaison: "$liaison"
                 }
-            }, 30000, true)
-            await this.send({
+            }, 30000, true))
+            await checkpoint(this.send({
                 command: "run",
                 args: ["psychopy.alerts:addAlertHandler", "$alerts"]
             }, 30000, true).catch(
                 err => logging.error(["Failed to add alert handler", err])
-            )
+            ))
         }
-        
+
         // setup prefs
         try {
-            await this.send({
+            await checkpoint(this.send({
                 command: "register",
                 args: ["prefs", "psychopy.preferences:prefs"]
             }, 10000, true).catch(
                 err => logging.error([`Failed to load prefs`, err])
-            )
+            ))
             // point to devices json
-            await this.send({
+            await checkpoint(this.send({
                 command: "try",
                 args: ["prefs.setDevicesFile", path.join(
                     app.getPath("appData"), "psychopy4", "devices.json"
                 )]
             }, undefined, true).catch(
                 err => logging.error([`Failed to set devices file`, err])
-            )
+            ))
             // set prefs from JSON
-            await this.send({
+            await checkpoint(this.send({
                 command: "try",
                 args: ["prefs.fromJSON", path.join(
                     app.getPath("appData"), "psychopy4", "preferences.json"
                 )]
             }, undefined, true).catch(
                 err => logging.error([`Failed to load preferences`, err])
-            )
+            ))
         } catch (err) {
+            // don't swallow being stopped mid-start
+            if (attempt.cancelled) {
+                throw err
+            }
             // todo: this fails on <2026.0, how can we get prefs otherwise?
             err => logging.error(`Failed to setup preferences`, err)
         }
 
         // activate plugins
-        if (await this.send({
+        if (await checkpoint(this.send({
             command: "exists",
             args: ["psychopy.plugins:activatePlugins"]
-        }, 10000, true)) {
-            await this.send({
+        }, 10000, true))) {
+            await checkpoint(this.send({
                 command: "run",
                 args: ["psychopy.plugins:activatePlugins"]
             }, undefined, true).catch(
                 err => logging.error(["Failed to activate plugins", err])
-            )
+            ))
         }
 
         // mark ready
@@ -221,6 +248,11 @@ export class Liaison {
     }
 
     async stop() {
+        // cancel any start in progress, so it doesn't carry on setting up after we've stopped
+        if (this.attempt) {
+            this.attempt.cancelled = true
+            this.attempt = undefined
+        }
         // kill Python process
         if (this.process) {
             await this.process.kill()
