@@ -56,7 +56,7 @@ export const handlers = {
 
             return shell.id
         }),
-        close: ipcMain.handle("python.shell.close", async (evt, venv, id) => (await getVenv(venv)).shells[id].close())
+        close: ipcMain.handle("python.shell.close", async (evt, venv, id) => (await getVenv(venv)).shells[id].stop())
     },
     scripts: {
         run: ipcMain.handle("python.scripts.run", async (evt, venv, file, ...args) => {
