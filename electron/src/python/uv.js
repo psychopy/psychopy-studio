@@ -202,7 +202,9 @@ export class UV {
             )
             this.output(`Finished installing UV.`)
         } catch (err) {
-            this.output(err?.error || err)
+            // log the failure, then pass it on
+            this.output(`Failed to install UV: ${err?.message || err?.error || err}`)
+            throw err
         }
     }
 

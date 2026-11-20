@@ -61,8 +61,18 @@ export async function installUV(forceReinstall=false) {
     )
     status.dlg.shown = true
     status.dlg.busy = true
+    // is there already a UV (i.e. is this an update rather than a fresh install)?
+    let hadUV = await python.uv.exists().catch(() => false)
     // do install
-    await python.uv.install().catch(handleError)
+    await python.uv.install().catch(err => {
+        if (hadUV) {
+            // a failed update isn't fatal, as the existing UV still works - so just warn
+            console.warn("Failed to update UV, continuing with the installed version.", err)
+        } else {
+            // a failed fresh install is fatal
+            handleError(err)
+        }
+    })
     status.dlg.busy = false
     // make sure install worked
     let hasUV = await python.uv.exists().catch(handleError)
