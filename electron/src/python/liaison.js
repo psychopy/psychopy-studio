@@ -123,7 +123,9 @@ export class Liaison {
                         if (decoder.decode(evt) === `${this.constants.START_MARKER}@${this.address}`) {
                             resolve(evt)
                         }
-                    }
+                    },
+                    // if Python fails to launch, fail now rather than waiting for the timeout
+                    onerror: reject
                 },
                 // tag output as coming from the app (rather than a script)
                 "app"

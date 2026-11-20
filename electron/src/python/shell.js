@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { decoder } from "./utils.js";
+import { decoder, output } from "./utils.js";
 import logging from "../tools/logging.js";
 import proc from "child_process";
 
@@ -51,6 +51,11 @@ export class PythonShell {
     this.started.resolve()
     // map finished callback
     this.process.on("close", this.finished.resolve)
+    // handle failure to launch
+    this.process.on("error", err => {
+      logging.error(`Shell ${this.id} failed to launch: ${err.message}`)
+      output("stderr", `Python shell failed to launch: ${err.message}`)
+    })
     // import sys from start
     this.send("import sys")
   }
