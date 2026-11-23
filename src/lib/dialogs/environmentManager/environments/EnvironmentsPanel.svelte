@@ -82,7 +82,6 @@
             tooltip={translate("Create a new environment for a PsychoPy version you don't yet have one for")}
             icon="/icons/btn-add.svg"
             onclick={evt => creating.showDlg = true}
-            opaque
             small
         />
     {:catch err}
