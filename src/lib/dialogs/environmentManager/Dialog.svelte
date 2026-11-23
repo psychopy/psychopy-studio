@@ -4,8 +4,6 @@
     import PluginsPanel from "./plugins/PluginsPanel.svelte";
     import PackagesPanel from "./packages/PackagesPanel.svelte";
     import EnvironmentsPanel from "./environments/EnvironmentsPanel.svelte";
-    import VenvChooser from "./VenvChooser.svelte";
-    import { python } from "$lib/globals.svelte"
     import { translate } from "$lib/translation";
 
     let {

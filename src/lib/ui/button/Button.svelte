@@ -116,7 +116,6 @@
 
 {#snippet button(status)}
     <button
-        {...attrs}
         data-action={action}
         disabled={isDisabled} 
         onclick={{
@@ -146,6 +145,7 @@
         onfocusin={() => {if (tooltip) {show.tooltip = true}}}
         onfocusout={() => {if (tooltip) {show.tooltip = false}}}
         aria-label={attrs["aria-label"] ?? name}
+        {...attrs}
     >
         {#if tooltip}
             <Tooltip
