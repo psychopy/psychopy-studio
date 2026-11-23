@@ -41,6 +41,10 @@
      */
     function sortByCateg(shownItems) {
         let output = {}
+        // start with registered categories, so they keep the order they're declared in
+        for (let categ in items.categories) {
+            output[categ] = []
+        }
         // iterate through items
         for (let item of shownItems) {
             // make sure we have an entry for this category
@@ -50,8 +54,8 @@
             // add item to categ
             output[item.categ].push(item)
         }
-
-        return Object.entries(output)
+        // don't show categories with no visible items
+        return Object.entries(output).filter(([categ, subitems]) => subitems.length)
     }
 </script>
 
