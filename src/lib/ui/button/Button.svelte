@@ -14,6 +14,8 @@
         icon=undefined,
         /** @prop {Snippet|undefined} menu Snippet defining a menu - if defined, gives this button a dropdown arrow which opens the menu */
         menu=undefined,
+        /** @prop {Snippet|undefined} contextmenu Snippet defining a context menu which is shown on a rightclick */
+        contextmenu=undefined,
         /**
          * @prop @type {String|undefined} Name of the action (e.g. save, undo, etc.) this button
          * performs. Clicking runs the view's callback for this action (if any) as well as `onclick`.
@@ -65,7 +67,8 @@
         tooltip: false,
         error: false,
         menu: false,
-        menuTooltip: false
+        menuTooltip: false,
+        contextmenu: false
     })
 
     // get the callback (if any) for this button's action
@@ -124,6 +127,7 @@
             // if errored, show error
             error: evt => show.error = true
         }[status]}
+        oncontextmenu={evt => show.contextmenu = true}
         class:vertical={layout === "vertical"}
         class:horizontal={layout === "horizontal"}
         class:small={size === "small"}
@@ -225,6 +229,15 @@
             {/snippet}
         </MessageDialog>
     {/await}
+
+    {#if contextmenu}
+        <Menu
+            bind:shown={show.contextmenu}
+        >
+            {@render contextmenu?.()}
+        </Menu>
+    {/if}
+
     {#if menu}
         <button
             onclick={evt => show.menu = !show.menu}

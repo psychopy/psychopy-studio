@@ -79,6 +79,7 @@ export const python = {
     installPackage: (venv, name, version=undefined) => {},
     uninstallPackage: (venv, name) => {},
     getPackages: (venv) => {},
+    delete: (venv) => {},
     getPackageDetails: (venv, name) => {},
     hasGIL: (venv) => {}
   },

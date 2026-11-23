@@ -78,6 +78,7 @@ const python = {
     installPackage: (venv, name, version=undefined) => ipcRenderer.invoke("python.venv.installPackage", venv, name, version).then(resp => resp),
     uninstallPackage: (venv, name) => ipcRenderer.invoke("python.venv.uninstallPackage", venv, name).then(resp => resp),
     getPackages: (venv) => ipcRenderer.invoke("python.venv.getPackages", venv).then(resp => resp),
+    delete: (venv) => ipcRenderer.invoke("python.venv.delete", venv).then(resp => resp),
     getPackageDetails: (venv, name) => ipcRenderer.invoke("python.venv.getPackageDetails", venv, name).then(resp => resp),
     hasGIL: (venv) => ipcRenderer.invoke("python.venv.hasGIL", venv).then(resp => resp)
   },

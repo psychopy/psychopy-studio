@@ -237,9 +237,11 @@ export class UV {
             let pyVersion = execSync(undefined, `"${executable}"`, ["--version"]).match(/Python (\d+\.\d+)/)[1]
             // store
             output.push({
+                name: subfolder,
                 executable: executable,
                 psychopyVersion: subfolder,
-                pythonVersion: pyVersion
+                pythonVersion: pyVersion,
+                isApp: subfolder === appVersion
             })
             
         }

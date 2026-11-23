@@ -54,11 +54,8 @@
     }
     
     .details-panel {
-        position: absolute;
-        top: calc(100% + 1rem);
-        left: 1rem;
-        z-index: 2;
-        width: 35rem;
+        /* fit within the Info popover's 35rem max-width, minus its padding */
+        width: 34rem;
         background-color: transparent;
         color: var(--text);
     }

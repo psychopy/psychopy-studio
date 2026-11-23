@@ -121,6 +121,51 @@ export class PythonVenv {
     }
 
     /**
+     * Delete this virtual environment, stopping anything running in it first
+     * 
+     * @returns {Promise<boolean>} `true` if the environment was deleted, `false` if it didn't exist
+     */
+    async delete() {
+        // stop anything running in this environment
+        this.killAll()
+        // forget this venv object, so it isn't reused
+        for (let [key, venv] of Object.entries(venvs)) {
+            if (venv === this) {
+                delete venvs[key]
+            }
+        }
+        // without an executable, there's no environment to delete
+        if (!this.executable) {
+            return false
+        }
+        // get the environment's folder: the subfolder of uv's Python folder which contains the executable
+        let subfolder = path.relative(uv.pyFolder, this.executable).split(path.sep)[0]
+        // make sure the executable really is in an environment folder, so we don't delete anything else
+        if (!subfolder || subfolder === ".." || path.isAbsolute(subfolder)) {
+            throw new Error(
+                `Python executable ${this.executable} is not inside ${uv.pyFolder}, so won't delete its environment.`
+            )
+        }
+        let folder = path.join(uv.pyFolder, subfolder)
+        // if it doesn't exist, there's nothing to delete
+        if (!fs.existsSync(folder)) {
+            return false
+        }
+        // delete it (retrying, as Windows may take a moment to release files from killed processes)
+        output("uv", `Deleting environment ${subfolder}...`)
+        await fs.promises.rm(folder, {
+            recursive: true,
+            force: true,
+            maxRetries: 5,
+            retryDelay: 200
+        })
+        this.executable = undefined
+        output("uv", `Deleted environment ${subfolder}.`)
+
+        return true
+    }
+
+    /**
      * Setup this virtual environment; make sure it exists and install necessary packages. If setup
      * is already in progress (e.g. requested again by another caller), returns the same promise
      * rather than running it twice at once.
