@@ -43,12 +43,7 @@
                 {#if resp.success}
                     {translate("{} conditions, with {} parameters").replace("{}", resp.result[0].length).replace("{}", resp.result[1].length)} 
                     <Info>
-                        <div 
-                            class=more-info
-                            transition:slide={{axis: "x", delay: 0.5}}
-                        >
-                            {resp.result[1].join(", ")}
-                        </div>
+                        {resp.result[1].join(", ")}
                     </Info>
                 {/if}
             {:catch err}
@@ -74,17 +69,5 @@
         gap: .5rem;
         align-items: center;
         padding: 0 .5rem;
-    }
-
-    .more-info {
-        position: absolute;
-        left: 1rem;
-        padding: .25rem .5rem;
-        border-radius: .5rem;
-        background-color: var(--outline);
-        color: var(--text-on-outline);
-        overflow: hidden;
-        text-wrap: nowrap;
-        max-width: 35rem;
     }
 </style>
