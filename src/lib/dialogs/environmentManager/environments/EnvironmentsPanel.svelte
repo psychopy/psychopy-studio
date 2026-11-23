@@ -94,8 +94,8 @@
 
 <!-- confirmation dialog for deleting a venv -->
 <MessageDialog
-    shown={deleting.showDlg}
-    shrink
+    title={translate("Confirm deletion")}
+    bind:shown={deleting.showDlg}
 >
     {translate(
         "Are you sure you want to delete the environment for {}? This cannot be undone."
@@ -122,6 +122,7 @@
 
 <!-- dialog for creating a new environment -->
 <MessageDialog
+    title={translate("Create new environment")}
     bind:shown={creating.showDlg}
 >
     <div
