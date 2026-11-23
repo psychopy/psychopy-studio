@@ -1,10 +1,11 @@
 <script>
     import { setContext } from 'svelte';
+    import { PlaceholderPage } from '$lib/ui/placeholder';
 
     let {
         /** @prop @type {function} Function to execute when the page is changed */
         onselect=(index, data) => {},
-        /** @interface @type {Array<HTMLElement>} Child elements of this notebook */
+        /** @prop {Snippet|string} [placeholder] Content to be rendered in the placeholder page */
         placeholder=undefined,
         /** @prop {Snippet} children Child elements are presumed to be tabs */
         children=undefined,
@@ -50,12 +51,9 @@
         role=tabpanel
     >
         {#if pages.selected.index === undefined}
-            <div class=placeholder-page>
-                <svg class=placeholder-bg>
-                    <use href={"/branding/emblem-line.svg"} />
-                </svg>
-                {@render placeholder?.()}
-            </div>
+            <PlaceholderPage 
+                content={placeholder}
+            />
         {:else}
             {@render pages.selected.page?.()}
         {/if}
@@ -99,27 +97,5 @@
         z-index: 1;
         border: 1px solid var(--overlay);
         grid-row-start: page;
-    }
-
-    .placeholder-page {
-        position: absolute;
-        left: 0; right: 0; top: 0; bottom: 0;
-        background-color: var(--crust);
-        overflow: hidden;
-        display: flex;
-        gap: .5rem;
-        flex-direction: column;
-        align-items: center;
-        align-content: center;
-        justify-items: center;
-        justify-content: center;
-    }
-
-    .placeholder-page svg.placeholder-bg {
-        color: var(--outline);
-        opacity: 10%;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 2560 / 321;
     }
 </style>
