@@ -76,8 +76,13 @@ export class PythonVenv {
 
     /**
      * Kill all instances of this venv
+     * 
+     * @returns {Promise<void>} Resolves once all killed processes have exited
      */
     killAll() {
+        // promises which resolve when each killed process exits
+        let exits = []
+
         /**
          * On Linux and Mac, killing the Python process doesn't kill PTB, it has to be killed by PID
          * 
@@ -87,6 +92,10 @@ export class PythonVenv {
             // skip anything not started, already exited, or not a child process
             if (!_process?.pid || _process.exitCode !== null || _process.signalCode !== null) {
                 return
+            }
+            // listen for exit before killing, so we can't miss it
+            if (typeof _process.once === "function") {
+                exits.push(new Promise(resolve => _process.once("exit", resolve)))
             }
             try {
                 // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
@@ -118,6 +127,8 @@ export class PythonVenv {
         for (let server of Object.values(this.psychojs)) {
             server.process?.close()
         }
+
+        return Promise.all(exits).then(() => {})
     }
 
     /**
@@ -126,8 +137,14 @@ export class PythonVenv {
      * @returns {Promise<boolean>} `true` if the environment was deleted, `false` if it didn't exist
      */
     async delete() {
-        // stop anything running in this environment
-        this.killAll()
+        // stop anything running in this environment, and wait (up to 10s) for it to exit so that it 
+        // releases its files (on Windows, files can't be deleted while a process has them open)
+        let timeout
+        await Promise.race([
+            this.killAll(),
+            new Promise(resolve => timeout = setTimeout(resolve, 10000))
+        ])
+        clearTimeout(timeout)
         // forget this venv object, so it isn't reused
         for (let [key, venv] of Object.entries(venvs)) {
             if (venv === this) {
@@ -151,7 +168,7 @@ export class PythonVenv {
         if (!fs.existsSync(folder)) {
             return false
         }
-        // delete it (retrying, as Windows may take a moment to release files from killed processes)
+        // delete it (retrying, in case Windows is still releasing files from killed processes)
         output("uv", `Deleting environment ${subfolder}...`)
         await fs.promises.rm(folder, {
             recursive: true,
