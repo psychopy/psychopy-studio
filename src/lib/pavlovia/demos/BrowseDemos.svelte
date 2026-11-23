@@ -35,6 +35,7 @@
 <ListDetail
     filter={(params, data) => data.name.includes(params.searchTerm || "")}
     bind:params={params}
+    placeholder={translate("Click on a demo to get started")}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 

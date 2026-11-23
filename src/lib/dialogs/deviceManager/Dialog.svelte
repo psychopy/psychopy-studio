@@ -173,10 +173,6 @@
             devices[key].fromJSON(dev)
             // set restore point
             devices[key].restore.set()
-            // select if nothing selected yet
-            if (currentDevice === undefined) {
-                currentDevice = devices[key]
-            }
         }
     }
 
@@ -195,8 +191,10 @@
     onopen={restore.set}
     bind:shown={shown}
 >
-    <ListDetail>
-        {#each Object.entries(devices) as [key, device] (key)}
+    <ListDetail
+        placeholder={translate("Click on a device to configure it, or click 'Add device' to setup a new device")}
+    >
+        {#each Object.entries(devices) as [key, device], i (key)}
             <ListDetailItem
                 bind:selected={
                     () => currentDevice === device,
@@ -206,6 +204,7 @@
                         }
                     }
                 }
+                initial={i===0}
                 data={device}
                 onremove={(evt) => delete devices[key]}
                 removeTooltip={translate("Remove device")}

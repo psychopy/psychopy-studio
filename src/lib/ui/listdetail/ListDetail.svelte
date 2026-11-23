@@ -115,7 +115,6 @@
         {#each items.items.filter(item => item.shown) as item}
             {@render item.details()}
         {/each}
-        {items.selected === undefined}
         {#if items.selected === undefined}
             <PlaceholderPage 
                 content={placeholder}

@@ -38,6 +38,7 @@
 <ListDetail
     bind:params={params}
     filter={(params, data) => data.name.toLowerCase().includes(params.searchTerm.toLowerCase()) || params.searchTerm === ""}
+    placeholder={translate("Click on a package to get started")}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 
@@ -51,12 +52,13 @@
         label={translate("Installed")}
         open
     >
-        {#each Object.keys(installed).filter(key => installed[key]) as name (name)}
+        {#each Object.keys(installed).filter(key => installed[key]) as name, i (name)}
             <ListDetailItem
                 label={name}
                 data={{
                     name: name
                 }}
+                initial={i === 0}
             >
                 <PackageItem
                     name={name}

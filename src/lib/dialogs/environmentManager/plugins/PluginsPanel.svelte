@@ -30,6 +30,7 @@
         data.keywords?.includes(params.searchTerm) ||
         params.searchTerm === ""
     )}
+    placeholder={translate("Click on a plugin to get started")}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 
@@ -53,9 +54,10 @@
                 label={isInstalled ? translate("Installed") : translate("Not installed")}
                 open
             >
-                {#each plugins as plugin (plugin.pipname)}
+                {#each plugins as plugin, i (plugin.pipname)}
                     <ListDetailItem
                         data={plugin}
+                        initial={i===0}
                     >
                         {#snippet label()}
                             <div class=plugin-label>
