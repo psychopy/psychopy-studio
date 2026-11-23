@@ -104,6 +104,10 @@
         <DialogButton 
             action="YES" 
             onclick={async evt => {
+                // deselect venv
+                if (value === deleting.version) {
+                    value = "app"
+                }
                 // delete venv
                 await python.venv.delete(deleting.version)
                 // rescan
@@ -165,6 +169,7 @@
                 // clear version selection
                 creating.version = undefined
             }}
+            disabled={!creating.version}
         />
         <DialogButton 
             action="CANCEL"
