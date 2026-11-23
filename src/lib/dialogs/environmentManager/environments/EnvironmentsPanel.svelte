@@ -154,6 +154,12 @@
                             </option>
                         {/if}
                     {/each}
+                {:catch}
+                    <option
+                    style:color="var(--red)"
+                    >
+                        {translate("Failed to get PsychoPy versions.")}
+                    </option>
                 {/await}
             {/await}
         </select>
