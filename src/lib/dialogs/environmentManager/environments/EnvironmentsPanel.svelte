@@ -104,16 +104,19 @@
         <DialogButton 
             action="YES" 
             onclick={async evt => {
-                // deselect venv
-                if (value === deleting.version) {
-                    value = "app"
+                try {
+                    // delete venv
+                    await python.venv.delete(deleting.version)
+                    // deselect venv 
+                    if (value === deleting.version) {
+                        value = "app"
+                    }
+                    // clear deleting version
+                    deleting.version = undefined
+                } finally {
+                    // rescan in case venv was partially deleted
+                    environmentsPromise = python.uv.getEnvironments()
                 }
-                // delete venv
-                await python.venv.delete(deleting.version)
-                // rescan
-                environmentsPromise = python.uv.getEnvironments()
-                // clear deleting version
-                deleting.version = undefined
             }}
             negative
         />
