@@ -34,6 +34,7 @@
         <Notebook>
             <NotebookPage
                 label={translate("Plugins")}
+                initial
                 bind:selected={
                     () => pages.current === "plugins",
                     value => pages.current = "plugins"

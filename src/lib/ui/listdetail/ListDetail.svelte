@@ -37,6 +37,16 @@
             items.items[i].shown = filter(params, items.items[i].data)
         }
     })
+    // if no item is selected, select the one marked `initial` (this runs after all items' own
+    // effects, so any item which starts out selected will have claimed selection already)
+    $effect(() => {
+        if (items.selected === undefined) {
+            let initial = items.items.find(item => item.initial && item.shown)
+            if (initial) {
+                items.selected = initial.index
+            }
+        }
+    })
 
     /**
      * Sort items by category

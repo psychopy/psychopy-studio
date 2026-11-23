@@ -25,13 +25,14 @@
 </script>
 
 <Listbook>
-    {#each Object.entries(details.calibrations || {}) as [calibName, calib]}
+    {#each Object.entries(details.calibrations || {}) as [calibName, calib], i}
         <NotebookPage
             label={calibName}
             bind:selected={
                 () => monitors.selection?.calibration === calibName,
                 (evt) => monitors.selection.calibration = calibName
             }
+            initial={i===0}
         >
             {#if details.calibrations[calibName]}
                 <MonitorConfigurationPanel 

@@ -25,6 +25,7 @@
         <NotebookPage
             label={page.file.name}
             data-file={page.file.file}
+            initial={parseInt(i)===0}
             close={(evt) => current.pages.splice(i, 1)}
             bind:selected={
                 () => current.tab === parseInt(i),

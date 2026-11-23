@@ -125,9 +125,10 @@
             {#await monitors.promise}
                 {translate("Loading monitors...")}
             {:then}
-                {#each Object.entries(monitors.all) as [name, details]}
+                {#each Object.entries(monitors.all) as [name, details], i}
                     <NotebookPage
                         bind:label={monitors.all[name].name}
+                        initial={i===0}
                         close={evt => delete monitors.all[name]}
                         bind:selected={
                             () => monitors.selection.monitor === name,

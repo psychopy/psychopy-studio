@@ -52,23 +52,24 @@
                 ["dkl", DklColor],
                 ["hsv", HsvColor],
                 ["lms", LmsColor]
-            ] as [thisSpace, Component]}
-                {#if allowedSpaces.includes(thisSpace)}
-                    <NotebookPage
-                        label={thisSpace}
-                        bind:selected={
-                            () => space === thisSpace,
-                            (value) => space = thisSpace
-                        }
-                    >
-                        <div class=page>
-                            <Component 
-                                bind:value={value} 
-                                target={target}
-                            />
-                        </div>
-                    </NotebookPage>
-                {/if}
+            ].filter(
+                ([thisSpace]) => allowedSpaces.includes(thisSpace)
+            ) as [thisSpace, Component], i}
+                <NotebookPage
+                    label={thisSpace}
+                    bind:selected={
+                        () => space === thisSpace,
+                        (value) => space = thisSpace
+                    }
+                    initial={i===0}
+                >
+                    <div class=page>
+                        <Component 
+                            bind:value={value} 
+                            target={target}
+                        />
+                    </div>
+                </NotebookPage>
             {/each}
         </Notebook>
     </div>

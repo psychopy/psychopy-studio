@@ -130,6 +130,7 @@
                 <Notebook>
                     <NotebookPage
                         label={translate("Alerts")}
+                        initial
                         bind:selected={
                             () => current.tab === "alerts",
                             (val) => {

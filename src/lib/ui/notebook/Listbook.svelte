@@ -22,11 +22,15 @@
     $effect(() => {
         onselect(pages.selected.index, pages.selected.data)
     })
-    // if no page is selected, select the first one (this runs after all pages' own effects, so any 
-    // page which starts out selected will have claimed selection already)
+    // if no page is selected, select the one marked `initial`, or the first one if none are (this 
+    // runs after all pages' own effects, so any page which starts out selected will have claimed 
+    // selection already)
     $effect(() => {
         if (pages.selected.index === undefined) {
-            pages.all.find(page => page !== undefined)?.select()
+            (
+                pages.all.find(page => page?.initial) 
+                ?? pages.all.find(page => page !== undefined)
+            )?.select()
         }
     })
 
