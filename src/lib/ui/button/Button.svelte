@@ -298,6 +298,7 @@
     }
     button .label {
         hyphens: auto;
+        flex-grow: 1;
     }
 
     /* Dropdown button */
@@ -358,9 +359,6 @@
     button.stretch .label {
         flex-shrink: 1;
         text-align: left;
-    }
-    .button-container.stretch { 
-        flex: 1; 
     }
 
     /* Ghost */
