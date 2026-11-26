@@ -155,7 +155,7 @@
         {:catch}
             {""}
         {/await}
-        {#if current.experiment.settings.alerts.length}
+        {#if current.experiment.settings?.alerts.length}
             <Button 
                 onclick={evt => show.alertsDlg = true}
                 tooltip={translate("Click to view alerts from Experiment Settings")}
