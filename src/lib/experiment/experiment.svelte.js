@@ -50,12 +50,12 @@ export class AlertsManager {
      * Generate a new set of alerts
      */
     update() {
-        // clear alerts
-        this.all.length = 0
         // compile scripts to generate new alerts
         if (!this.busy) {
             // mark busy
             this.busy = true
+            // clear alerts
+            this.all.length = 0
             // compile experiments then mark done
             this.compile().then(
                 () => this.busy = false
