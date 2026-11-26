@@ -10,6 +10,86 @@ import { setupPython } from "$lib/python";
 import { profiles } from "./profiles.svelte";
 
 
+export class AlertsManager {
+    
+    all = $state([])
+    busy = false
+    queue = false
+
+    /**
+     * Handles alerts for a given experiment
+     * 
+     * @param {Experiment} exp Experiment to generate alerts from
+     */
+    constructor(exp) {
+        // store reference to experiment
+        this.exp = exp
+        // setup listener for alerts
+        this.listener = python.liaison.listen("alert", 
+            (evt, message) => {
+                // only continue if message matches this experiment
+                if (!this.exp?.file.file || message.message.file !== this.exp?.file?.file) return
+                // avoid duplicates
+                if (this.all.some(
+                    item => (
+                        // same code
+                        item.code === message.message.code
+                        // same experiment
+                        && item.file === message.message.file
+                        // same element
+                        && item.name === message.message.name
+                    )
+                )) return
+                // store alert
+                this.all.push(message.message);
+            }
+        )
+    }
+
+    /**
+     * Generate a new set of alerts
+     */
+    update() {
+        // compile scripts to generate new alerts
+        if (!this.busy) {
+            // mark busy
+            this.busy = true
+            // clear alerts
+            this.all.length = 0
+            // compile experiments then mark done
+            this.compile().then(
+                () => this.busy = false
+            )
+        } else {
+            // if still compiling from last time, queue
+            this.queue = true
+        }
+    }
+
+    /**
+     * Dry run compiling scripts to generate alerts
+     */
+    async compile() {
+        // write scripts
+        await this.exp.writeScript("PsychoPy", true).catch(err => {})
+        await this.exp.writeScript("PsychoJS", true).catch(err => {})
+        // if another request came in while doing this, do it again
+        if (this.queue) {
+            this.queue = false
+            await this.compile()
+        }
+    }
+
+    filterFor(element) {
+        return this.all.filter(
+            item => (
+                // element matches
+                item.name === element.name
+            )
+        )
+    }
+}
+
 export class Experiment {
 
     version = "2026.1.0"
@@ -52,6 +132,8 @@ export class Experiment {
             }
             // clear future
             this.history.future = []
+            // update alerts
+            this.alerts.update()
         },
         clear: () => {
             // clear arrays for past and future
@@ -172,6 +254,8 @@ export class Experiment {
     constructor(filename) {
         // create attributes
         this.flow = new Flow(this);
+        // setup alerts
+        this.alerts = new AlertsManager(this);
         // starting defaults
         this.reset()
         // set filename
@@ -643,18 +727,27 @@ export class Experiment {
         }
     }
 
-    async writeScript(target="PsychoPy", executable=undefined) {
+    /**
+     * Write this experiment to a Python or JS script
+     * 
+     * @param {"PsychoPy"|"PsychoJS"} target Target library to write to 
+     * @param {boolean} dryrun Prevent this function from saving any files
+     * @returns 
+     */
+    async writeScript(target="PsychoPy", dryrun=false) {
         if (!python) {
             console.error("Script writing is not available in browser.")
             return
         }
         // error if there's no psyexp
-        if (!this.file.file) {
-            console.error("Cannot compile to Python on an experiment with no psyexp file attached")
+        if (!dryrun && !this.file.file) {
+            console.error("Can only compile to Python as a dryrun on an experiment with no psyexp file attached")
             return
         }
         // save to file
-        await this.toFile(this.file)
+        if (!dryrun) {
+            await this.toFile(this.file)
+        }
         // construct output path
         let targetFile = path.join(
             this.file.parent,
@@ -673,7 +766,6 @@ export class Experiment {
         }).catch(
             err => console.error([`Failed to set devices file`, err])
         )
-
         // create experiment object via Liaison
         await python.liaison.send(this.useVersion, {
             command: "init",
@@ -684,16 +776,30 @@ export class Experiment {
         }).catch(
             reason => console.error(reason)
         )
-        // load from file
-        await python.liaison.send(this.useVersion, {
-            command: "run",
-            args: [
-                "currentExperiment.loadFromXML",
-                $state.snapshot(this.file.file)
-            ]
-        }).catch(
-            reason => console.error(reason)
-        )
+        // load from file or string depending on dry run
+        if (dryrun) {
+            let xml = new XMLSerializer().serializeToString(this.toXML())
+            await python.liaison.send(this.useVersion, {
+                command: "run",
+                args: [
+                    "currentExperiment.applyXML",
+                    xml,
+                    $state.snapshot(this.file.file)
+                ]
+            }).catch(
+                reason => console.error(reason)
+            )
+        } else {
+            await python.liaison.send(this.useVersion, {
+                command: "run",
+                args: [
+                    "currentExperiment.loadFromXML",
+                    $state.snapshot(this.file.file)
+                ]
+            }).catch(
+                reason => console.error(reason)
+            )
+        }
         // clear use version param (as version is handled by studio)
         await python.liaison.send(this.useVersion, {
             command: "init",
@@ -730,10 +836,12 @@ export class Experiment {
             reason => console.error(reason)
         )
         // save to python/js file
-        if (typeof script === "string") {
-            await electron.files.save(targetFile, script)
-        } else {
-            console.error(script)
+        if (!dryrun) {
+            if (typeof script === "string") {
+                await electron.files.save(targetFile, script)
+            } else {
+                console.error(script)
+            }
         }
 
         return targetFile

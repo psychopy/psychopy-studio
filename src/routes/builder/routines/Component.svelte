@@ -1,6 +1,9 @@
 <script>
     import EntryPoint from './EntryPoint.svelte';
     import { Menu, SubMenu, MenuItem} from '$lib/ui/menu';
+    import { Button } from "$lib/ui/button";
+    import { Dialog } from "$lib/ui/dialog";
+    import { AlertsOutput } from "$lib/python/alerts";
     import { getContext } from "svelte"
     import { ParamsDialog } from "$lib/ui/paramCtrls";
     import StaticPeriod from './StaticPeriod.svelte';
@@ -17,7 +20,11 @@
 
     let hovered = $state(false);
 
-    let showContextMenu = $state(false);
+    let show = $state({
+        contextMenu: false,
+        alertsDlg: false
+    })
+
     let contextMenuPos = $state({
         x: undefined,
         y: undefined
@@ -26,7 +33,7 @@
     function oncontextmenu(evt) {
         evt.preventDefault();
         // show menu
-        showContextMenu = true;
+        show.contextMenu = true;
         // set its position to the mouse pos
         contextMenuPos.x = evt.pageX;
         contextMenuPos.y = evt.pageY;
@@ -45,6 +52,21 @@
 
 <!-- entry point for this component -->
 <EntryPoint routine={component.routine} index={component.index}></EntryPoint>
+
+<!-- alerts -->
+ {#if component.alerts.length}
+    <div 
+        class=alerts-container
+        style:grid-row-start={component.index + 3}
+    >
+        <Button 
+            onclick={evt => show.alertsDlg = true}
+            tooltip={translate("Click to view alerts about this Component")}
+            icon="/icons/sym-warning.svg"
+            ghost
+        />
+    </div>
+{/if}
 
 <!-- icon & name -->
 <button 
@@ -146,7 +168,7 @@
 
 <!-- menu to open when right clicked on -->
 <Menu 
-    bind:shown={showContextMenu} 
+    bind:shown={show.contextMenu} 
     bind:position={contextMenuPos}
 >
     <MenuItem
@@ -203,12 +225,22 @@
     />
 </Menu>
 
-<!-- dialog to open when clicked on -->
+<!-- dialogs to open when clicked on -->
 
 <ParamsDialog 
     element={component}
     bind:shown={showDialog} 
 />
+<Dialog
+    title={translate("Alerts for {}").replaceAll("{}", component.name)}
+    buttons={["OK"]}
+    bind:shown={show.alertsDlg}
+    closable
+>
+    <AlertsOutput 
+        bind:alerts={component.alerts}
+    />
+</Dialog>
 
 <style>
     .comp-timeline {
@@ -258,6 +290,12 @@
         position: relative;
         width: 100%;
         height: 100%;
+    }
+
+    .alerts-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 
     .comp-name {

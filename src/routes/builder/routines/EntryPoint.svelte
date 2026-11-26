@@ -97,4 +97,7 @@
         color: transparent !important;
         background-color: transparent !important;
     }
+    .entry-point:not(.active) .hitbox {
+        pointer-events: none;
+    }
 </style>

@@ -6,7 +6,8 @@
     import Panel from "$lib/ui/Panel.svelte";
     import { PaneGroup, Pane, PaneResizer } from "paneforge";
     import Theme from "$lib/utils/Theme.svelte";
-    import AlertsOutput from "./outputs/AlertsOutput.svelte";
+    import { AlertsOutput } from "$lib/python/alerts";
+    import { Button } from "$lib/ui/button";
     import FilesPanel from "./files/Panel.svelte";
     import { current } from "./globals.svelte";
     import { setContext } from "svelte";
@@ -42,20 +43,6 @@
         electron.windows.emit("ready", true)
     }
 
-    // setup listener for alerts
-    python.liaison.listen("alert", 
-        (evt, message) => {
-            // if this code isn't already in the panel, add it
-            if (!current.output.alerts.some(
-                item => item.code === message.message.code
-            )) {
-                current.output.alerts.push(message.message);
-                // focus runner and switch to alerts tab
-                showWindow("runner", true)
-                current.tab = "alerts";
-            }
-        }
-    )
     // setup listeners for stdout
     python.output.stdout.listen(
         (evt, message) => current.output.stdout += `${message}\n`
@@ -140,7 +127,19 @@
                             }
                         }
                     >
-                        <AlertsOutput />
+                        <AlertsOutput
+                            bind:alerts={current.output.alerts}
+                            subscribe
+                        >
+                            {#snippet ctrls()}
+                                <Button
+                                    icon="/icons/btn-clear.svg"
+                                    onclick={evt => current.output.alerts.length = 0}
+                                    tooltip={translate("Clear alerts")}
+                                    small
+                                />
+                            {/snippet}
+                        </AlertsOutput>
                     </NotebookPage>
                     <NotebookPage
                         label={translate("Stdout")}

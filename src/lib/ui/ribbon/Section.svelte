@@ -61,4 +61,10 @@
     .ribbon-section:not(:first-of-type) {
         border-left: 1px solid var(--overlay)
     }
+    :global(.ribbon-section) + .ribbon-section {
+        border-left: none;
+    }
+    .ribbon-section:not(:last-of-type) {
+        border-right: 1px solid var(--overlay);
+    }
 </style>

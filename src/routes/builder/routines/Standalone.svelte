@@ -1,5 +1,9 @@
 <script>
     import { ParamsNotebook } from "$lib/ui/paramCtrls";
+    import { Button } from "$lib/ui/button";
+    import { Dialog } from "$lib/ui/dialog";
+    import { AlertsOutput } from "$lib/python/alerts";
+    import { translate } from "$lib/translation";
     import { onMount, untrack } from "svelte";
 
     let {
@@ -7,6 +11,10 @@
     } = $props();
 
     onMount(() => routine.restore.set())
+
+    let show = $state({
+        alertsDlg: false
+    })
 
     // update history when Routine has changes
     $effect(() => {
@@ -42,20 +50,52 @@
             wide
         />
     </div>
+    <div class=ctrls>
+        {#if routine.alerts.length}
+            <Button 
+                label={translate("Alerts")}
+                onclick={evt => show.alertsDlg = true}
+                tooltip={translate("Click to view alerts about this Routine")}
+                icon="/icons/sym-warning.svg"
+                small
+            />
+        {/if}
+    </div>
 </div>
+
+<Dialog
+    title={translate("Alerts for {}").replaceAll("{}", routine.name)}
+    buttons={["OK"]}
+    bind:shown={show.alertsDlg}
+    closable
+>
+    <AlertsOutput 
+        bind:alerts={routine.alerts}
+    />
+</Dialog>
 
 <style>
     .standalone-routine-canvas {
-        display: grid;
-        gap: 1rem;
-        grid-template-rows: [canvas] 1fr [ctrls] min-content;
-        justify-content: center;
-        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         height: 100%;
+        width: min-width;
+        margin: 0 auto;
+        padding: 1rem;
         box-sizing: border-box;
     }
-
+    
     .notebook-container {
-        max-width: 55rem;
+        flex-grow: 1;
+        min-height: 0;
+    }
+
+    .ctrls {
+        display: flex;
+        flex-direction: row;
+        gap: .5rem;
+        justify-content: start;
+        padding: 0 1rem;
     }
 </style>
