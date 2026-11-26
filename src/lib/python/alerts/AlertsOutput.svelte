@@ -42,7 +42,14 @@
                 (evt, message) => {
                     // if this code isn't already in the array, add it
                     if (!alerts.some(
-                        item => item.code === message.message.code
+                        item => (
+                            // same code
+                            item.code === message.message.code
+                            // same experiment
+                            && item.file === message.message.file
+                            // same element
+                            && item.name === message.message.name
+                        )
                     )) {
                         alerts.push(message.message);
                     }
