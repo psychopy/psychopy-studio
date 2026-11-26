@@ -72,6 +72,7 @@
                     <Notebook>
                         <NotebookPage
                             label={translate("Files")}
+                            initial
                             bind:selected={
                                 () => current.navigationtab === "files",
                                 (val) => {

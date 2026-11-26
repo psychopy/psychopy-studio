@@ -33,7 +33,7 @@
         {/if}
     {/snippet}
     {#if current.experiment !== null}
-        {#each Object.entries(current.experiment.routines) as [name, routine]}
+        {#each Object.entries(current.experiment.routines) as [name, routine], i}
             <NotebookPage 
                 bind:selected={
                     () => {return current.routine === routine},
@@ -51,6 +51,7 @@
                 data={routine}
                 data-testid={routine.name}
                 data-testclass={routine instanceof Routine ? "routine" : "standalone-routine"}
+                initial={i===0}
             >
                 {#if routine instanceof Routine}
                     <RoutineCanvas routine={routine} />

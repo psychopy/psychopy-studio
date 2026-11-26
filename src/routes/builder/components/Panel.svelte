@@ -5,7 +5,7 @@
     import { profiles as allProfiles, refresh } from '$lib/experiment/profiles.svelte';
     import FilterDialog from './FilterDialog.svelte';
     import { Button } from "$lib/ui/button";
-    import { PluginManagerDlg } from "$lib/dialogs/pluginManager"
+    import { PluginManagerDlg } from "$lib/dialogs/environmentManager"
     import { electron, python } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
     import { Component, StandaloneRoutine } from "$lib/experiment";

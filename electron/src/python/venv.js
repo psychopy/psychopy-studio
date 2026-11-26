@@ -76,8 +76,13 @@ export class PythonVenv {
 
     /**
      * Kill all instances of this venv
+     * 
+     * @returns {Promise<void>} Resolves once all killed processes have exited
      */
     killAll() {
+        // promises which resolve when each killed process exits
+        let exits = []
+
         /**
          * On Linux and Mac, killing the Python process doesn't kill PTB, it has to be killed by PID
          * 
@@ -87,6 +92,10 @@ export class PythonVenv {
             // skip anything not started, already exited, or not a child process
             if (!_process?.pid || _process.exitCode !== null || _process.signalCode !== null) {
                 return
+            }
+            // listen for exit before killing, so we can't miss it
+            if (typeof _process.once === "function") {
+                exits.push(new Promise(resolve => _process.once("exit", resolve)))
             }
             try {
                 // kill current on Windows, kill by PID on Linux and Mac to also hit PTB
@@ -118,6 +127,59 @@ export class PythonVenv {
         for (let server of Object.values(this.psychojs)) {
             server.process?.close()
         }
+
+        return Promise.all(exits).then(() => {})
+    }
+
+    /**
+     * Delete this virtual environment, stopping anything running in it first
+     * 
+     * @returns {Promise<boolean>} `true` if the environment was deleted, `false` if it didn't exist
+     */
+    async delete() {
+        // stop anything running in this environment, and wait (up to 10s) for it to exit so that it 
+        // releases its files (on Windows, files can't be deleted while a process has them open)
+        let timeout
+        await Promise.race([
+            this.killAll(),
+            new Promise(resolve => timeout = setTimeout(resolve, 10000))
+        ])
+        clearTimeout(timeout)
+        // forget this venv object, so it isn't reused
+        for (let [key, venv] of Object.entries(venvs)) {
+            if (venv === this) {
+                delete venvs[key]
+            }
+        }
+        // without an executable, there's no environment to delete
+        if (!this.executable) {
+            return false
+        }
+        // get the environment's folder: the subfolder of uv's Python folder which contains the executable
+        let subfolder = path.relative(uv.pyFolder, this.executable).split(path.sep)[0]
+        // make sure the executable really is in an environment folder, so we don't delete anything else
+        if (!subfolder || subfolder === ".." || path.isAbsolute(subfolder)) {
+            throw new Error(
+                `Python executable ${this.executable} is not inside ${uv.pyFolder}, so won't delete its environment.`
+            )
+        }
+        let folder = path.join(uv.pyFolder, subfolder)
+        // if it doesn't exist, there's nothing to delete
+        if (!fs.existsSync(folder)) {
+            return false
+        }
+        // delete it (retrying, in case Windows is still releasing files from killed processes)
+        output("uv", `Deleting environment ${subfolder}...`)
+        await fs.promises.rm(folder, {
+            recursive: true,
+            force: true,
+            maxRetries: 5,
+            retryDelay: 200
+        })
+        this.executable = undefined
+        output("uv", `Deleted environment ${subfolder}.`)
+
+        return true
     }
 
     /**

@@ -6,7 +6,7 @@
     import { BugReportDlg } from "$lib/dialogs/bugReport";
     import { electron, python } from "$lib/globals.svelte";
     import { DeviceManagerDialog } from "$lib/dialogs/deviceManager/index.js";
-    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/pluginManager";
+    import { PluginManagerDlg, PsychoPyBranchDlg } from "$lib/dialogs/environmentManager";
     import semver from "semver";
     import { translate } from "$lib/translation";
 

@@ -72,70 +72,71 @@
     <!-- notebook -->
     {#if Object.keys(element.sortedParams).filter(value => value !== "uncategorised").length}
         <Notebook>
-            {#each Object.entries(element.sortedParams).sort(
-                (left, right) => (categOrder[left[0]] || 0) - (categOrder[right[0]] || 0)
-            ) as [categ, params]}
-                {#if !Object.keys(params).every(
+            {#each Object.entries(element.sortedParams).filter(
+                ([categ, params]) => categ !== "uncategorised" && !Object.keys(params).every(
                     (value) => hideParams.includes(value)
-                ) && categ !== "uncategorised"}
-                    <NotebookPage
-                        label={categ}
-                        highlight={highlightCategs[categ]}
-                        data={element}
-                        bind:selected={
-                            () => {return pageIndex === categ},
-                            (value) => {pageIndex = categ}
-                        }
-                        data-testid={categ}
-                    >
-                        <div class=params-panel>
-                            <!-- start ctrl, if needed -->
-                            {#if "startVal" in params}
-                                <StartStopCtrl
-                                    bind:valueParam={element.params.startVal}
-                                    bind:typeParam={element.params.startType}
-                                    bind:expectedParam={element.params.startEstim}
+                )
+            ).sort(
+                (left, right) => (categOrder[left[0]] || 0) - (categOrder[right[0]] || 0)
+            ) as [categ, params], i}
+                <NotebookPage
+                    label={categ}
+                    initial={i===0}
+                    highlight={highlightCategs[categ]}
+                    data={element}
+                    bind:selected={
+                        () => {return pageIndex === categ},
+                        (value) => {pageIndex = categ}
+                    }
+                    data-testid={categ}
+                >
+                    <div class=params-panel>
+                        <!-- start ctrl, if needed -->
+                        {#if "startVal" in params}
+                            <StartStopCtrl
+                                bind:valueParam={element.params.startVal}
+                                bind:typeParam={element.params.startType}
+                                bind:expectedParam={element.params.startEstim}
+                            />
+                        {/if}
+                        <!-- stop ctrl, if needed -->
+                        {#if "stopVal" in params}
+                            <StartStopCtrl
+                                bind:valueParam={element.params.stopVal}
+                                bind:typeParam={element.params.stopType}
+                                bind:expectedParam={element.params.durationEstim}
+                            />
+                        {/if}
+                        <!-- other params -->
+                        {#each Object.entries(params) as [name, param]}
+                            {#if name in translatableParams}
+                                <!-- translatable code params need to be in a pane sizer -->
+                                <TranslatedCodeCtrl
+                                    bind:codeTypeParam={element.params["Code Type"]}
+                                    bind:pyParam={element.params[name]}
+                                    bind:jsParam={element.params[translatableParams[name]]}
+                                />
+                            {:else if [
+                                "startVal", 
+                                "startType", 
+                                "startEstim", 
+                                "stopVal", 
+                                "stopType", 
+                                "durationEstim", 
+                                ...Object.values(translatableParams), 
+                                ...hideParams
+                            ].includes(name)}
+                                <!-- start/stop params and JS params are already covered, so skip them along with any always hidden -->
+                            {:else}
+                                <!-- other params rendered as normal -->
+                                <ParamCtrl 
+                                    name={name} 
+                                    bind:param={element.params[name]}
                                 />
                             {/if}
-                            <!-- stop ctrl, if needed -->
-                            {#if "stopVal" in params}
-                                <StartStopCtrl
-                                    bind:valueParam={element.params.stopVal}
-                                    bind:typeParam={element.params.stopType}
-                                    bind:expectedParam={element.params.durationEstim}
-                                />
-                            {/if}
-                            <!-- other params -->
-                            {#each Object.entries(params) as [name, param]}
-                                {#if name in translatableParams}
-                                    <!-- translatable code params need to be in a pane sizer -->
-                                    <TranslatedCodeCtrl
-                                        bind:codeTypeParam={element.params["Code Type"]}
-                                        bind:pyParam={element.params[name]}
-                                        bind:jsParam={element.params[translatableParams[name]]}
-                                    />
-                                {:else if [
-                                    "startVal", 
-                                    "startType", 
-                                    "startEstim", 
-                                    "stopVal", 
-                                    "stopType", 
-                                    "durationEstim", 
-                                    ...Object.values(translatableParams), 
-                                    ...hideParams
-                                ].includes(name)}
-                                    <!-- start/stop params and JS params are already covered, so skip them along with any always hidden -->
-                                {:else}
-                                    <!-- other params rendered as normal -->
-                                    <ParamCtrl 
-                                        name={name} 
-                                        bind:param={element.params[name]}
-                                    />
-                                {/if}
-                            {/each}
-                        </div>
-                    </NotebookPage>
-                {/if}
+                        {/each}
+                    </div>
+                </NotebookPage>
             {/each}
         </Notebook>
     {/if}

@@ -86,6 +86,7 @@
 
 <ListDetail
     bind:params={params}
+    placeholder={translate("Click on a project to get started")}
 >
     {#snippet ctrls(params)}
         <SearchCtrl 

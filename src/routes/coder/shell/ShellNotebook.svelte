@@ -22,6 +22,7 @@
 <Notebook>
     <NotebookPage
         label={translate("Stdout")}
+        initial
         bind:selected={
             () => current.shelltab === "stdout",
             (value) => {

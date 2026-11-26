@@ -18,19 +18,17 @@
     let dialog = getContext("dialog")
 
     // augment onclick according to action
-    function handler(evt) {
+    async function handler(evt) {
         // handle when HELP button supplies onclick as a string
         if (action === "HELP" && typeof onclick === "string") {
             window.open(onclick, '_blank');
             return
         }
-        try {
-            onclick?.(evt);
-        } finally {
-            // close dialog if needed (even if onclick errored)
-            if (["OK", "CANCEL", "YES", "NO"].includes(action)) {
-                dialog.shown = false;
-            }
+        // run and await onclick function
+        await onclick?.(evt);
+        // close dialog if needed (even if onclick errored)
+        if (["OK", "CANCEL", "YES", "NO"].includes(action)) {
+            dialog.shown = false;
         }
     }
 

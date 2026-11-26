@@ -2,6 +2,7 @@ import { app } from 'electron';
 import { platform , arch } from "process";
 import path from "path";
 import fs from "fs";
+import semver from "semver";
 import { execSync, execTracked, output, resolvePackageVersion } from "./utils.js";
 import { downloadFolder } from "../files.js";
 import { appVersion } from "../tools/version.js";
@@ -237,9 +238,11 @@ export class UV {
             let pyVersion = execSync(undefined, `"${executable}"`, ["--version"]).match(/Python (\d+\.\d+)/)[1]
             // store
             output.push({
+                name: subfolder,
                 executable: executable,
                 psychopyVersion: subfolder,
-                pythonVersion: pyVersion
+                pythonVersion: pyVersion,
+                isApp: subfolder === appVersion || subfolder === semver.coerce(appVersion)?.version
             })
             
         }

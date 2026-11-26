@@ -41,13 +41,14 @@
             bind:value={searchTerm} 
         />
         <Notebook>
-            {#each ["system", "packaged", "user", "experiment"] as source}
+            {#each ["system", "packaged", "user", "experiment"] as source, i}
                 <NotebookPage
                     label={FontManager[source].label}
                     bind:selected={
                         () => currentTab === source,
                         (value) => currentTab = source
                     }
+                    initial={i===0}
                 >
                     <div class=page>
                         <div class=info>

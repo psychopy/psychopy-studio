@@ -14,6 +14,8 @@
         onremove=undefined,
         /** @prop @type {string|undefined} Tooltip when hovered over remove button */
         removeTooltip=undefined,
+        /** @prop {boolean} initial Start off with this item selected, if no others are */
+        initial=false,
         /** @prop @type {array<Snippet>} Children of this element are presumed to be the contents of details */
         children
     } = $props()
@@ -31,6 +33,7 @@
             index: index,
             categ: categ,
             get data() { return data },
+            initial: initial,
             button: itemButton,
             details: itemDetails,
             shown: true

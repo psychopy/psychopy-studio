@@ -22,6 +22,8 @@
         data={},
         /** @prop {Snippet} contextMenu Menu with which to replace the default context menu on this tab */
         contextMenu=undefined,
+        /** @prop {boolean} initial Start off with this item selected, if no others are */
+        initial=false,
         /** @prop {Snippet} children Child elements make up the contents of this page */
         children=undefined,
         /** @prop {ComponentProps} props Other props are passed to the tab button */
@@ -53,6 +55,7 @@
     onMount(() => {
         siblings.all.push({
             handle: handle,
+            initial: initial,
             select: () => selected = true
         })
     })

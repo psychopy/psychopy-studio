@@ -3,8 +3,7 @@
     import { Dialog } from "$lib/ui/dialog";
     import PluginsPanel from "./plugins/PluginsPanel.svelte";
     import PackagesPanel from "./packages/PackagesPanel.svelte";
-    import VenvChooser from "./VenvChooser.svelte";
-    import { python } from "$lib/globals.svelte"
+    import EnvironmentsPanel from "./environments/EnvironmentsPanel.svelte";
     import { translate } from "$lib/translation";
 
     let {
@@ -26,17 +25,14 @@
     buttons={["OK"]}
 >
     <div class=container>
-        <div class=environment-ctrl>
-            {translate("Python environment:")}
-            <VenvChooser 
-                bind:value={venv}
-            />
-        </div>
+        <EnvironmentsPanel 
+            bind:value={venv}
+        />
 
         <Notebook>
-
             <NotebookPage
                 label={translate("Plugins")}
+                initial
                 bind:selected={
                     () => pages.current === "plugins",
                     value => pages.current = "plugins"
@@ -60,16 +56,12 @@
 <style>
     .container {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         height: 100%;
         width: 100%;
         gap: 1rem;
         padding: 1rem;
         box-sizing: border-box;
         align-items: stretch;
-    }
-    .environment-ctrl {
-        display: flex;
-        flex-direction: column;
     }
 </style>

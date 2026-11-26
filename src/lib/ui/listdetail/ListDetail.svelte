@@ -1,12 +1,15 @@
 <script>
     import { setContext } from "svelte";
     import { PanelButton } from "$lib/ui/button";
+    import { PlaceholderPage } from '$lib/ui/placeholder';
 
     let {
         /** @prop @type {object|undefined} Parameters to use for filtering; bind to this to read/set them from outside */
         params=$bindable(),
         /** @prop @type {((params: object, data: object) => boolean)|undefined} Function which takes an item's data along with an object of optional parameters, then returns whether it should be shown */
         filter=(params, data) => true,
+        /** @prop {Snippet|string} [placeholder] Content to be rendered in the placeholder page */
+        placeholder=undefined,
         /** @prop @type {Snippet|undefined} Snippet for optional other controls; it receives a parameters object so can bind to it */
         ctrls=undefined,
         /** @prop @type {Snippet} */
@@ -19,6 +22,7 @@
         categories: {},
         items: []
     })
+    $inspect(items)
     setContext("siblings", items)
     // assign defaults if not given any params
     if (params === undefined) {
@@ -33,6 +37,16 @@
             items.items[i].shown = filter(params, items.items[i].data)
         }
     })
+    // if no item is selected, select the one marked `initial` (this runs after all items' own
+    // effects, so any item which starts out selected will have claimed selection already)
+    $effect(() => {
+        if (items.selected === undefined) {
+            let initial = items.items.find(item => item.initial && item.shown)
+            if (initial) {
+                items.selected = initial.index
+            }
+        }
+    })
 
     /**
      * Sort items by category
@@ -41,6 +55,10 @@
      */
     function sortByCateg(shownItems) {
         let output = {}
+        // start with registered categories, so they keep the order they're declared in
+        for (let categ in items.categories) {
+            output[categ] = []
+        }
         // iterate through items
         for (let item of shownItems) {
             // make sure we have an entry for this category
@@ -50,8 +68,8 @@
             // add item to categ
             output[item.categ].push(item)
         }
-
-        return Object.entries(output)
+        // don't show categories with no visible items
+        return Object.entries(output).filter(([categ, subitems]) => subitems.length)
     }
 </script>
 
@@ -97,6 +115,11 @@
         {#each items.items.filter(item => item.shown) as item}
             {@render item.details()}
         {/each}
+        {#if items.selected === undefined}
+            <PlaceholderPage 
+                content={placeholder}
+            />
+        {/if}
     </div>
 </div>
 
@@ -127,6 +150,7 @@
         padding: .5rem 0;
     }
     .details-panel {
+        position: relative;
         padding: 2rem;
         background-color: var(--base);
         border: 1px solid var(--overlay);

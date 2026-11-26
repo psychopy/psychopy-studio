@@ -1,0 +1,1 @@
+export { default as PlaceholderPage } from "./PlaceholderPage.svelte";
