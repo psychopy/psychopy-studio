@@ -1,6 +1,8 @@
 <script>
     import { Button } from "$lib/ui/button";
     import { Menu, MenuItem} from '$lib/ui/menu';
+    import { Dialog } from "$lib/ui/dialog";
+    import { AlertsOutput } from "$lib/python/alerts";
     import callbacks from "../callbacks.svelte.js";
     import Component from './Component.svelte';
     import TimelineHeader from './Timeline.svelte';
@@ -12,7 +14,10 @@
         routine=undefined
     } = $props()
 
-    let showDialog = $state(false);
+    let show = $state({
+        paramsDlg: false,
+        alertsDlg: false
+    })
 
     let contextMenu = $state({
         show: false,
@@ -42,15 +47,33 @@
             label={translate("Routine settings")}
             icon="/icons/btn-settings.svg"
             tooltip={translate("Edit settings for this Routine")}
-            onclick={() => showDialog = true}
+            onclick={() => show.paramsDlg = true}
             horizontal 
         />
+        {#if routine.settings.alerts.length}
+            <Button 
+                onclick={evt => show.alertsDlg = true}
+                tooltip={translate("Click to view alerts about this Routine")}
+                icon="/icons/sym-warning.svg"
+                ghost
+            />
+        {/if}
     </div>
 
     <ParamsDialog
         element={routine.settings}
-        bind:shown={showDialog}
+        bind:shown={show.paramsDlg}
     />
+    <Dialog
+        title={translate("Alerts for {}").replaceAll("{}", routine.settings.name)}
+        buttons={["OK"]}
+        bind:shown={show.alertsDlg}
+        closable
+    >
+        <AlertsOutput 
+            bind:alerts={routine.settings.alerts}
+        />
+    </Dialog>
 
     {#if routine.components}
         <TimelineHeader routine={routine} />
@@ -90,15 +113,20 @@
 <style>
     .routine-canvas {
         display: grid;
-        grid-template-columns: [entrypoints] 1rem [name] min-content [undershoot] 3rem [timeline] 1fr [overshoot] 3rem [end];
+        grid-template-columns: [entrypoints] 1rem [alerts] min-content [name] min-content [undershoot] 3rem [timeline] 1fr [overshoot] 3rem [end];
         grid-gap: 0;
         padding-bottom: 2rem;
         height: 100%;
         box-sizing: border-box;
     }
     .button-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+        gap: .5rem;
         grid-column-start: entrypoints;
-        grid-column-end: undershoot;
+        grid-column-end: end;
         justify-self: start;
         margin: .5rem;
         z-index: 2;

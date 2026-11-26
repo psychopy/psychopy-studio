@@ -267,6 +267,11 @@ export class HasParams {
     disabled = $derived(this.params['disabled'] && [true, "true", "True"].includes(this.params['disabled'].val));
 
     /**
+     * Any alerts on this element
+     */
+    alerts = $derived(this.exp?.alerts?.filterFor?.(this) || [])
+
+    /**
      * Whether all of this element's parameters are valid
      */
     valid = $derived(
