@@ -19,9 +19,14 @@ export class Liaison {
         // ready markers
         this.started = false
         this.starting = undefined
+        // token for the current start attempt, which `stop` cancels
+        this.attempt = undefined
+        // interval which pings Liaison to keep the connection alive
+        this.pingpong = undefined
         this.open = Liaison.marker()
         this.ready = Liaison.marker()
-        this.pending = []
+        // messages awaiting a reply, by message ID
+        this.pending = {}
     }
 
     /**
@@ -45,17 +50,37 @@ export class Liaison {
      */
     start() {
         if (!this.starting) {
-            this.starting = this._start().catch(err => {
-                // allow a retry if starting failed
-                this.starting = undefined
-                this.started = false
+            let attempt = { cancelled: false }
+            this.attempt = attempt
+            this.starting = this._start(attempt).catch(async err => {
+                // fully tear down so we can retry clean (unless `stop` already has, in which case a
+                // new attempt may have begun since and we mustn't stop that one)
+                if (this.attempt === attempt) {
+                    await this.stop()
+                }
                 throw err
             })
         }
         return this.starting
     }
 
-    async _start() {
+    /**
+     * @param {{cancelled: boolean}} attempt Token for this start attempt, which `stop` will cancel
+     */
+    async _start(attempt) {
+        /**
+         * Await a step of setup, then bail out if `stop` was called in the meantime - otherwise setup
+         * would carry on against whatever socket/markers exist next, and could mark them ready too soon
+         *
+         * @param {Promise} promise Step to await
+         */
+        let checkpoint = async promise => {
+            let result = await promise
+            if (attempt.cancelled) {
+                throw new Error("Liaison was stopped while starting")
+            }
+            return result
+        }
         // mark started
         this.started = true
         // get liaison constants
@@ -72,7 +97,7 @@ export class Liaison {
                     "Launching Python was blocked by Windows Smart App Control. Recreating Python environment and trying again."
                 )
                 // recreate the environment
-                await this.venv.recreate()
+                await checkpoint(this.venv.recreate())
                 // try again (if this fails, let it error)
                 constants = this.venv.execSync([
                     "-m", "liaison.constants"
@@ -83,11 +108,11 @@ export class Liaison {
         }
         this.constants = JSON.parse(constants)
         // get a safe address
-        this.address = await getSafeAddress()
+        this.address = await checkpoint(getSafeAddress())
         // log start
         logging.log(`Starting Liaison at ${this.address}`)
         // spawn a python process
-        await new Promise((resolve, reject) => {
+        await checkpoint(new Promise((resolve, reject) => {
             this.process = this.venv.spawn(
                 [
                     "-m", "liaison.websocket", this.address
@@ -98,14 +123,16 @@ export class Liaison {
                         if (decoder.decode(evt) === `${this.constants.START_MARKER}@${this.address}`) {
                             resolve(evt)
                         }
-                    }
+                    },
+                    // if Python fails to launch, fail now rather than waiting for the timeout
+                    onerror: reject
                 },
                 // tag output as coming from the app (rather than a script)
                 "app"
             )
             // timeout after 1s
             setTimeout(reject, 10000)
-        })
+        }))
         // create websocket connection
         this.socket = new WebSocket(`ws://${this.address}`);
         // resolve/reject on open/error
@@ -114,11 +141,18 @@ export class Liaison {
         // timeout after 1s
         setTimeout(this.open.reject, 1000)
         // wait for websocket open/error
-        await this.open.promise
+        await checkpoint(this.open.promise)
         // log started
         logging.log("Liaison started")
         // listen for websocket closing
-        this.socket.onclose = evt => logging.error(`Closed websocket on ws://${this.address}`, evt.reason)
+        let socket = this.socket
+        this.socket.onclose = evt => {
+            logging.error(`Closed websocket on ws://${this.address}`, evt.reason)
+            // fail anything still waiting
+            if (this.socket === socket) {
+                this.rejectPending(`Websocket closed before Liaison replied`)
+            }
+        }
         // listen for websocket messages
         this.socket.addEventListener("message", evt => {
             // convert data to JSON
@@ -136,8 +170,9 @@ export class Liaison {
                 this.output(msg.tag, msg)
             }
         })
-        // start a ping pong to keep the connection alive
-        setInterval(
+        // start a ping pong to keep the connection alive (clearing any left over from a previous start)
+        clearInterval(this.pingpong)
+        this.pingpong = setInterval(
             () => this.send({
                 command: "ping"
             }, 30000, true).catch(
@@ -146,67 +181,71 @@ export class Liaison {
         )
 
         // setup alerts
-        if (await this.send({
+        if (await checkpoint(this.send({
             command: "exists",
             args: ["psychopy.alerts.liaison:LiaisonAlertHandler"]
-        }, 10000, true)) {
-            await this.send({
+        }, 10000, true))) {
+            await checkpoint(this.send({
                 command: "init",
                 args: ["alerts", "psychopy.alerts.liaison:LiaisonAlertHandler"],
                 kwargs: {
                     liaison: "$liaison"
                 }
-            }, 30000, true)
-            await this.send({
+            }, 30000, true))
+            await checkpoint(this.send({
                 command: "run",
                 args: ["psychopy.alerts:addAlertHandler", "$alerts"]
             }, 30000, true).catch(
                 err => logging.error(["Failed to add alert handler", err])
-            )
+            ))
         }
-        
+
         // setup prefs
         try {
-            await this.send({
+            await checkpoint(this.send({
                 command: "register",
                 args: ["prefs", "psychopy.preferences:prefs"]
             }, 10000, true).catch(
                 err => logging.error([`Failed to load prefs`, err])
-            )
+            ))
             // point to devices json
-            await this.send({
+            await checkpoint(this.send({
                 command: "try",
                 args: ["prefs.setDevicesFile", path.join(
                     app.getPath("appData"), "psychopy4", "devices.json"
                 )]
             }, undefined, true).catch(
                 err => logging.error([`Failed to set devices file`, err])
-            )
+            ))
             // set prefs from JSON
-            await this.send({
+            await checkpoint(this.send({
                 command: "try",
                 args: ["prefs.fromJSON", path.join(
                     app.getPath("appData"), "psychopy4", "preferences.json"
                 )]
             }, undefined, true).catch(
                 err => logging.error([`Failed to load preferences`, err])
-            )
+            ))
         } catch (err) {
+            // don't swallow being stopped mid-start
+            if (attempt.cancelled) {
+                throw err
+            }
             // todo: this fails on <2026.0, how can we get prefs otherwise?
             err => logging.error(`Failed to setup preferences`, err)
         }
 
         // activate plugins
-        if (await this.send({
+        if (await checkpoint(this.send({
             command: "exists",
             args: ["psychopy.plugins:activatePlugins"]
-        }, 10000, true)) {
-            await this.send({
+        }, 10000, true))) {
+            await checkpoint(this.send({
                 command: "run",
                 args: ["psychopy.plugins:activatePlugins"]
             }, undefined, true).catch(
                 err => logging.error(["Failed to activate plugins", err])
-            )
+            ))
         }
 
         // mark ready
@@ -214,6 +253,14 @@ export class Liaison {
     }
 
     async stop() {
+        // cancel any start in progress, so it doesn't carry on setting up after we've stopped
+        if (this.attempt) {
+            this.attempt.cancelled = true
+            this.attempt = undefined
+        }
+        // stop pinging
+        clearInterval(this.pingpong)
+        this.pingpong = undefined
         // kill Python process
         if (this.process) {
             await this.process.kill()
@@ -234,7 +281,21 @@ export class Liaison {
         if (this.ready.settled) {
             this.ready = Liaison.marker()
         }
-        this.pending = []
+        // fail any messages still awaiting a reply
+        this.rejectPending(`Liaison was stopped before it replied`)
+    }
+
+    /**
+     * Reject all messages which are still awaiting a reply
+     *
+     * @param {string} reason Error message to reject with
+     */
+    rejectPending(reason) {
+        for (let deferred of Object.values(this.pending)) {
+            deferred.reject({
+                error: [reason]
+            })
+        }
     }
 
     /**
@@ -254,30 +315,39 @@ export class Liaison {
             await this.ready.promise
         }
         // wait for other messages to finish (without inheriting their failures)
-        await Promise.allSettled(this.pending).catch(err => {})
+        await Promise.allSettled(
+            Object.values(this.pending).map(deferred => deferred.promise)
+        )
+        // if Liaison was stopped while we waited, there's nothing to send to
+        if (!this.socket) {
+            throw {
+                error: [`Liaison was stopped before message could be sent: ${JSON.stringify(msg, undefined, 4)}`]
+            }
+        }
+        // keep a ref to the socket we're sending on, in case it's replaced before we get a reply
+        let socket = this.socket
         // generate random ID
         let msgid = crypto.randomUUID()
         // start timer
         let startTime = performance.now()
-        // log message
-        logging.log(msg,`SENT\t${msgid}`, "liaison", false)
-        // send message with ident
-        this.socket.send(
-          JSON.stringify({
-            command: msg,
-            id: msgid
-          })
-        );
-        // create promise and store it in Liaison's array of pending
+        // create promise and store it in Liaison's object of pending messages
         let promise = Promise.withResolvers()
-        this.pending.push(promise.promise)
+        this.pending[msgid] = promise
         // setup timeout
+        let timer
         if (timeout) {
-            setTimeout(evt => promise.reject({
+            timer = setTimeout(evt => promise.reject({
                 error: [`Message timed out: ${JSON.stringify(msg, undefined, 4)}`],
                 evt: evt
             }), timeout)
         }
+        // clean up so nothing waits on this message
+        let cleanup = () => {
+            delete this.pending[msgid]
+            clearTimeout(timer)
+            socket.removeEventListener("message", lsnr)
+        }
+        promise.promise.then(cleanup, cleanup)
         // define listener to find reply then remove itself
         let lsnr = evt => {
             // parse reply
@@ -291,9 +361,7 @@ export class Liaison {
             if (data?.evt?.id !== msgid) {
                 return
             }
-            // if ID matches, store and stop listening
-            this.socket.removeEventListener("message", lsnr)
-            // resolve or reject
+            // resolve or reject (listener is removed by cleanup once settled)
             if ("response" in data) {
                 // log reply
                 logging.log(data.response, `RECEIVED\t${performance.now() - startTime}ms\t${msgid}`, "liaison", false)
@@ -307,8 +375,24 @@ export class Liaison {
             }
         }
         // listen for reply
-        this.socket.addEventListener("message", lsnr)
-        
+        socket.addEventListener("message", lsnr)
+        // log message
+        logging.log(msg,`SENT\t${msgid}`, "liaison", false)
+        // send message with ident
+        try {
+            socket.send(
+              JSON.stringify({
+                command: msg,
+                id: msgid
+              })
+            );
+        } catch (err) {
+            // if sending failed, no reply is coming
+            promise.reject({
+                error: [`Failed to send message: ${err?.message || err}`]
+            })
+        }
+
         return promise.promise
     }
 

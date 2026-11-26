@@ -127,7 +127,7 @@ const python = {
     stop: (venv, id) => ipcRenderer.invoke("python.scripts.stop", venv, id).then(resp => resp),
   },
   psychojs: {
-    run: (cwd, params={}) => ipcRenderer.invoke("python.psychojs.run", cwd, params).then(resp => resp),
+    run: (cwd, params={}, width, height, fullscreen) => ipcRenderer.invoke("python.psychojs.run", cwd, params, width, height, fullscreen).then(resp => resp),
     stop: (address) => ipcRenderer.invoke("python.psychojs.stop", address).then(resp => resp),
   }
 }

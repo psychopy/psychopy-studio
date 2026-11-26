@@ -238,7 +238,9 @@ export class PythonVenv {
             } else {
                 // for released version, install from tag
                 let pkg = "psychopy"
-                if (semver.parse(this.psychopyVersion) < "2026.2.0") {
+                // compare with semver
+                let parsed = semver.coerce(this.psychopyVersion)
+                if (parsed && semver.lt(parsed, "2026.2.0")) {
                     // older versions need to use psychopy-lib rather than psychopy to avoid installing wx
                     pkg += "-lib"
                 }
@@ -495,7 +497,7 @@ export class PythonVenv {
      * Spawn a Python process
      * 
      * @param {array<string>} args Arguments to pass on spawn
-     * @param {object} callbacks Functions to call on stdout/stderr (`onstdout` and `onstderr`)
+     * @param {object} callbacks Functions to call on stdout/stderr (`onstdout` and `onstderr`), and if the process fails to launch (`onerror`)
      * @param {string} tag Subchannel to send output over (e.g. "app" sends to `stdout:app`/`stderr:app` as well as `stdout`/`stderr`), leave undefined to only send to `stdout`/`stderr`
      */
     spawn(args, callbacks={
@@ -521,6 +523,12 @@ export class PythonVenv {
                 this.onstderr(evt)
             }
         )
+        // add listener for the process failing to launch
+        process.on("error", err => {
+            logging.error(`Python process failed to launch: ${err.message}`)
+            output(tag ? `stderr:${tag}` : "stderr", `Python failed to launch: ${err.message}`)
+            callbacks.onerror?.(err)
+        })
         // add listener to know when process exits
         process.on("exit", evt => logging.log(
             `Python process stopped, reason: ${evt?.message}`

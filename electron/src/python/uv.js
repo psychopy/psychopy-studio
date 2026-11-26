@@ -162,11 +162,10 @@ export class UV {
                 })
             }
         }
-        // map installers to system architectures
+        // map installers to system architectures 
         let installers = {
             win32: {
                 x64: "uv-x86_64-pc-windows-msvc.zip",
-                x86: "uv-i686-pc-windows-msvc.zip",
                 arm64: "uv-aarch64-pc-windows-msvc.zip",
             },
             darwin: {
@@ -175,13 +174,7 @@ export class UV {
             },
             linux: {
                 x64: "uv-x86_64-unknown-linux-gnu.tar.gz",
-                x86: "uv-i686-unknown-linux-gnu.tar.gz",
-                arm: "uv-armv7-unknown-linux-gnueabihf.tar.gz",
                 arm64: "uv-aarch64-unknown-linux-gnu.tar.gz",
-                ppc: "uv-powerpc64-unknown-linux-gnu.tar.gz",
-                s390x: "uv-s390x-unknown-linux-gnu.tar.gz",
-                ppc64: "uv-powerpc64le-unknown-linux-gnu.tar.gz",
-                ricsv: "uv-riscv64gc-unknown-linux-gnu.tar.gz",
             }
         }
         // Linux requires some further distinctions
@@ -190,24 +183,29 @@ export class UV {
             if (!process.report.getReport().header?.glibcVersionRuntime) {
                 installers.linux = {
                     x64: "uv-x86_64-unknown-linux-musl.tar.gz",
-                    x86: "uv-i686-unknown-linux-musl.tar.gz",
-                    arm: "uv-armv7-unknown-linux-musleabihf.tar.gz",
                     arm64: "uv-aarch64-unknown-linux-musl.tar.gz",
                 }
             }
         }
-        // get relevant executable 
+        // get relevant executable
+        let installer = installers[platform]?.[arch]
+        // error if there isn't one
+        if (!installer) {
+            throw new Error(`UV is not available for this system (${platform}, ${arch})`)
+        }
         this.output(`Downloading UV for ${platform} (${arch})...`)
         try {
             await downloadFolder(
-                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installers[platform][arch]}`,
+                `https://github.com/astral-sh/uv/releases/download/${this.version}/${installer}`,
                 path.dirname(this.uvFolder),
                 path.basename(this.uvFolder),
                 true
             )
             this.output(`Finished installing UV.`)
         } catch (err) {
-            this.output(err?.error || err)
+            // log the failure, then pass it on
+            this.output(`Failed to install UV: ${err?.message || err?.error || err}`)
+            throw err
         }
     }
 
@@ -224,10 +222,6 @@ export class UV {
         }
         // iterate through subfolders in the python folder
         for (let subfolder of fs.readdirSync(this.pyFolder)) {
-            // reinstate .* syntax
-            if (subfolder.match(/^\d+\.\d+$/)) {
-                subfolder += ".*"
-            }
             // look for an executable in this folder
             let executable = await this.findPython(subfolder)
             // skip this folder if it doesn't have one
@@ -298,10 +292,8 @@ export class UV {
     async makeExecutable(psychopyVersion=appVersion, pythonVersion="3.10") {
         // wait until folder has been specified
         await this.folderSpecified.promise
-        // strip * if present
-        if (psychopyVersion.match(/\d+\.\d+\.\*/)) {
-            psychopyVersion = psychopyVersion.match(/\d+\.\d+/)[0]
-        }
+        // resolve asterisks
+        psychopyVersion = await resolvePackageVersion(psychopyVersion, "psychopy")
         // get specific folder for this version
         let folder = path.join(
             this.pyFolder, psychopyVersion

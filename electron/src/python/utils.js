@@ -9,6 +9,23 @@ import { appVersion } from "../tools/version.js";
 export const decoder = new TextDecoder();
 
 
+class ProcessError extends Error {
+    constructor(message, {code, signal, command} = {}) {
+        // substitute a default message
+        if (message === undefined) {
+            message = "Process error"
+        }
+        // initialise superclass
+        super(message)
+        this.name = "ProcessError"
+        // store extra info
+        this.code = code
+        this.signal = signal
+        this.command = command
+    }
+}
+
+
 /**
  * Use PyPi to resolve an asterisk in a version number (e.g. psychopy 2022.2.* => 2022.2.5)
  * 
@@ -198,7 +215,21 @@ export async function execTracked(tag, command, args, timeout=undefined, env={})
     process.stderr.on("data", evt => output(tag, evt))
     // await completion/error
     let promise = Promise.withResolvers()
-    process.on("close", (code, signal) => promise.resolve([code, signal]))
+    process.on("close", (code, signal) => {
+        if (code === 0) {
+            // resolve on a success
+            promise.resolve([code, signal])
+        } else {
+            // reject if there was an error code
+            promise.reject(
+                new ProcessError(
+                    `${command} exited with code ${code}`, 
+                    { code, signal, command }
+                )
+            )
+        }
+    })
+    // reject is the process itself errors
     process.on("error", err => promise.reject(err))
 
     return promise.promise

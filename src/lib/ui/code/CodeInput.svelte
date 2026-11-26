@@ -7,7 +7,9 @@
         label=undefined,
         onsubmit=evt => {},
         onprevious=evt => {},
-        onnext=evt => {}
+        onnext=evt => {},
+        busy=$bindable(),
+        disabled=false
     } = $props()
 
     let ctrl = $state.raw();
@@ -16,13 +18,23 @@
 <textarea 
     bind:this={ctrl}
     bind:value={value}
-    placeholder={placeholder}
+    placeholder={busy ? translate("...") : placeholder}
     aria-label={label}
-    onkeypress={evt => {
+    onkeypress={async evt => {
+        // ignore if busy
+        if (busy) return
         // on submit...
         if (evt.key === "Enter" && !evt.shiftKey) {
             evt.preventDefault()
-            onsubmit(evt)
+            // mark as busy
+            busy = true
+            // execute submit function
+            try {
+                await onsubmit(evt)
+            } finally {
+                // mark as not busy
+                busy = false
+            }
         }
     }}
     onkeydown={evt => {
@@ -36,6 +48,8 @@
             onnext(evt)
         }
     }}
+    readonly={busy}
+    disabled={disabled}
 >
 </textarea>
 
