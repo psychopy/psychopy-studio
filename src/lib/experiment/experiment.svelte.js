@@ -51,7 +51,7 @@ export class AlertsManager {
      */
     update() {
         // clear alerts
-        this.all.length = 1
+        this.all.length = 0
         // compile scripts to generate new alerts
         if (!this.busy) {
             // mark busy
