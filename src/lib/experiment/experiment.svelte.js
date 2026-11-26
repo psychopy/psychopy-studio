@@ -734,7 +734,7 @@ export class Experiment {
      * @param {boolean} dryrun Prevent this function from saving any files
      * @returns 
      */
-    async writeScript(target="PsychoPy", dryrun=true) {
+    async writeScript(target="PsychoPy", dryrun=false) {
         if (!python) {
             console.error("Script writing is not available in browser.")
             return
