@@ -5,6 +5,7 @@
     import { Icon } from "$lib/ui/icon";
     import { prefs } from "$lib/preferences.svelte";
     import { marked } from "marked";
+    import { onMount } from "svelte";
     import { translate } from "$lib/translation";
 
     let {
@@ -16,7 +17,9 @@
 
     // listen for show message from electron
     if (electron) {
-        electron.windows.listen("showTips", (evt, value) => shown = value)
+        onMount(
+            () => electron.windows.listen("showTips", (evt, value) => shown = value)
+        )
     }
     // pick a tip at random
     let tip = $state.raw();

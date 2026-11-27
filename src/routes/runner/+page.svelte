@@ -10,7 +10,7 @@
     import { Button } from "$lib/ui/button";
     import FilesPanel from "./files/Panel.svelte";
     import { current } from "./globals.svelte";
-    import { setContext } from "svelte";
+    import { setContext, onMount } from "svelte";
     import StdoutOutput from "./outputs/StdoutOutput.svelte";
     import PavloviaOutput from "./outputs/PavloviaOutput.svelte";
     import { electron, python, git } from "$lib/globals.svelte";
@@ -37,41 +37,51 @@
     
     // listen for messages from other windows
     if (electron) {
-        // for opening files via another window
-        electron.windows.listen("fileOpen", (evt, file) => callbacks.addFile.fcn(file))
-        // mark ready
-        electron.windows.emit("ready", true)
+        onMount(() => {
+            // for opening files via another window
+            let unlisten = electron.windows.listen("fileOpen", (evt, file) => callbacks.addFile.fcn(file))
+            // mark ready (only once listening, so no files are missed)
+            electron.windows.emit("ready", true)
+
+            return unlisten
+        })
     }
 
-    // setup listeners for stdout
-    python.output.stdout.listen(
-        (evt, message) => current.output.stdout += `${message}\n`
-    )
-    python.output.stderr.listen(
-        (evt, message) => {
-            current.output.stdout += `${message}\n`;
-            // focus runner and switch to stdout tab
-            showWindow("runner", true)
-            current.tab = "stdout";
-        }
-    )
-    python.liaison.listen("error",
-        (evt, message) => {
-            current.output.stdout += `${message.error}\n`;
-            // focus runner and switch to stdout tab
-            showWindow("runner", true)
-            current.tab = "stdout";
-        }
-    )
-    // setup listener for pavlovia
-    git.listen(
-        (evt, message) => {
-            current.output.pavlovia += message + "\n";
-            // switch to pavlovia tab and flash to indicate new input
-            current.tab = "pavlovia";
-            electron?.windows.flash()
-        }
-    )
+    onMount(() => {
+        let unlisteners = [
+            // setup listeners for stdout
+            python.output.stdout.listen(
+                (evt, message) => current.output.stdout += `${message}\n`
+            ),
+            python.output.stderr.listen(
+                (evt, message) => {
+                    current.output.stdout += `${message}\n`;
+                    // focus runner and switch to stdout tab
+                    showWindow("runner", true)
+                    current.tab = "stdout";
+                }
+            ),
+            python.liaison.listen("error",
+                (evt, message) => {
+                    current.output.stdout += `${message.error}\n`;
+                    // focus runner and switch to stdout tab
+                    showWindow("runner", true)
+                    current.tab = "stdout";
+                }
+            ),
+            // setup listener for pavlovia
+            git.listen(
+                (evt, message) => {
+                    current.output.pavlovia += message + "\n";
+                    // switch to pavlovia tab and flash to indicate new input
+                    current.tab = "pavlovia";
+                    electron?.windows.flash()
+                }
+            )
+        ]
+
+        return () => unlisteners.forEach(unlisten => unlisten())
+    })
 
     // keep app state up to date with open files
     if (electron) {

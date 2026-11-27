@@ -11,9 +11,15 @@
     import { translate } from "$lib/translation";
     import ChooseDirectory from "./ChooseDirectory.svelte";
     import { prefs } from "$lib/preferences.svelte.js";
-    
+    import { onMount } from "svelte";
+
     // setup logging to app
-    electron.windows.listen("uv", (evt, message) => status.logs += `${message}\n`)
+    onMount(
+        () => electron.windows.listen(
+            "uv", 
+            (evt, message) => status.logs += `${message}\n`
+        )
+    )
     // setup on initial load
     $effect(() => {
         if (prefs.params.environmentsFolder.val) {

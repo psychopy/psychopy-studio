@@ -3,14 +3,19 @@
     import { MessageDialog, DialogButton } from "$lib/ui/dialog";
     import { python, electron } from "$lib/globals.svelte";
     import { translate } from "$lib/translation";
-    import { untrack } from "svelte";
+    import { untrack, onMount } from "svelte";
 
     let {
         tag,
         shown=$bindable()
     } = $props()
     let output = $state.raw("")
-    electron.windows.listen(untrack(() => $state.snapshot(tag)), (evt, value) => output += value)
+    onMount(
+        () => electron.windows.listen(
+            untrack(() => $state.snapshot(tag)), 
+            (evt, value) => output += value
+        )
+    )
 </script>
 
 <MessageDialog

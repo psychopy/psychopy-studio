@@ -75,14 +75,19 @@
         return () => removeFromTemplate(template, entry)
     })
     // listen for calls from backend
-    electron.windows.listen(`menu:${id}`, evt => {
-        // execute the callback for this item's action (unless disabled)
-        if (callback && !callback.disabled) {
-            callback.fcn()
-        }
-        // execute front-end onclick function
-        onclick?.(evt, data)
-    })
+    onMount(
+        () => electron.windows.listen(
+            `menu:${id}`, 
+            evt => {
+                // execute the callback for this item's action (unless disabled)
+                if (callback && !callback.disabled) {
+                    callback.fcn()
+                }
+                // execute front-end onclick function
+                onclick?.(evt, data)
+            }
+        )
+    )
     // keep the template up to date as this item's values change
     $effect(() => Object.assign(
         entry,

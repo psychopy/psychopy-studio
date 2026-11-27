@@ -1,5 +1,5 @@
 <script>
-    import { setContext } from "svelte";
+    import { setContext, onMount } from "svelte";
     import { current } from "./globals.svelte";
     import Theme from "$lib/utils/Theme.svelte";
     import CoderRibbon from "./ribbon/Ribbon.svelte";
@@ -34,10 +34,14 @@
 
     // listen for messages from other windows
     if (electron) {
-        // for opening files via another window
-        electron.windows.listen("fileOpen", (evt, file) => current.openFile(file))
-        // mark ready
-        electron.windows.emit("ready", true)
+        onMount(() => {
+            // for opening files via another window
+            let unlisten = electron.windows.listen("fileOpen", (evt, file) => current.openFile(file))
+            // mark ready (only once listening, so no files are missed)
+            electron.windows.emit("ready", true)
+
+            return unlisten
+        })
     }
 
     // keep app state up to date with open files

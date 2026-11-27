@@ -10,7 +10,7 @@
     import ComponentsPanel from './components/Panel.svelte';
     import FlowPanel from './flow/Panel.svelte';
     import { current } from "./globals.svelte.js";
-    import { setContext } from 'svelte';
+    import { setContext, onMount } from 'svelte';
     import { electron } from "$lib/globals.svelte";
     import { SetupPython, PythonErrors } from '$lib/python';
     import ReadMe from '$lib/dialogs/readme/ReadMe.svelte';
@@ -33,10 +33,14 @@
     setContext("callbacks", callbacks)
     // listen for messages from other windows
     if (electron) {
-        // for opening files via another window
-        electron.windows.listen("fileOpen", (evt, file) => callbacks.openFile.fcn(file))
-        // mark ready
-        electron.windows.emit("ready", true)
+        onMount(() => {
+            // for opening files via another window
+            let unlisten = electron.windows.listen("fileOpen", (evt, file) => callbacks.openFile.fcn(file))
+            // mark ready (only once listening, so no files are missed)
+            electron.windows.emit("ready", true)
+
+            return unlisten
+        })
     }
 
 

@@ -4,6 +4,7 @@
     import { CodeOutput } from "$lib/ui/code";
     import { python } from "$lib/globals.svelte.js";
     import { translate } from "$lib/translation";
+    import { onMount } from "svelte";
 
     let {
         enabled=$bindable()
@@ -21,10 +22,16 @@
             })
         }
     }
-    // listen to stderr from the app's own Python processes (not scripts/experiments)
-    python.output.app.stderr.listen(listener)
-    // listen for Liaison too
-    python.liaison.listen("error", listener)
+    onMount(() => {
+        let unlisteners = [
+            // listen to stderr from the app's own Python processes (not scripts/experiments)
+            python.output.app.stderr.listen(listener),
+            // listen for Liaison too
+            python.liaison.listen("error", listener)
+        ]
+
+        return () => unlisteners.forEach(unlisten => unlisten())
+    })
 </script>
 
 

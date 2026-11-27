@@ -38,7 +38,7 @@
     onMount(() => {
         if (subscribe) {
             // setup listener for alerts
-            python.liaison.listen("alert", 
+            return python.liaison.listen("alert",
                 (evt, message) => {
                     // if this code isn't already in the array, add it
                     if (!alerts.some(
