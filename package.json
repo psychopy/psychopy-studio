@@ -168,7 +168,7 @@
 		"monaco-editor": "^0.56.0",
 		"paneforge": "^1.0.2",
 		"path-browserify": "^1.0.1",
-		"semver": "^7.8.5",
+		"semver": "^7.8.6",
 		"tar": "^7.5.22",
 		"tcp-port-used": "^1.0.3",
 		"xml-formatter": "^3.6.5"
