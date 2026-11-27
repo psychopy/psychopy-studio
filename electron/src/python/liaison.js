@@ -137,14 +137,7 @@ export class Liaison {
             }
         })
         // start a ping pong to keep the connection alive
-        setInterval(
-            () => this.send({
-                command: "ping"
-            }, 30000, true).catch(
-                err => logging.error(`Liaison isn't responding (sent a ping and didn't receive a pong within 30s)`)
-            ), 30000
-        )
-
+        setInterval(() => this.ping(), 30000)
         // setup alerts
         if (await this.send({
             command: "exists",
@@ -310,6 +303,20 @@ export class Liaison {
         this.socket.addEventListener("message", lsnr)
         
         return promise.promise
+    }
+
+    /**
+     * Send a harmless message to the server, can be used to check if it's alive or to wait until 
+     * messages have flushed.
+     */
+    async ping() {
+        return this.send(
+            { command: "ping" }, 
+            30000, 
+            true
+        ).catch(
+            err => logging.error(`Liaison isn't responding (sent a ping and didn't receive a pong within 30s)`)
+        )
     }
 
     output(tag, message) {

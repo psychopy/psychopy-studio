@@ -86,7 +86,8 @@ const python = {
     listen: (tag, lsnr) => listen(`liaison:${tag}`, lsnr),
     send: (venv, message, timeout) => ipcRenderer.invoke("python.liaison.send", venv, message, timeout).then(resp => resp),
     started: (venv) => ipcRenderer.invoke("python.liaison.started", venv).then(resp => resp),
-    ready: (venv) => ipcRenderer.invoke("python.liaison.ready", venv).then(resp => resp)
+    ready: (venv) => ipcRenderer.invoke("python.liaison.ready", venv).then(resp => resp),
+    ping: (venv) => ipcRenderer.invoke("python.liaison.ping", venv).then(resp => resp)
   },
   venv: {
     setup: (venv, prerelease=false) => ipcRenderer.invoke("python.venv.setup", venv, prerelease).then(resp => resp),

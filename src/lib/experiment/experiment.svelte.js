@@ -13,7 +13,9 @@ import { profiles } from "./profiles.svelte";
 export class AlertsManager {
     
     all = $state([])
-    busy = false
+    // while listening for alerts (i.e. busy), this will contain the unlisten function
+    unlisten = undefined
+    // if a request comes in while busy, this will become true
     queue = false
 
     /**
@@ -24,8 +26,14 @@ export class AlertsManager {
     constructor(exp) {
         // store reference to experiment
         this.exp = exp
-        // setup listener for alerts
-        this.listener = python.liaison.listen("alert", 
+    }
+    /**
+     * Start listening for alerts
+     * 
+     * @returns {function} Function to stop listening
+     */
+    listen() {
+        return python.liaison.listen("alert", 
             (evt, message) => {
                 // only continue if message matches this experiment
                 if (!this.exp?.file.file || message.message.file !== this.exp?.file?.file) return
@@ -51,17 +59,22 @@ export class AlertsManager {
      */
     update() {
         // compile scripts to generate new alerts
-        if (!this.busy) {
-            // mark busy
-            this.busy = true
+        if (!this.unlisten) {
+            // start listening (also indicates busy)
+            this.unlisten = this.listen()
             // clear alerts
             this.all.length = 0
             // compile experiments then mark done
             this.compile().then(
-                () => this.busy = false
+                () => {
+                    // stop listening
+                    this.unlisten()
+                    // clear unlistener (indicates not busy)
+                    delete this.unlisten
+                }
             )
         } else {
-            // if still compiling from last time, queue
+            // if still listening from last time, queue
             this.queue = true
         }
     }
@@ -73,6 +86,8 @@ export class AlertsManager {
         // write scripts
         await this.exp.writeScript("PsychoPy", true).catch(err => {})
         await this.exp.writeScript("PsychoJS", true).catch(err => {})
+        // await a ping to make sure any pending messages have arrived
+        await python.liaison.ping(this.exp.useVersion).catch(err => {})
         // if another request came in while doing this, do it again
         if (this.queue) {
             this.queue = false
@@ -695,6 +710,8 @@ export class Experiment {
             // mark as no longer loading
             this.loading = undefined
         }
+        // update alerts
+        this.alerts.update()
     }
 
     async toFile(file) {
