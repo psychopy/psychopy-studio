@@ -2,7 +2,9 @@
     import RoutineCanvas from './Canvas.svelte';
     import StandaloneRoutineCanvas from './Standalone.svelte'
     import { StandaloneRoutine, Routine } from '$lib/experiment';
-    import { Notebook, NotebookPage, ButtonTab } from '$lib/ui/notebook';
+    import { Notebook, NotebookPage, ButtonTab, TabsGap } from '$lib/ui/notebook';
+    import { Button } from "$lib/ui/button";
+    import { AlertsOutput } from "$lib/python/alerts";
     import { getContext } from "svelte";
     import { Dialog, DialogButton } from '$lib/ui/dialog';
     import { ParamsNotebook } from '$lib/ui/paramCtrls';
@@ -19,6 +21,10 @@
         APPLY: Object.values(valid).some(
             (val) => !val.state
         )
+    })
+
+    let show = $state({
+        alertsDlg: false
     })
 </script>
 
@@ -70,9 +76,35 @@
                 showNewRoutineDialog = true
             }}
             tooltip={translate("New Routine...")}
-        ></ButtonTab>
+        />
     {:catch}
+        {""}
     {/await}
+
+    <TabsGap />
+
+    {#if current.experiment.alerts.all.length}
+        <div class=button-container>
+            <Button 
+                label={translate("Alerts") + (current.experiment.alerts.all.length > 1 ? ` (${current.experiment.alerts.all.length})` : "")}
+                icon="/icons/sym-warning.svg"
+                onclick={evt => show.alertsDlg = true}
+                tooltip={translate("There are alerts for this experiment, click to view them")}
+                ghost
+                small
+            />
+            <Dialog
+                title={translate("Alerts")}
+                buttons={["OK"]}
+                bind:shown={show.alertsDlg}
+                closable
+            >
+                <AlertsOutput 
+                    bind:alerts={current.experiment.alerts.all}
+                />
+            </Dialog>
+        </div>
+    {/if}
 </Notebook>
 
 <!-- dialog for creating a new Routine -->
@@ -115,5 +147,12 @@
 <style>
     .loading-msg {
         color: var(--outline);
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: .25rem .5rem;
     }
 </style>

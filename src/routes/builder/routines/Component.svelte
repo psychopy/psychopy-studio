@@ -53,21 +53,6 @@
 <!-- entry point for this component -->
 <EntryPoint routine={component.routine} index={component.index}></EntryPoint>
 
-<!-- alerts -->
- {#if component.alerts.length}
-    <div 
-        class=alerts-container
-        style:grid-row-start={component.index + 3}
-    >
-        <Button 
-            onclick={evt => show.alertsDlg = true}
-            tooltip={translate("Click to view alerts about this Component")}
-            icon="/icons/sym-warning.svg"
-            ghost
-        />
-    </div>
-{/if}
-
 <!-- icon & name -->
 <button 
     class=comp-name 
@@ -231,16 +216,6 @@
     element={component}
     bind:shown={showDialog} 
 />
-<Dialog
-    title={translate("Alerts for {}").replaceAll("{}", component.name)}
-    buttons={["OK"]}
-    bind:shown={show.alertsDlg}
-    closable
->
-    <AlertsOutput 
-        bind:alerts={component.alerts}
-    />
-</Dialog>
 
 <style>
     .comp-timeline {

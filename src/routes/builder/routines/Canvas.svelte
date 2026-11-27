@@ -1,8 +1,6 @@
 <script>
     import { Button } from "$lib/ui/button";
     import { Menu, MenuItem} from '$lib/ui/menu';
-    import { Dialog } from "$lib/ui/dialog";
-    import { AlertsOutput } from "$lib/python/alerts";
     import callbacks from "../callbacks.svelte.js";
     import Component from './Component.svelte';
     import TimelineHeader from './Timeline.svelte';
@@ -50,30 +48,12 @@
             onclick={() => show.paramsDlg = true}
             horizontal 
         />
-        {#if routine.settings.alerts.length}
-            <Button 
-                onclick={evt => show.alertsDlg = true}
-                tooltip={translate("Click to view alerts about this Routine")}
-                icon="/icons/sym-warning.svg"
-                ghost
-            />
-        {/if}
     </div>
 
     <ParamsDialog
         element={routine.settings}
         bind:shown={show.paramsDlg}
     />
-    <Dialog
-        title={translate("Alerts for {}").replaceAll("{}", routine.settings.name)}
-        buttons={["OK"]}
-        bind:shown={show.alertsDlg}
-        closable
-    >
-        <AlertsOutput 
-            bind:alerts={routine.settings.alerts}
-        />
-    </Dialog>
 
     {#if routine.components}
         <TimelineHeader routine={routine} />
@@ -113,7 +93,7 @@
 <style>
     .routine-canvas {
         display: grid;
-        grid-template-columns: [entrypoints] 1rem [alerts] min-content [name] min-content [undershoot] 3rem [timeline] 1fr [overshoot] 3rem [end];
+        grid-template-columns: [entrypoints] 1rem [name] min-content [undershoot] 3rem [timeline] 1fr [overshoot] 3rem [end];
         grid-gap: 0;
         padding-bottom: 2rem;
         height: 100%;

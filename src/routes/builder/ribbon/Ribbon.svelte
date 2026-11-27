@@ -1,8 +1,6 @@
 <script>
     import callbacks, { prompts, file_new, file_open } from '../callbacks.svelte.js';
     import Menu from "./Menu.svelte";
-    import { Dialog } from "$lib/ui/dialog";
-    import { AlertsOutput } from "$lib/python/alerts"
     import { Ribbon, RibbonSection, RibbonGap } from '$lib/ui/ribbon';
     import { getContext } from "svelte";
     import { electron, python, git } from "$lib/globals.svelte.js";
@@ -155,25 +153,6 @@
         {:catch}
             {""}
         {/await}
-        {#if current.experiment.settings?.alerts.length}
-            <Button 
-                onclick={evt => show.alertsDlg = true}
-                tooltip={translate("Click to view alerts from Experiment Settings")}
-                icon="/icons/sym-warning.svg"
-                ghost
-                tight
-            />
-            <Dialog
-                title={translate("Alerts for experiment settings")}
-                buttons={["OK"]}
-                bind:shown={show.alertsDlg}
-                closable
-            >
-                <AlertsOutput 
-                    bind:alerts={current.experiment.settings.alerts}
-                />
-            </Dialog>
-        {/if}
         <SwitchButton 
             labels={[translate("Pilot"), translate("Run")]} 
             tooltip={current.experiment?.pilotMode ? translate("Experiment will run in pilot mode") : translate("Experiment will run in run mode")}
