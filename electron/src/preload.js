@@ -1,6 +1,22 @@
 const { ipcRenderer, contextBridge, webUtils } = require('electron');
 
 
+/**
+ * Listen on an IPC channel
+ *
+ * @param {string} channel IPC channel to listen on
+ * @param {Function} lsnr Function to call when a message is received
+ * @returns {Function} Function which removes this listener (the listener can't be removed by
+ * passing it back in, as functions are re-wrapped each time they cross the context bridge)
+ */
+function listen(channel, lsnr) {
+  // start listening
+  ipcRenderer.on(channel, lsnr)
+  // return function to remove this listener
+  return () => ipcRenderer.removeListener(channel, lsnr)
+}
+
+
 // details about Electron process
 const electron = {
   windows: {
@@ -8,7 +24,7 @@ const electron = {
     get: (target) => ipcRenderer.invoke("electron.windows.get", target).then(resp => resp),
     send: (id, tag, data) => ipcRenderer.invoke("electron.windows.send", id, tag, data).then(resp => resp),
     emit: (tag, data) => ipcRenderer.send(tag, data),
-    listen: (tag, lsnr) => ipcRenderer.on(tag, lsnr),
+    listen: (tag, lsnr) => listen(tag, lsnr),
     focus: (id) => ipcRenderer.invoke("electron.windows.focus", id).then(resp => resp),
     flash: (id) => ipcRenderer.invoke("electron.windows.flash", id).then(resp => resp),
     devtools: (id) => ipcRenderer.invoke("electron.windows.devtools", id).then(resp => resp),
@@ -67,7 +83,7 @@ const python = {
   liaison: {
     start: (venv) => ipcRenderer.invoke("python.liaison.start",venv).then(resp => resp),
     stop: (venv) => ipcRenderer.invoke("python.liaison.stop",venv).then(resp => resp),
-    listen: (tag, lsnr) => ipcRenderer.on(`liaison:${tag}`, lsnr),
+    listen: (tag, lsnr) => listen(`liaison:${tag}`, lsnr),
     send: (venv, message, timeout) => ipcRenderer.invoke("python.liaison.send", venv, message, timeout).then(resp => resp),
     started: (venv) => ipcRenderer.invoke("python.liaison.started", venv).then(resp => resp),
     ready: (venv) => ipcRenderer.invoke("python.liaison.ready", venv).then(resp => resp)
@@ -96,21 +112,21 @@ const python = {
     getEnvironments: () => ipcRenderer.invoke("python.uv.getEnvironments").then(resp => resp),
     output: {
       send: (message) => ipcRenderer.send("uv", message),
-      listen: (lsnr) => ipcRenderer.on("uv", lsnr)
+      listen: (lsnr) => listen("uv", lsnr)
     }
   },
   output: {
     stdout: {
       send: (message) => ipcRenderer.send("stdout", message),
-      listen: (lsnr) => ipcRenderer.on("stdout", lsnr)
+      listen: (lsnr) => listen("stdout", lsnr)
     },
     stderr: {
       send: (message) => ipcRenderer.send("stderr", message),
-      listen: (lsnr) => ipcRenderer.on("stderr", lsnr)
+      listen: (lsnr) => listen("stderr", lsnr)
     },
     app: {
       stderr: {
-        listen: (lsnr) => ipcRenderer.on("stderr:app", lsnr)
+        listen: (lsnr) => listen("stderr:app", lsnr)
       }
     }
   },
@@ -133,7 +149,7 @@ const python = {
 contextBridge.exposeInMainWorld('python', python)
 
 const git = {
-  listen: (lsnr) => ipcRenderer.on("git", lsnr),
+  listen: (lsnr) => listen("git", lsnr),
   output: (message) => ipcRenderer.invoke("git.output", message).then(resp => resp),
   server: () => ipcRenderer.invoke("git.server").then(resp => resp),
   login: () => ipcRenderer.invoke("git.login").then(resp => resp),
