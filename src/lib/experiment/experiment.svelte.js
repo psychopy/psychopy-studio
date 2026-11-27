@@ -13,6 +13,7 @@ import { profiles } from "./profiles.svelte";
 export class AlertsManager {
     
     all = $state([])
+    pending = []
     // while listening for alerts (i.e. busy), this will contain the unlisten function
     unlisten = undefined
     // if a request comes in while busy, this will become true
@@ -38,7 +39,7 @@ export class AlertsManager {
                 // only continue if message matches this experiment
                 if (!this.exp?.file.file || message.message.file !== this.exp?.file?.file) return
                 // avoid duplicates
-                if (this.all.some(
+                if (this.pending.some(
                     item => (
                         // same code
                         item.code === message.message.code
@@ -49,7 +50,7 @@ export class AlertsManager {
                     )
                 )) return
                 // store alert
-                this.all.push(message.message);
+                this.pending.push(message.message);
             }
         )
     }
@@ -62,8 +63,6 @@ export class AlertsManager {
         if (!this.unlisten) {
             // start listening (also indicates busy)
             this.unlisten = this.listen()
-            // clear alerts
-            this.all.length = 0
             // compile experiments then mark done
             this.compile().then(
                 () => {
@@ -83,11 +82,15 @@ export class AlertsManager {
      * Dry run compiling scripts to generate alerts
      */
     async compile() {
+        // start a fresh list for this pass
+        this.pending = []
         // write scripts
         await this.exp.writeScript("PsychoPy", true).catch(err => {})
         await this.exp.writeScript("PsychoJS", true).catch(err => {})
         // await a ping to make sure any pending messages have arrived
         await python.liaison.ping(this.exp.useVersion).catch(err => {})
+        // apply any alerts
+        this.all = this.pending
         // if another request came in while doing this, do it again
         if (this.queue) {
             this.queue = false
